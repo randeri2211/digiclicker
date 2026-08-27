@@ -1,0 +1,74 @@
+:root {
+  --bg: #0a0e14;
+  --panel: #10161d;
+  --panel-2: #0d1319;
+  --panel-border: rgba(45, 212, 191, 0.22);
+  --panel-border-strong: rgba(45, 212, 191, 0.45);
+  --accent: #22d3ee;
+  --accent-soft: rgba(34, 211, 238, 0.12);
+  --pos: #39ff88;
+  --pos-soft: rgba(57, 255, 136, 0.12);
+  --warn: #ffb020;
+  --danger: #ff3b5c;
+  --text-h: #e8fbff;
+  --text: #8fa8ad;
+  --text-dim: #4d6166;
+
+  --mono: 'Share Tech Mono', ui-monospace, Consolas, monospace;
+  --head: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+}
+
+a {
+  color: var(--accent);
+}
+a:hover {
+  color: #7fe8f7;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.screen {
+  position: relative;
+  min-height: 100vh;
+  /* Rapid clicking (the core clicker-game interaction) otherwise triggers
+     the browser's native text/drag selection, highlighting whatever the
+     cursor passes over in blue - this isn't a real text-selection surface. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background:
+    radial-gradient(ellipse 900px 500px at 50% -10%, rgba(34, 211, 238, 0.07), transparent 60%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(34, 211, 238, 0.035) 0px,
+      rgba(34, 211, 238, 0.035) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(34, 211, 238, 0.035) 0px,
+      rgba(34, 211, 238, 0.035) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    var(--bg);
+  display: flex;
+  flex-direction: column;
+}
