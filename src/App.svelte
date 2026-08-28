@@ -6,6 +6,7 @@
   import MainMenu from './lib/components/MainMenu.svelte';
   import SettingsScreen from './lib/components/SettingsScreen.svelte';
   import EvolutionScreen from './lib/components/evolution/EvolutionScreen.svelte';
+  import DigimonHubScreen from './lib/components/DigimonHubScreen.svelte';
   import {
     startCombatTickLoop,
     stopCombatTickLoop,
@@ -26,6 +27,7 @@
   let screen: 'main-menu' | 'game' = $state('main-menu');
   let settingsOpen = $state(false);
   let evolutionOpen = $state(false);
+  let hubOpen = $state(false);
 
   $effect(() => {
     const urls = PRELOAD_SPECIES_IDS.map(getSpriteUrl).filter((url): url is string => url !== null);
@@ -69,7 +71,11 @@
   {:else if screen === 'main-menu'}
     <MainMenu onEnterGame={enterGame} />
   {:else}
-    <TopBar onOpenSettings={() => (settingsOpen = true)} onOpenEvolution={() => (evolutionOpen = true)} />
+    <TopBar
+      onOpenSettings={() => (settingsOpen = true)}
+      onOpenEvolution={() => (evolutionOpen = true)}
+      onOpenHub={() => (hubOpen = true)}
+    />
     <div class="main">
       <CombatPanel />
       <Sidebar onOpenEvolution={() => (evolutionOpen = true)} />
@@ -82,6 +88,10 @@
 
   {#if evolutionOpen}
     <EvolutionScreen onClose={() => (evolutionOpen = false)} />
+  {/if}
+
+  {#if hubOpen}
+    <DigimonHubScreen onClose={() => (hubOpen = false)} />
   {/if}
 </div>
 

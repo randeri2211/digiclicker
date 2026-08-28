@@ -6,12 +6,14 @@
     /** Digivolution-eligibility indicator. */
     ready?: boolean;
     isActive?: boolean;
+    /** Only fired for filled slots - empty/locked slots have nothing to act on. */
+    onClick?: (event: MouseEvent) => void;
   }
 
-  const { variant, spriteUrl = null, level, ready = false, isActive = false }: Props = $props();
+  const { variant, spriteUrl = null, level, ready = false, isActive = false, onClick }: Props = $props();
 </script>
 
-<div class="slot" class:active-slot={isActive} class:empty={variant === 'empty'} class:locked={variant === 'locked'}>
+{#snippet slotContent()}
   {#if variant === 'filled'}
     {#if spriteUrl}
       <img src={spriteUrl} alt="" />
@@ -30,7 +32,33 @@
       <path d="M8 11V7a4 4 0 018 0v4" stroke="currentColor" stroke-width="1.8" />
     </svg>
   {/if}
-</div>
+{/snippet}
+
+{#if variant === 'filled' && onClick}
+  <div
+    class="slot clickable"
+    class:active-slot={isActive}
+    onclick={onClick}
+    onkeydown={(e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      e.currentTarget.click();
+    }}
+    role="button"
+    tabindex="0"
+  >
+    {@render slotContent()}
+  </div>
+{:else}
+  <div
+    class="slot"
+    class:active-slot={isActive}
+    class:empty={variant === 'empty'}
+    class:locked={variant === 'locked'}
+  >
+    {@render slotContent()}
+  </div>
+{/if}
 
 <style>
   .slot {
@@ -45,6 +73,12 @@
   }
   .slot.active-slot {
     border-color: var(--panel-border-strong);
+  }
+  .slot.clickable {
+    cursor: pointer;
+  }
+  .slot.clickable:hover {
+    border-color: var(--accent);
   }
   .slot img {
     width: 78%;

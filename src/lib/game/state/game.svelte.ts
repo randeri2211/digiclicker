@@ -2,7 +2,7 @@
 // than reaching into individual state modules directly.
 export { currency } from './currency.svelte';
 export { team } from './team.svelte';
-export { combat, handleClick } from './combat.svelte';
+export { combat, handleClick, debugSpawn, applyDebugSpawn } from './combat.svelte';
 export { startCombatTickLoop, stopCombatTickLoop } from '../combat/tickLoop';
 export { computeActiveTeamDps, computeMemberDps } from '../combat/damage';
 export {
@@ -26,3 +26,6 @@ export {
   dedigivolve,
 } from '../evolution/digivolve';
 export type { DigivolutionOption } from '../evolution/digivolve';
+export { moveMember, hasRoomIn } from '../team/teamActions';
+export type { TeamBucket } from '../team/teamActions';
+export { getTeamSlotMenuItems } from '../team/teamMenu';

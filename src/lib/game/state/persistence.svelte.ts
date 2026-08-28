@@ -7,6 +7,7 @@ import type { SaveSlot, SaveSlotData } from './saveData';
 import type { DigimonInstance, TeamState } from '../types';
 import { getSpecies } from '../images';
 import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
+import { AUTOSAVE_INTERVAL_MS } from '../constants';
 
 export const activeSlot: { id: string | null } = $state({ id: null });
 
@@ -38,6 +39,7 @@ function normalizeTeam(loadedTeam: TeamState): TeamState {
     ...loadedTeam,
     activeMembers: loadedTeam.activeMembers.map(normalizeInstance),
     trainingMembers: loadedTeam.trainingMembers.map(normalizeInstance),
+    reserveMembers: (loadedTeam.reserveMembers ?? []).map(normalizeInstance),
   };
 }
 
@@ -136,7 +138,6 @@ export async function importSlotFromFile(file: File): Promise<SaveSlot | null> {
 
 export { listSlots };
 
-const AUTOSAVE_INTERVAL_MS = 15000;
 let autosaveIntervalId: ReturnType<typeof setInterval> | null = null;
 
 function onVisibilityChange() {

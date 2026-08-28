@@ -1,11 +1,21 @@
-import type { CombatState } from '../types';
+import type { CombatState, Stage } from '../types';
 import { team } from './team.svelte';
 import { currency } from './currency.svelte';
 import { computeClickDamage, computeAttacksPerSecond, computeTeamDamagePerHit } from '../combat/damage';
-import { pickNextWildSpawn, computeKillXp, computeKillBits } from '../combat/spawn';
+import { pickNextWildSpawn, spawnDebugWild, computeKillXp, computeKillBits } from '../combat/spawn';
 import { awardKillXp } from '../combat/xp';
 
 export const combat: CombatState = $state({ wild: null, damagePopup: null });
+
+// DEBUG: while enabled, every spawn (including the ones tick() picks after
+// a kill) uses this stage+level instead of the normal WILD_SPAWN_POOL
+// progression - set-and-forget, no per-spawn click needed. See
+// DebugSpawnPanel.svelte.
+export const debugSpawn: { enabled: boolean; stage: Stage; level: number } = $state({
+  enabled: false,
+  stage: 'Rookie',
+  level: 1,
+});
 
 let popupCounter = 0;
 
@@ -40,10 +50,20 @@ export function handleClick() {
   }
 }
 
+// DEBUG: immediately replaces the current wild with one matching the live
+// debugSpawn settings - called whenever the panel's enabled/stage/level
+// changes, and by tick() below whenever a new spawn is due.
+export function applyDebugSpawn(now: number = Date.now()): void {
+  if (!debugSpawn.enabled) return;
+  const wild = spawnDebugWild(now, debugSpawn.stage, debugSpawn.level);
+  if (wild) combat.wild = wild;
+}
+
 export function tick(now: number) {
   const wild = combat.wild;
   if (!wild) {
-    combat.wild = pickNextWildSpawn(now);
+    combat.wild = debugSpawn.enabled ? spawnDebugWild(now, debugSpawn.stage, debugSpawn.level) : null;
+    if (!combat.wild) combat.wild = pickNextWildSpawn(now);
     return;
   }
 

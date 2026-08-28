@@ -20,6 +20,11 @@ Running log of gameplay decisions. Split into **Confirmed** (locked in) and
 ### Team structure
 Two independently expandable sets of team slots:
 - **Active slots** — Digimon that deal damage in the click/combat loop.
+  Base (starting) active capacity is **6** slots
+  (`STARTER_ACTIVE_CAPACITY` in `src/lib/game/constants.ts`), all
+  unlocked from the start of a new game - only 1 is filled by the
+  starter Digimon, the rest are empty until roster growth (taming) is
+  implemented.
 - **Training slots** — Digimon that don't fight, but passively receive a
   share of combat XP.
 
@@ -30,6 +35,31 @@ expanding to 10 slots still gives every member 35 XP, not 17.5 XP each.
 Net effect: growing team size is a pure multiplier on total XP earned per
 kill, which makes slot expansion (via currency/progression) a meaningful,
 non-wash upgrade — more slots = strictly more total training throughput.
+
+### Team slot menu & Digimon Hub
+- Clicking a filled Active or Training team slot opens a context menu
+  (positioned next to the cursor, closes on outside click/Escape) with
+  per-slot actions: **Open Stats** (a small table of Attack/Defense/
+  Speed/SpecialAttack, Base vs. Digivolution columns), and moving the
+  Digimon between buckets - **Send To Training Team** / **Send To
+  Active Team** (greyed out when the destination is full), and
+  **Remove From Team** (sends it to the Digimon Hub).
+- **Digimon Hub**: a new screen (reachable from the top bar) listing
+  every caught Digimon that isn't on the Active or Training team. A
+  checkbox toggle ("Also show Active/Training Team members") widens
+  the list to include the current teams too, rather than a fixed
+  filter - each card there opens the same bucket-aware context menu.
+- Implementation is deliberately generic rather than one menu per team
+  kind: a single `ContextMenu.svelte` (pure popup, no game logic) plus
+  a single `getTeamSlotMenuItems(instance, bucket, callbacks)` builder
+  (`src/lib/game/team/teamMenu.ts`) that switches on
+  `'active' | 'training' | 'reserve'` - adding a new action later is a
+  one-line change there, not a new component. `TeamState` gained a
+  third, uncapped `reserveMembers` bucket (the Hub's backing store)
+  alongside the existing capacity-limited `activeMembers`/
+  `trainingMembers`; `moveMember(instanceId, toBucket)`
+  (`src/lib/game/team/teamActions.ts`) is the one generic mover between
+  all three buckets.
 
 ### Digivolution UI & automation
 - Digimon level up through normal play; once eligible to digivolve, they're
@@ -63,6 +93,14 @@ non-wash upgrade — more slots = strictly more total training throughput.
   own personal history, and not further back than one step at a time.
 - De-digivolving to a lower form grants Digivolution stat bonuses, added on
   top of that lower form's base stats (not replacing them).
+- The Digimon's **level right before the transition** (digivolve or
+  de-digivolve resets it to 0 afterward) also feeds into that
+  transition's Digivolution stat bonus, on top of the usual stage/type
+  amount - a small `LEVEL_IMPACT_SCALE` (0.1, placeholder) added per
+  level, scaled by the same dominant/off factor as everything else so
+  attack-type Digimon still gain more Attack than Defense/Speed/
+  SpecialAttack from the level they're cashing in
+  (`src/lib/game/combat/stats.ts`).
 - Because digivolution stats are form-independent and only accumulate, they
   persist through every future form change. This makes repeated
   digivolve/de-digivolve cycling a permanent, grindable progression layer
@@ -72,17 +110,39 @@ non-wash upgrade — more slots = strictly more total training throughput.
   the Digimon's level back to 1, so reaching the next digivolution threshold
   again means re-grinding combat XP from scratch either way — this is the
   natural cost that bounds the digivolve/de-digivolve/re-digivolve loop, no
-  separate currency needed. De-digivolving still has no *level requirement
-  to trigger it* (you can de-digivolve at any level, unlike digivolving up
-  which requires hitting the stage's level threshold) — the reset happens
-  as a result of the transition, not as a precondition for starting one.
-- **Open question:** because de-digivolving is unrestricted, a player could
-  digivolve up the moment they hit the threshold and immediately
-  de-digivolve right back down, re-grinding the same cheap low-level
-  threshold repeatedly to farm digivolution-stat bonuses fast. A proposed
-  mitigation is a cooldown between digivolving and being allowed to
-  de-digivolve again (i.e. a minimum time spent in the new form before it
-  can be reverted) — not yet decided.
+  separate currency needed. The reset happens as a result of the
+  transition, not as a precondition for starting one.
+- **Level-gate baseline (confirmed):** every digivolve-up/de-digivolve
+  transition requires a minimum level first, keyed off the *target's*
+  stage (see `DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE` /
+  `DEDIGIVOLVE_MIN_LEVEL` in `src/lib/game/constants.ts`):
+  - De-digivolve (any lower stage): **Lv 4**
+  - Digivolve to Champion: **Lv 16**
+  - Digivolve to Ultimate: **Lv 36**
+  - Digivolve to Mega: **Lv 56**
+  - Digivolve to In-Training/Rookie: no requirement yet (not specified,
+    defaults to open).
+  This supersedes the earlier "de-digivolving has no level requirement"
+  decision - de-digivolving now needs Lv 4, which also softens (but
+  doesn't fully close) the farm-by-cycling concern below.
+- **Open question:** because de-digivolving only needs Lv 4 (much lower
+  than any digivolve-up threshold), a player could still digivolve up the
+  moment they hit a threshold and de-digivolve back down almost
+  immediately, re-grinding a cheap low-level range repeatedly to farm
+  digivolution-stat bonuses fast. A proposed mitigation is a cooldown
+  between digivolving and being allowed to de-digivolve again - not yet
+  decided.
+- **Playable stage scope (confirmed, temporary):** only In-Training,
+  Rookie, Champion, Ultimate, and Mega stage Digimon are searched/offered
+  as digivolve or de-digivolve options right now
+  (`IN_GAME_STAGES` in `src/lib/game/constants.ts`). Fresh, Armor,
+  Hybrid, Ultra, Burst Mode, and Unknown-stage species stay fully present
+  in the scraped data (`src/lib/data/digimon-evolution.json`) - nothing
+  is deleted - they're just excluded from the live evolution-option
+  search until support for them (item-triggered Armor evolution,
+  Hybrid's separate mechanic, DNA/Jogress multi-source fusion, etc.) is
+  actually built. Re-enabling a stage later is a one-line change to
+  `IN_GAME_STAGES`, no data regeneration needed.
 
 ### Combat: attack ticks and damage
 - Combat runs on **discrete attack ticks**, not a smooth per-second HP
@@ -96,10 +156,10 @@ non-wash upgrade — more slots = strictly more total training throughput.
   attack progress between polls of the tick loop isn't dropped - it
   carries over (`WildSpawnState.attackProgress`) so the long-run rate
   stays accurate regardless of polling cadence.
-- **Speed drives attack rate**: `attacksPerSecond = 1 + teamSpeedSum *
-  SPEED_TO_APS_SCALE` (placeholder constants, see
-  `src/lib/game/combat/damage.ts`). This is a shared, team-wide rate -
-  one clock for the whole active team, not a rate per Digimon.
+- **Speed drives attack rate**: `attacksPerSecond = BASE_ATTACKS_PER_SECOND
+  + teamSpeedSum * SPEED_TO_APS_SCALE` (placeholder constants, see
+  `src/lib/game/constants.ts`). This is a shared, team-wide rate - one
+  clock for the whole active team, not a rate per Digimon.
 - **Attack + SpecialAttack drive damage/hit**: each active member
   contributes `attack + specialAttack` (from baseStats + level *
   growthPerLevel + digivolutionStats) to the team's flat per-hit
@@ -114,9 +174,16 @@ non-wash upgrade — more slots = strictly more total training throughput.
   the Active Team section.
 - **Tuning note:** per-hit damage currently reads as too high (base
   stat/growth/digivolution-bonus scale constants in
-  `src/lib/game/combat/stats.ts` - `BASE_STAT_SCALE`,
+  `src/lib/game/constants.ts` - `BASE_STAT_SCALE`,
   `GROWTH_PER_LEVEL_SCALE`, `DIGIVOLUTION_BONUS_SCALE` - are still
   early placeholders). Not yet retuned - open balance work.
+- **All tunable numbers now live in one file**:
+  `src/lib/game/constants.ts` centralizes every placeholder/balance
+  constant across the game (team size, level requirements, in-game
+  stage scope, combat/attack-rate constants, stat-roll scales, level
+  curve, wild spawn/reward formulas, autosave interval), grouped by
+  relevance - edit there to rebalance instead of hunting through
+  individual combat/evolution files.
 
 ### Idle production
 - Active-slot auto-attack (see Core click loop) *is* the idle/offline

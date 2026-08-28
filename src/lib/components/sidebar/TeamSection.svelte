@@ -10,9 +10,10 @@
     capacity: number;
     maxCapacity: number;
     members: DigimonInstance[];
+    onSlotClick?: (member: DigimonInstance, event: MouseEvent) => void;
   }
 
-  const { kind, capacity, maxCapacity, members }: Props = $props();
+  const { kind, capacity, maxCapacity, members, onSlotClick }: Props = $props();
 
   const emptyCount = $derived(Math.max(0, capacity - members.length));
   const lockedCount = $derived(Math.max(0, maxCapacity - capacity));
@@ -33,6 +34,7 @@
         spriteUrl={getSpriteUrl(member.speciesId)}
         level={levelForXp(member.xp)}
         ready={isReadyToDigivolve(member)}
+        onClick={onSlotClick && ((event) => onSlotClick(member, event))}
       />
     {/each}
     {#each Array.from({ length: emptyCount }) as _, i (i)}

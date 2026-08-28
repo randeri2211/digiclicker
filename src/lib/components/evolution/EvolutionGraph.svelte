@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { DigimonInstance, StatBlock } from '../../game/types';
+  import type { DigimonInstance, StatBlock, StatRangeBlock } from '../../game/types';
   import { getSpecies, getSpriteUrl } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import {
@@ -12,6 +12,19 @@
 
   function formatStatBlock(block: StatBlock, signed: boolean): string {
     const fmt = (n: number) => (signed ? `${n >= 0 ? '+' : ''}${n}` : `${n}`);
+    return `ATK ${fmt(block.attack)} · DEF ${fmt(block.defense)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
+  }
+
+  // Ranges are shown instead of a rolled number - the actual roll only
+  // happens at the moment of commit (see digivolve.ts), so there's nothing
+  // here for the player to preview-reroll by reopening the screen.
+  function formatStatRange(block: StatRangeBlock, signed: boolean): string {
+    const fmt = ([min, max]: [number, number]) => {
+      const lo = Math.round(min);
+      const hi = Math.round(max);
+      const sign = signed && lo >= 0 ? '+' : '';
+      return lo === hi ? `${sign}${lo}` : `${sign}${lo}–${hi}`;
+    };
     return `ATK ${fmt(block.attack)} · DEF ${fmt(block.defense)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
   }
 
@@ -37,11 +50,11 @@
   const currentSpecies = $derived(getSpecies(instance.speciesId));
 
   function commitDigivolve(option: DigivolutionOption) {
-    digivolve(instance, option.species.id, option.digivolutionStatsBonus, option.growthPerLevelPreview);
+    digivolve(instance, option.species.id);
   }
 
   function commitDedigivolve(option: DigivolutionOption) {
-    dedigivolve(instance, option.species.id, option.digivolutionStatsBonus, option.growthPerLevelPreview);
+    dedigivolve(instance, option.species.id);
   }
 </script>
 
@@ -64,9 +77,15 @@
     </div>
     <div class="option-name">{option.species.name}</div>
     <div class="option-stage">{option.species.stage} · {option.species.statType}</div>
-    <div class="option-bonus">{formatStatBlock(option.digivolutionStatsBonus, true)}</div>
-    <div class="option-growth">New growth/lvl: {formatStatBlock(option.growthPerLevelPreview, false)}</div>
-    <div class="option-req">{option.requirement ? 'Requirements apply' : 'No requirements'}</div>
+    <div class="option-bonus">{formatStatRange(option.digivolutionStatsBonusRange, true)}</div>
+    <div class="option-growth">Growth/lvl: {formatStatRange(option.growthPerLevelRange, false)}</div>
+    <div class="option-req">
+      {#if option.requirement?.minLevel !== undefined}
+        Requires Lv {option.requirement.minLevel}
+      {:else}
+        No requirements
+      {/if}
+    </div>
   </div>
 {/snippet}
 

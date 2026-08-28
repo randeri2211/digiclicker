@@ -1,21 +1,24 @@
 import type { DigimonInstance } from '../types';
+import { getSpecies } from '../images';
+import { levelForXp } from '../combat/levelCurve';
+import { DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE } from '../constants';
 
-// TODO: real digivolution requirements (level thresholds, items, etc.) -
-// no requirement data source exists yet. getRequirement always returns
-// null, and isRequirementMet treats null as "no requirement" and always
-// passes - a deliberate auto-allow fallback for testing until real
-// requirement data exists.
 export interface DigivolutionRequirement {
   minLevel?: number;
 }
 
-export function getRequirement(_fromSpeciesId: string, _toSpeciesId: string): DigivolutionRequirement | null {
-  return null;
+// Digivolve-up requirement is purely stage-based right now (see
+// DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE in constants.ts) - a target stage
+// with no entry has no level requirement. De-digivolve's flat
+// DEDIGIVOLVE_MIN_LEVEL is applied separately in digivolve.ts, since it
+// doesn't depend on the target's stage the way digivolving up does.
+export function getRequirement(_fromSpeciesId: string, toSpeciesId: string): DigivolutionRequirement | null {
+  const targetStage = getSpecies(toSpeciesId)?.stage;
+  const minLevel = targetStage ? DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE[targetStage] : undefined;
+  return minLevel !== undefined ? { minLevel } : null;
 }
 
-export function isRequirementMet(_instance: DigimonInstance, _requirement: DigivolutionRequirement | null): boolean {
-  // Always passes for now - see the TODO above. Once getRequirement
-  // returns real data, this should actually evaluate its fields (e.g.
-  // levelForXp(instance.xp) >= requirement.minLevel).
-  return true;
+export function isRequirementMet(instance: DigimonInstance, requirement: DigivolutionRequirement | null): boolean {
+  if (requirement?.minLevel === undefined) return true;
+  return levelForXp(instance.xp) >= requirement.minLevel;
 }

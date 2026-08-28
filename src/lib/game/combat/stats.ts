@@ -1,28 +1,16 @@
-import type { Stage, StatBlock, StatType } from '../types';
+import type { Stage, StatBlock, StatRangeBlock, StatType } from '../types';
+import {
+  STAGE_POWER,
+  STAT_DOMINANT_FACTOR,
+  STAT_OFF_FACTOR,
+  STAT_RANGE_SPREAD_FRACTION,
+  BASE_STAT_SCALE,
+  GROWTH_PER_LEVEL_SCALE,
+  DIGIVOLUTION_BONUS_SCALE,
+  LEVEL_IMPACT_SCALE,
+} from '../constants';
 
-// PLACEHOLDER combat formulas - not final game balance.
-
-const STAGE_POWER: Record<Stage, number> = {
-  Fresh: 1,
-  'In-Training': 2,
-  Rookie: 3,
-  Armor: 4,
-  Champion: 4,
-  Hybrid: 5,
-  Ultimate: 5,
-  Mega: 6,
-  Ultra: 7,
-  'Burst Mode': 7,
-  Unknown: 1,
-};
-
-const DOMINANT_FACTOR = 1.5;
-const OFF_FACTOR = 0.6;
-const RANGE_SPREAD_FRACTION = 0.2;
-
-const BASE_STAT_SCALE = 2;
-const GROWTH_PER_LEVEL_SCALE = 0.5;
-const DIGIVOLUTION_BONUS_SCALE = 5;
+// Formulas here are placeholders - tune the actual numbers in constants.ts.
 
 const STAT_KEYS = ['attack', 'defense', 'speed', 'specialAttack'] as const;
 
@@ -41,12 +29,13 @@ function computeStatRange(
   stage: Stage,
   statType: StatType,
   stat: (typeof STAT_KEYS)[number],
-  scale: number
+  scale: number,
+  preTransitionLevel: number
 ): [min: number, max: number] {
   const power = STAGE_POWER[stage] ?? 1;
-  const factor = statMatchesType(stat, statType) ? DOMINANT_FACTOR : OFF_FACTOR;
-  const mid = power * scale * factor;
-  const spread = mid * RANGE_SPREAD_FRACTION;
+  const factor = statMatchesType(stat, statType) ? STAT_DOMINANT_FACTOR : STAT_OFF_FACTOR;
+  const mid = (power * scale + preTransitionLevel * LEVEL_IMPACT_SCALE) * factor;
+  const spread = mid * STAT_RANGE_SPREAD_FRACTION;
   return [mid - spread, mid + spread];
 }
 
@@ -54,12 +43,30 @@ function rollInRange([min, max]: [number, number]): number {
   return Math.round(min + Math.random() * (max - min));
 }
 
-function rollStatBlock(stage: Stage, statType: StatType, scale: number): StatBlock {
+// Deterministic - same (stage, statType, scale, preTransitionLevel) always
+// produces the same ranges, no Math.random() involved. Safe to expose as a
+// preview: reopening/re-rendering it can never reveal or change what an
+// actual roll (rollStatBlock below) would produce.
+function computeStatBlockRange(
+  stage: Stage,
+  statType: StatType,
+  scale: number,
+  preTransitionLevel = 0
+): StatRangeBlock {
   return {
-    attack: rollInRange(computeStatRange(stage, statType, 'attack', scale)),
-    defense: rollInRange(computeStatRange(stage, statType, 'defense', scale)),
-    speed: rollInRange(computeStatRange(stage, statType, 'speed', scale)),
-    specialAttack: rollInRange(computeStatRange(stage, statType, 'specialAttack', scale)),
+    attack: computeStatRange(stage, statType, 'attack', scale, preTransitionLevel),
+    defense: computeStatRange(stage, statType, 'defense', scale, preTransitionLevel),
+    speed: computeStatRange(stage, statType, 'speed', scale, preTransitionLevel),
+    specialAttack: computeStatRange(stage, statType, 'specialAttack', scale, preTransitionLevel),
+  };
+}
+
+function rollStatBlock(stage: Stage, statType: StatType, scale: number, preTransitionLevel = 0): StatBlock {
+  return {
+    attack: rollInRange(computeStatRange(stage, statType, 'attack', scale, preTransitionLevel)),
+    defense: rollInRange(computeStatRange(stage, statType, 'defense', scale, preTransitionLevel)),
+    speed: rollInRange(computeStatRange(stage, statType, 'speed', scale, preTransitionLevel)),
+    specialAttack: rollInRange(computeStatRange(stage, statType, 'specialAttack', scale, preTransitionLevel)),
   };
 }
 
@@ -71,8 +78,24 @@ export function rollGrowthPerLevel(stage: Stage, statType: StatType): StatBlock 
   return rollStatBlock(stage, statType, GROWTH_PER_LEVEL_SCALE);
 }
 
-export function rollDigivolutionBonus(stage: Stage, statType: StatType): StatBlock {
-  return rollStatBlock(stage, statType, DIGIVOLUTION_BONUS_SCALE);
+export function computeGrowthPerLevelRange(stage: Stage, statType: StatType): StatRangeBlock {
+  return computeStatBlockRange(stage, statType, GROWTH_PER_LEVEL_SCALE);
+}
+
+/** preTransitionLevel is the Digimon's level right before this
+ * digivolve/de-digivolve (the transition resets it to 0 afterward) - it
+ * feeds a small bonus into the stats gained, on top of the usual
+ * stage/type-driven amount, scaled by the same dominant/off factor. */
+export function rollDigivolutionBonus(stage: Stage, statType: StatType, preTransitionLevel: number): StatBlock {
+  return rollStatBlock(stage, statType, DIGIVOLUTION_BONUS_SCALE, preTransitionLevel);
+}
+
+export function computeDigivolutionBonusRange(
+  stage: Stage,
+  statType: StatType,
+  preTransitionLevel: number
+): StatRangeBlock {
+  return computeStatBlockRange(stage, statType, DIGIVOLUTION_BONUS_SCALE, preTransitionLevel);
 }
 
 export function zeroStatBlock(): StatBlock {

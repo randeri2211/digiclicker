@@ -20,6 +20,10 @@ export interface StatBlock {
   specialAttack: number;
 }
 
+/** Same shape as StatBlock, but each stat is a [min, max] range rather than
+ * a rolled value - used to preview a roll without actually rolling it. */
+export type StatRangeBlock = Record<keyof StatBlock, [number, number]>;
+
 export interface DigimonSpecies {
   id: string;
   name: string;
@@ -67,6 +71,9 @@ export interface TeamState {
   trainingCapacity: number;
   trainingMaxCapacity: number;
   trainingMembers: DigimonInstance[];
+  /** The "Digimon Hub" - caught Digimon that aren't on either team. No
+   * capacity limit, unlike activeMembers/trainingMembers. */
+  reserveMembers: DigimonInstance[];
 }
 
 export interface CurrencyState {

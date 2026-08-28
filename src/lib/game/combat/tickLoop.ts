@@ -1,12 +1,11 @@
 import { tick } from '../state/combat.svelte';
-
-const TICK_INTERVAL_MS = 250;
+import { COMBAT_TICK_INTERVAL_MS } from '../constants';
 
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 export function startCombatTickLoop() {
   if (intervalId !== null) return;
-  intervalId = setInterval(() => tick(Date.now()), TICK_INTERVAL_MS);
+  intervalId = setInterval(() => tick(Date.now()), COMBAT_TICK_INTERVAL_MS);
 }
 
 export function stopCombatTickLoop() {

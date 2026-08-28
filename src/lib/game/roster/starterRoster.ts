@@ -1,6 +1,12 @@
 import type { DigimonInstance, TeamState } from '../types';
 import { getSpecies } from '../images';
 import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
+import {
+  STARTER_ACTIVE_CAPACITY,
+  STARTER_ACTIVE_MAX_CAPACITY,
+  STARTER_TRAINING_CAPACITY,
+  STARTER_TRAINING_MAX_CAPACITY,
+} from '../constants';
 
 // PLACEHOLDER: curated species pool confirmed to have resolved sprites.
 // Mirrors the approved mockup's own example roster.
@@ -42,11 +48,12 @@ function makeInstance(speciesId: string, xp: number): DigimonInstance {
 
 export function createStarterTeam(): TeamState {
   return {
-    activeCapacity: 1,
-    activeMaxCapacity: 6,
+    activeCapacity: STARTER_ACTIVE_CAPACITY,
+    activeMaxCapacity: STARTER_ACTIVE_MAX_CAPACITY,
     activeMembers: [makeInstance(STARTER_ACTIVE_SPECIES, 0)],
-    trainingCapacity: 1,
-    trainingMaxCapacity: 6,
+    trainingCapacity: STARTER_TRAINING_CAPACITY,
+    trainingMaxCapacity: STARTER_TRAINING_MAX_CAPACITY,
     trainingMembers: [makeInstance(STARTER_TRAINING_SPECIES, 0)],
+    reserveMembers: [],
   };
 }

@@ -1,11 +1,7 @@
 import type { DigimonInstance, StatBlock } from '../types';
 import { levelForXp } from './levelCurve';
 import { damageRelevantSum } from './stats';
-
-// PLACEHOLDER combat formulas - not final game balance.
-const CLICK_DAMAGE = 8;
-const BASE_ATTACKS_PER_SECOND = 1;
-const SPEED_TO_APS_SCALE = 0.02;
+import { CLICK_DAMAGE, BASE_ATTACKS_PER_SECOND, SPEED_TO_APS_SCALE } from '../constants';
 
 export function computeClickDamage(): number {
   return CLICK_DAMAGE;
