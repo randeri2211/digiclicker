@@ -10,6 +10,7 @@ speciesId-keyed lookup with precomputed evolvesTo/evolvesFrom/lateralTo edges.
 viz:position (Gephi layout jitter) is discarded entirely - it carries no
 gameplay signal.
 """
+import collections
 import hashlib
 import json
 import re
@@ -18,9 +19,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from evolution_junk_labels import JUNK_LABELS
-from evolution_type_mapping import TYPE_TO_STAT
+from evolution_type_mapping import TYPE_TO_STAT_AFFINITY
+from egg_type_mapping import TYPE_TO_EGG_TYPE
 
-STAT_TYPES = ("Attack", "Defense", "Speed", "SpecialAttack")
+STAT_AFFINITIES = ("Attack", "Defense", "Speed", "SpecialAttack")
+EGG_TYPES = (
+    "Dragon", "Beast", "Dinosaur", "Bird", "Aquatic", "Insect",
+    "Plant", "Machine", "Mineral", "Evil", "Holy",
+)
 
 ROOT = Path(__file__).resolve().parent
 GEXF_PATH = ROOT / "data" / "evolution_graph.gexf"
@@ -114,7 +120,11 @@ def find_sprite(label):
     if not folder.is_dir():
         return None
 
-    files = sorted(folder.glob("*.png"))
+    # Importer.py's category scrape happens to be all .png, but
+    # InfoboxImageImporter.py's per-page fallback downloads whatever format
+    # the wiki actually serves (commonly .jpg) - glob every format either
+    # importer can produce, not just .png.
+    files = sorted(f for ext in ("*.png", "*.jpg", "*.jpeg", "*.gif") for f in folder.glob(ext))
     if not files:
         return None
 
@@ -160,18 +170,28 @@ def sprite_url(label):
     return path.relative_to(ROOT / "public").as_posix()
 
 
-def resolve_stat_type(raw_type, slug):
-    """Curated lookup first; anything not in the table (long-tail raw values,
-    or the wiki's own "no signal" markers like Unknown/None/Lesser) falls
-    back to a deterministic hash of the species slug - hashlib, not the
+def _resolve_curated(mapping, fallback_values, raw_type, slug, salt):
+    """Shared curated-lookup-then-deterministic-hash-fallback pattern, used
+    for both stat affinity and egg type resolution. hashlib, not the
     built-in hash(), which is randomized per-process and would silently
-    reshuffle fallback assignments on every rerun."""
-    mapped = TYPE_TO_STAT.get(raw_type)
+    reshuffle fallback assignments on every rerun. salt keeps the two
+    fallbacks independent - without it, a species falling back for both
+    stat affinity and egg type would always land on the matching index in
+    both value lists."""
+    mapped = mapping.get(raw_type)
     if mapped:
         return mapped, "mapped"
-    digest = hashlib.md5(slug.encode("utf-8")).hexdigest()
-    index = int(digest, 16) % len(STAT_TYPES)
-    return STAT_TYPES[index], "fallback"
+    digest = hashlib.md5(f"{salt}:{slug}".encode("utf-8")).hexdigest()
+    index = int(digest, 16) % len(fallback_values)
+    return fallback_values[index], "fallback"
+
+
+def resolve_stat_affinity(raw_type, slug):
+    return _resolve_curated(TYPE_TO_STAT_AFFINITY, STAT_AFFINITIES, raw_type, slug, "stat-affinity")
+
+
+def resolve_egg_type(raw_type, slug):
+    return _resolve_curated(TYPE_TO_EGG_TYPE, EGG_TYPES, raw_type, slug, "egg-type")
 
 
 def build_species(nodes, edges):
@@ -189,7 +209,8 @@ def build_species(nodes, edges):
     species = {}
     for node_id, node in nodes.items():
         slug = id_to_slug[node_id]
-        stat_type, stat_type_source = resolve_stat_type(node["type"], slug)
+        stat_affinity, stat_affinity_source = resolve_stat_affinity(node["type"], slug)
+        egg_type, egg_type_source = resolve_egg_type(node["type"], slug)
         species[slug] = {
             "id": slug,
             "name": node["label"],
@@ -197,8 +218,10 @@ def build_species(nodes, edges):
             "stageOrder": node["stageOrder"],
             "type": node["type"],
             "attribute": node["attribute"],
-            "statType": stat_type,
-            "statTypeSource": stat_type_source,
+            "statAffinity": stat_affinity,
+            "statAffinitySource": stat_affinity_source,
+            "eggType": egg_type,
+            "eggTypeSource": egg_type_source,
             "evolvesTo": [],
             "evolvesFrom": [],
             "lateralTo": [],
@@ -210,6 +233,10 @@ def build_species(nodes, edges):
             continue
         source_slug = id_to_slug[source]
         target_slug = id_to_slug[target]
+        if source_slug == target_slug:
+            continue  # self-loop (e.g. Fukamon -> Fukamon) - a scraping
+            # artifact, not a real relationship; drop at the source so it
+            # can't reappear as a sameStageEvolutions self-loop later.
         if edge_type == "lateral":
             species[source_slug]["lateralTo"].append(target_slug)
         else:
@@ -217,6 +244,162 @@ def build_species(nodes, edges):
             species[target_slug]["evolvesFrom"].append(source_slug)
 
     return species
+
+
+def classify_evolution_skips(species):
+    """For every evolvesTo edge that isn't a normal one-tier-at-a-time step
+    (stageOrder gap of exactly 0 or 1 - stageOrder groups parallel tiers
+    together, e.g. Armor/Champion both = 3), classify what kind of
+    irregular edge it is:
+
+    - "shortcut": the target is ALSO reachable from the same species via a
+      fully legitimate, one-tier-at-a-time chain through its own non-skip
+      children (transitively - never through another skip edge). A
+      legitimate route already exists; this edge is redundant.
+    - "path": no such legitimate chain exists. This skip edge is the only
+      way this species' line reaches that target - removing it would
+      disconnect the target entirely, not just remove a redundant shortcut.
+    - "backward": the target's stageOrder is LOWER than the source's (e.g.
+      DeckerGreymon, Ultimate, evolvesTo Bombmon, Fresh) - not a forward
+      digivolution at all, always invalid regardless of reachability (a
+      legitimate forward-only walk can never land on a lower stage, so
+      there's no meaningful shortcut/path distinction to make here).
+
+    Computed over the full graph (every kept species, every stage) -
+    independent of IN_GAME_STAGES, since this is about the wiki data's own
+    structure, not current gameplay scope. Mutates species in place,
+    adding evolutionSkips only to species that actually have skip edges.
+    Returns a Counter of totals per classification for the summary printout.
+    """
+    # 0 <= gap <= 1, NOT just gap <= 1 - a backward edge (gap < 0) is not a
+    # legitimate step, and must never be treated as one here: this feeds
+    # the reachability walk below, so letting a backward edge through would
+    # silently corrupt shortcut/path classification for OTHER species too
+    # (a "legitimate" route that secretly detours backward through a stage
+    # it shouldn't be able to reach at all).
+    normal_children = {}
+    for sid, s in species.items():
+        normal_children[sid] = [
+            t for t in s["evolvesTo"]
+            if t in species and 0 <= species[t]["stageOrder"] - s["stageOrder"] <= 1
+        ]
+
+    def reachable_via_normal_edges(start_id):
+        seen = set()
+        stack = list(normal_children.get(start_id, []))
+        while stack:
+            node_id = stack.pop()
+            if node_id in seen:
+                continue
+            seen.add(node_id)
+            stack.extend(normal_children.get(node_id, []))
+        return seen
+
+    counts = collections.Counter()
+    for sid, s in species.items():
+        classification = {}
+        legit_reachable = None  # computed lazily, at most once per species
+        for t in s["evolvesTo"]:
+            target = species.get(t)
+            if not target:
+                continue
+            gap = target["stageOrder"] - s["stageOrder"]
+            if gap < 0:
+                classification[t] = "backward"
+            elif gap >= 2:
+                if legit_reachable is None:
+                    legit_reachable = reachable_via_normal_edges(sid)
+                classification[t] = "shortcut" if t in legit_reachable else "path"
+
+        for label in classification.values():
+            counts[label] += 1
+        if classification:
+            s["evolutionSkips"] = classification
+
+    return counts
+
+
+def classify_same_stage_evolutions(species):
+    """For every evolvesTo edge where the source and target share the
+    exact same stage (e.g. Rookie -> Rookie), classify it:
+
+    - "self-loop": target IS the source - a literal scraping artifact
+      (e.g. Fukamon -> Fukamon).
+    - "mode-change": one name starts with the other (e.g. Alphamon ->
+      Alphamon Ouryuken) - an alternate mode/weapon-form of the same
+      base Digimon, not a real evolution.
+    - "mutual": the reverse edge ALSO exists (target evolvesTo lists the
+      source back) - not a fusion at all, a tangled web of forms that
+      all evolve into each other (usually one specific game's own
+      shift-between-forms mechanic, scraped flat alongside everything
+      else). Checked before "fusion" so a genuine multi-source target
+      isn't misread as one just because ONE of its several sources also
+      happens to loop back - see Omnimon below.
+    - "fusion": 2+ OTHER same-stage edges into the same target are ALSO
+      still unclaimed after the self-loop/mode-change/mutual passes -
+      likely a real DNA/Jogress digivolution result. Two-pass on
+      purpose: counting raw len(evolvesFrom) (any stage, including
+      edges that turned out to be a mode-change or mutual pairing)
+      over-counts - e.g. Alphamon Ouryuken has exactly 2 evolvesFrom
+      (Alphamon, Ouryumon), but Alphamon -> Alphamon Ouryuken is really
+      a mode-change, leaving only 1 genuine candidate (Ouryumon), not a
+      real fusion. Still frequently over-inclusive even after this fix:
+      a real fusion target often has its canonical parents (e.g.
+      Omnimon's WarGreymon + MetalGarurumon) mixed in the same
+      evolvesFrom list with other games' own, unrelated fusion rosters
+      for the same target name - distinguishing those needs per-
+      citation wikitext analysis this pass doesn't attempt (same open
+      "pick one canonical continuity" problem noted elsewhere in this
+      file/GAMEPLAY_DESIGN.md).
+    - "other": none of the above (including a same-stage edge that's
+      the only unclaimed source into its target - not enough signal to
+      call it a fusion) - a genuine anomaly worth a manual look.
+
+    Mutates species in place, adding sameStageEvolutions only to species
+    that have at least one same-stage edge. Returns a Counter of totals
+    per classification for the summary printout.
+    """
+    # Pass 1: self-loop/mode-change/mutual are cheap, local, per-edge
+    # checks - resolve those first and collect everything left over as
+    # "candidates" for the fusion count in pass 2.
+    resolved = collections.defaultdict(dict)
+    candidates = []
+    for sid, s in species.items():
+        for t in s["evolvesTo"]:
+            target = species.get(t)
+            if not target or target["stage"] != s["stage"]:
+                continue
+
+            source_name = s["name"].lower()
+            target_name = target["name"].lower()
+            if t == sid:
+                resolved[sid][t] = "self-loop"
+            elif target_name.startswith(source_name) or source_name.startswith(target_name):
+                resolved[sid][t] = "mode-change"
+            elif sid in target["evolvesTo"]:
+                resolved[sid][t] = "mutual"
+            else:
+                candidates.append((sid, t))
+
+    # Pass 2: a candidate is only "fusion" if at least one OTHER
+    # candidate also points at the same target - i.e. 2+ genuinely
+    # unclaimed same-stage sources, not just 2+ evolvesFrom entries
+    # total regardless of what those other entries turned out to be.
+    candidates_by_target = collections.defaultdict(set)
+    for sid, t in candidates:
+        candidates_by_target[t].add(sid)
+
+    counts = collections.Counter()
+    for sid, t in candidates:
+        label = "fusion" if len(candidates_by_target[t]) >= 2 else "other"
+        resolved[sid][t] = label
+
+    for sid, classification in resolved.items():
+        for label in classification.values():
+            counts[label] += 1
+        species[sid]["sameStageEvolutions"] = classification
+
+    return counts
 
 
 def main():
@@ -232,8 +415,21 @@ def main():
     with_sprite = sum(1 for s in species.values() if s["spriteUrl"])
     print(f"Resolved sprites for {with_sprite}/{len(species)} species")
 
-    mapped_count = sum(1 for s in species.values() if s["statTypeSource"] == "mapped")
-    print(f"statType: {mapped_count}/{len(species)} from curated table, {len(species) - mapped_count} via fallback hash")
+    affinity_mapped_count = sum(1 for s in species.values() if s["statAffinitySource"] == "mapped")
+    print(f"statAffinity: {affinity_mapped_count}/{len(species)} from curated table, {len(species) - affinity_mapped_count} via fallback hash")
+
+    egg_mapped_count = sum(1 for s in species.values() if s["eggTypeSource"] == "mapped")
+    print(f"eggType: {egg_mapped_count}/{len(species)} from curated table, {len(species) - egg_mapped_count} via fallback hash")
+
+    skip_counts = classify_evolution_skips(species)
+    total_skips = sum(skip_counts.values())
+    skip_breakdown = ", ".join(f"{label}: {count}" for label, count in skip_counts.most_common())
+    print(f"evolutionSkips: {total_skips} non-adjacent-stage edges found - {skip_breakdown}")
+
+    same_stage_counts = classify_same_stage_evolutions(species)
+    total_same_stage = sum(same_stage_counts.values())
+    breakdown = ", ".join(f"{label}: {count}" for label, count in same_stage_counts.most_common())
+    print(f"sameStageEvolutions: {total_same_stage} same-stage edges found - {breakdown}")
 
     output = {
         "species": species,

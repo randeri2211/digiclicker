@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { DigimonInstance } from '../../game/types';
-  import { getSpecies, getSpriteUrl } from '../../game/images';
+  import { getSpecies, getSpriteUrl, getEggSpriteUrl } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import { isReadyToDigivolve } from '../../game/state/game.svelte';
 
@@ -15,11 +15,25 @@
   const sorted = $derived(
     [...members].sort((a, b) => Number(isReadyToDigivolve(b)) - Number(isReadyToDigivolve(a)))
   );
+
+  // An unhatched egg's speciesId is already resolved but hidden until it
+  // hatches - show the per-type egg art/name instead of spoiling it.
+  function spriteFor(member: DigimonInstance): string | null {
+    return member.eggState ? getEggSpriteUrl(member.eggState.eggType) : getSpriteUrl(member.speciesId);
+  }
+  function nameFor(member: DigimonInstance): string {
+    if (member.eggState) return `Digi-Egg (${member.eggState.eggType})`;
+    return getSpecies(member.speciesId)?.name ?? member.speciesId;
+  }
+  function stageFor(member: DigimonInstance): string {
+    if (member.eggState) return 'Egg';
+    return getSpecies(member.speciesId)?.stage ?? 'Unknown';
+  }
 </script>
 
 <div class="list">
   {#each sorted as member (member.instanceId)}
-    {@const species = getSpecies(member.speciesId)}
+    {@const sprite = spriteFor(member)}
     {@const ready = isReadyToDigivolve(member)}
     <div
       class="row"
@@ -30,16 +44,16 @@
       tabindex="0"
     >
       <div class="thumb">
-        {#if getSpriteUrl(member.speciesId)}
-          <img src={getSpriteUrl(member.speciesId)} alt="" />
+        {#if sprite}
+          <img src={sprite} alt="" />
         {/if}
         {#if ready}
           <span class="ready-dot"></span>
         {/if}
       </div>
       <div class="info">
-        <div class="name">{species?.name ?? member.speciesId}</div>
-        <div class="meta">Lv {levelForXp(member.xp)} · {species?.stage ?? 'Unknown'}</div>
+        <div class="name">{nameFor(member)}</div>
+        <div class="meta">Lv {levelForXp(member.xp)} · {stageFor(member)}</div>
       </div>
     </div>
   {/each}

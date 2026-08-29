@@ -14,7 +14,7 @@ DEFENSE = "Defense"
 SPEED = "Speed"
 SPECIAL_ATTACK = "SpecialAttack"
 
-TYPE_TO_STAT = {
+TYPE_TO_STAT_AFFINITY = {
     # Attack - physical beast/dragon/dinosaur/warrior archetypes
     "Beast": ATTACK,
     "Beastkin": ATTACK,

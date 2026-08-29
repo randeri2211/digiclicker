@@ -31,18 +31,21 @@ export const PRELOAD_SPECIES_IDS = [
   STARTER_TRAINING_SPECIES,
 ];
 
-function makeInstance(speciesId: string, xp: number): DigimonInstance {
+// Shared instance-creation logic - also used by game/eggs/eggs.ts to build
+// a freshly-dropped egg's underlying (already-resolved) instance.
+export function createDigimonInstance(speciesId: string, xp: number): DigimonInstance {
   const species = getSpecies(speciesId);
   const stage = species?.stage ?? 'Unknown';
-  const statType = species?.statType ?? 'Attack';
+  const statAffinity = species?.statAffinity ?? 'Attack';
   return {
     instanceId: crypto.randomUUID(),
     speciesId,
     xp,
     formHistory: [speciesId],
-    baseStats: rollBaseStats(stage, statType),
-    growthPerLevel: rollGrowthPerLevel(stage, statType),
+    baseStats: rollBaseStats(stage, statAffinity),
+    growthPerLevel: rollGrowthPerLevel(stage, statAffinity),
     digivolutionStats: zeroStatBlock(),
+    eggState: null,
   };
 }
 
@@ -50,10 +53,10 @@ export function createStarterTeam(): TeamState {
   return {
     activeCapacity: STARTER_ACTIVE_CAPACITY,
     activeMaxCapacity: STARTER_ACTIVE_MAX_CAPACITY,
-    activeMembers: [makeInstance(STARTER_ACTIVE_SPECIES, 0)],
+    activeMembers: [createDigimonInstance(STARTER_ACTIVE_SPECIES, 0)],
     trainingCapacity: STARTER_TRAINING_CAPACITY,
     trainingMaxCapacity: STARTER_TRAINING_MAX_CAPACITY,
-    trainingMembers: [makeInstance(STARTER_TRAINING_SPECIES, 0)],
+    trainingMembers: [createDigimonInstance(STARTER_TRAINING_SPECIES, 0)],
     reserveMembers: [],
   };
 }

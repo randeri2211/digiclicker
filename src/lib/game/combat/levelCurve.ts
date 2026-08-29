@@ -1,4 +1,4 @@
-import { LEVEL_CURVE_BASE_XP, LEVEL_CURVE_EXPONENT } from '../constants';
+import { LEVEL_CURVE_BASE_XP, LEVEL_CURVE_EXPONENT, MAX_LEVEL } from '../constants';
 
 export function xpToReachLevel(level: number): number {
   if (level <= 1) return 0;
@@ -7,7 +7,7 @@ export function xpToReachLevel(level: number): number {
 
 export function levelForXp(totalXp: number): number {
   let level = 1;
-  while (xpToReachLevel(level + 1) <= totalXp) {
+  while (level < MAX_LEVEL && xpToReachLevel(level + 1) <= totalXp) {
     level += 1;
   }
   return level;

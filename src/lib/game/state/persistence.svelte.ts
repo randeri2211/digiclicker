@@ -21,16 +21,17 @@ export const activeSlot: { id: string | null } = $state({ id: null });
 function normalizeInstance(instance: DigimonInstance): DigimonInstance {
   const species = getSpecies(instance.speciesId);
   const stage = species?.stage ?? 'Unknown';
-  const statType = species?.statType ?? 'Attack';
+  const statAffinity = species?.statAffinity ?? 'Attack';
   const hasStatBlockDigivolutionStats =
     instance.digivolutionStats !== undefined && typeof instance.digivolutionStats === 'object';
 
   return {
     ...instance,
     formHistory: instance.formHistory ?? [instance.speciesId],
-    baseStats: instance.baseStats ?? rollBaseStats(stage, statType),
-    growthPerLevel: instance.growthPerLevel ?? rollGrowthPerLevel(stage, statType),
+    baseStats: instance.baseStats ?? rollBaseStats(stage, statAffinity),
+    growthPerLevel: instance.growthPerLevel ?? rollGrowthPerLevel(stage, statAffinity),
     digivolutionStats: hasStatBlockDigivolutionStats ? instance.digivolutionStats : zeroStatBlock(),
+    eggState: instance.eggState ?? null,
   };
 }
 

@@ -17,6 +17,9 @@
     startNewGameInSlot,
     team,
     combat,
+    findRootAncestors,
+    rollEggDrop,
+    tryHatch,
   } from './lib/game/state/game.svelte';
   import { preloadImages } from './lib/game/preload';
   import { getSpriteUrl } from './lib/game/images';
@@ -61,6 +64,9 @@
       startNewGameInSlot,
       team,
       combat,
+      findRootAncestors,
+      rollEggDrop,
+      tryHatch,
     };
   }
 </script>

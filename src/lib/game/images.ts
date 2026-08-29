@@ -1,5 +1,5 @@
 import rawData from '../data/digimon-evolution.json';
-import type { DigimonSpecies, Stage } from './types';
+import type { DigimonSpecies, EggType, Stage } from './types';
 
 interface EvolutionData {
   species: Record<string, DigimonSpecies>;
@@ -30,4 +30,11 @@ export function getSpriteUrl(speciesId: string): string | null {
     .map((segment) => encodeURIComponent(segment))
     .join('/');
   return `/${encoded}`;
+}
+
+// Recolored per-type Digi-Egg art (see EggImageGenerator.py) - egg types
+// have no spaces/special characters, so no encoding needed unlike
+// getSpriteUrl above.
+export function getEggSpriteUrl(eggType: EggType): string {
+  return `/digimon/eggs/${eggType}/egg-base.png`;
 }

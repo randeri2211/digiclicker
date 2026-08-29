@@ -12,6 +12,10 @@
 
   const species = $derived(getSpecies(instance.speciesId));
   const level = $derived(levelForXp(instance.xp));
+  // The instance's real speciesId is already resolved even while it's an
+  // unhatched egg - hide the name (the whole point of an egg) but the
+  // stat numbers below still reflect the real, hidden species.
+  const displayName = $derived(instance.eggState ? `Digi-Egg (${instance.eggState.eggType})` : (species?.name ?? instance.speciesId));
 
   const ROWS: { label: string; key: keyof StatBlock }[] = [
     { label: 'Attack', key: 'attack' },
@@ -49,7 +53,7 @@
   >
     <div class="panel-header">
       <div class="panel-title">
-        {species?.name ?? instance.speciesId}
+        {displayName}
         <span class="level">Lv {level}</span>
       </div>
       <button class="close-btn" onclick={onClose}>Close</button>

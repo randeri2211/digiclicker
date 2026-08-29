@@ -26,6 +26,7 @@ export {
   dedigivolve,
 } from '../evolution/digivolve';
 export type { DigivolutionOption } from '../evolution/digivolve';
+export { findRootAncestors, rollEggDrop, tryHatch } from '../eggs/eggs';
 export { moveMember, hasRoomIn } from '../team/teamActions';
 export type { TeamBucket } from '../team/teamActions';
 export { getTeamSlotMenuItems } from '../team/teamMenu';

@@ -20,6 +20,16 @@ function isInGameSpecies(species: DigimonSpecies): boolean {
   return IN_GAME_STAGES.has(species.stage);
 }
 
+// Stage-skipping evolvesTo edges (2+ tiers at once - see
+// classify_evolution_skips in EvolutionGraphConverter.py) are disabled
+// in-game for now, regardless of whether they're a redundant "shortcut"
+// or an essential "path" - source is the edge's OWN species (the one
+// whose evolvesTo the edge came from), since evolutionSkips is only ever
+// populated on that side, never on the target.
+function isSkipEdge(source: DigimonSpecies, targetId: string): boolean {
+  return Boolean(source.evolutionSkips?.[targetId]);
+}
+
 export interface DigivolutionOption {
   species: DigimonSpecies;
   requirement: DigivolutionRequirement | null;
@@ -38,8 +48,8 @@ function buildOption(instance: DigimonInstance, species: DigimonSpecies): Digivo
     species,
     requirement,
     requirementMet: isRequirementMet(instance, requirement),
-    digivolutionStatsBonusRange: computeDigivolutionBonusRange(species.stage, species.statType, preTransitionLevel),
-    growthPerLevelRange: computeGrowthPerLevelRange(species.stage, species.statType),
+    digivolutionStatsBonusRange: computeDigivolutionBonusRange(species.stage, species.statAffinity, preTransitionLevel),
+    growthPerLevelRange: computeGrowthPerLevelRange(species.stage, species.statAffinity),
   };
 }
 
@@ -49,10 +59,15 @@ function buildOption(instance: DigimonInstance, species: DigimonSpecies): Digivo
  * since this only ever reads the current instance's own evolvesTo.
  */
 export function getDigivolveOptions(instance: DigimonInstance): DigivolutionOption[] {
+  // An unhatched egg's speciesId is already resolved but deliberately
+  // hidden until it hatches - digivolving it would spoil/skip the reveal.
+  if (instance.eggState) return [];
+
   const current = getSpecies(instance.speciesId);
   if (!current) return [];
 
   return current.evolvesTo
+    .filter((targetId) => !isSkipEdge(current, targetId))
     .map((targetId) => getSpecies(targetId))
     .filter((species): species is DigimonSpecies => species !== undefined && isInGameSpecies(species))
     .map((species) => buildOption(instance, species));
@@ -69,6 +84,8 @@ export function getDigivolveOptions(instance: DigimonInstance): DigivolutionOpti
  * heading into, just that the Digimon has reached a minimum level first.
  */
 export function getDedigivolveOptions(instance: DigimonInstance): DigivolutionOption[] {
+  if (instance.eggState) return [];
+
   const current = getSpecies(instance.speciesId);
   if (!current) return [];
 
@@ -78,6 +95,10 @@ export function getDedigivolveOptions(instance: DigimonInstance): DigivolutionOp
   return current.evolvesFrom
     .map((speciesId) => getSpecies(speciesId))
     .filter((species): species is DigimonSpecies => species !== undefined && isInGameSpecies(species))
+    // A predecessor's edge INTO current is only recorded on the
+    // predecessor's own evolutionSkips (keyed by its evolvesTo target),
+    // never on current - check it from that side.
+    .filter((species) => !isSkipEdge(species, current.id))
     .map((species) => ({ ...buildOption(instance, species), requirement, requirementMet }));
 }
 
@@ -86,9 +107,11 @@ export function getDedigivolveOptions(instance: DigimonInstance): DigivolutionOp
 // rolling concern anymore (options carry ranges now, not rolls), just
 // avoids the pointless extra work of building full option objects.
 export function isReadyToDigivolve(instance: DigimonInstance): boolean {
+  if (instance.eggState) return false;
   const current = getSpecies(instance.speciesId);
   if (!current) return false;
   return current.evolvesTo
+    .filter((targetId) => !isSkipEdge(current, targetId))
     .map((targetId) => getSpecies(targetId))
     .some((species) => species && isInGameSpecies(species) && isRequirementMet(instance, getRequirement(instance.speciesId, species.id)));
 }
@@ -102,8 +125,8 @@ function applyTransition(instance: DigimonInstance, targetSpeciesId: string): vo
   if (!targetSpecies) return;
 
   const preTransitionLevel = levelForXp(instance.xp);
-  const digivolutionStatsBonus = rollDigivolutionBonus(targetSpecies.stage, targetSpecies.statType, preTransitionLevel);
-  const growthPerLevel = rollGrowthPerLevel(targetSpecies.stage, targetSpecies.statType);
+  const digivolutionStatsBonus = rollDigivolutionBonus(targetSpecies.stage, targetSpecies.statAffinity, preTransitionLevel);
+  const growthPerLevel = rollGrowthPerLevel(targetSpecies.stage, targetSpecies.statAffinity);
 
   // formHistory no longer drives de-digivolve options (that's graph-based
   // now, see getDedigivolveOptions), but it's still tracked here as a

@@ -1,9 +1,15 @@
 <script lang="ts">
   import TeamSlot from './TeamSlot.svelte';
   import type { DigimonInstance } from '../../game/types';
-  import { getSpriteUrl } from '../../game/images';
+  import { getSpriteUrl, getEggSpriteUrl } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import { isReadyToDigivolve } from '../../game/state/game.svelte';
+
+  // An unhatched egg's speciesId is already resolved but hidden - show the
+  // per-type egg art instead of spoiling the real sprite.
+  function spriteFor(member: DigimonInstance): string | null {
+    return member.eggState ? getEggSpriteUrl(member.eggState.eggType) : getSpriteUrl(member.speciesId);
+  }
 
   interface Props {
     kind: 'active' | 'training';
@@ -31,7 +37,7 @@
       <TeamSlot
         variant="filled"
         isActive={kind === 'active'}
-        spriteUrl={getSpriteUrl(member.speciesId)}
+        spriteUrl={spriteFor(member)}
         level={levelForXp(member.xp)}
         ready={isReadyToDigivolve(member)}
         onClick={onSlotClick && ((event) => onSlotClick(member, event))}

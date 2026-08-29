@@ -1,0 +1,13 @@
+{
+  "Dragon": { "color1": "#FFE8D6", "color2": "#C43E1C" },
+  "Beast": { "color1": "#f2aa7b", "color2": "#7A4B22" },
+  "Dinosaur": { "color1": "#ffffff", "color2": "#556B2F" },
+  "Bird": { "color1": "#FFF8E0", "color2": "#2D8FCB" },
+  "Aquatic": { "color1": "#DFF5F0", "color2": "#0E7C74" },
+  "Insect": { "color1": "#F0F5D0", "color2": "#5A9E2F" },
+  "Plant": { "color1": "#53bf4d45", "color2": "#965f17" },
+  "Machine": { "color1": "#ffffff", "color2": "#8c8883" },
+  "Mineral": { "color1": "#EDE6DC", "color2": "#6B5B4D" },
+  "Evil": { "color1": "#EDE3F5", "color2": "#5E2D91" },
+  "Holy": { "color1": "#FFF8E0", "color2": "#e9f700" }
+}

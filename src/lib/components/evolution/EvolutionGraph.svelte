@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { DigimonInstance, StatBlock, StatRangeBlock } from '../../game/types';
-  import { getSpecies, getSpriteUrl } from '../../game/images';
+  import { getSpecies, getSpriteUrl, getEggSpriteUrl } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import {
     getDigivolveOptions,
@@ -48,6 +48,11 @@
   });
 
   const currentSpecies = $derived(getSpecies(instance.speciesId));
+  // An unhatched egg's speciesId is already resolved but hidden until it
+  // hatches - show the per-type egg art/name instead of spoiling it.
+  const currentSprite = $derived(instance.eggState ? getEggSpriteUrl(instance.eggState.eggType) : getSpriteUrl(instance.speciesId));
+  const currentName = $derived(instance.eggState ? `Digi-Egg (${instance.eggState.eggType})` : (currentSpecies?.name ?? instance.speciesId));
+  const currentStage = $derived(instance.eggState ? 'Egg' : (currentSpecies?.stage ?? 'Unknown'));
 
   function commitDigivolve(option: DigivolutionOption) {
     digivolve(instance, option.species.id);
@@ -76,7 +81,7 @@
       {/if}
     </div>
     <div class="option-name">{option.species.name}</div>
-    <div class="option-stage">{option.species.stage} · {option.species.statType}</div>
+    <div class="option-stage">{option.species.stage} · {option.species.statAffinity}</div>
     <div class="option-bonus">{formatStatRange(option.digivolutionStatsBonusRange, true)}</div>
     <div class="option-growth">Growth/lvl: {formatStatRange(option.growthPerLevelRange, false)}</div>
     <div class="option-req">
@@ -105,15 +110,15 @@
 
   <div class="current-card">
     <div class="current-sprite">
-      {#if getSpriteUrl(instance.speciesId)}
-        <img src={getSpriteUrl(instance.speciesId)} alt="" />
+      {#if currentSprite}
+        <img src={currentSprite} alt="" />
       {:else}
-        <span class="no-sprite">{currentSpecies?.name ?? instance.speciesId}</span>
+        <span class="no-sprite">{currentName}</span>
       {/if}
     </div>
-    <div class="current-name">{currentSpecies?.name ?? instance.speciesId}</div>
+    <div class="current-name">{currentName}</div>
     <div class="current-meta">
-      {currentSpecies?.stage ?? 'Unknown'} · Lv {levelForXp(instance.xp)}
+      {currentStage} · Lv {levelForXp(instance.xp)}
     </div>
     <div class="current-stats">Digivolution stats: {formatStatBlock(instance.digivolutionStats, false)}</div>
   </div>

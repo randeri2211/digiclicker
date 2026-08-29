@@ -4,6 +4,7 @@ import { currency } from './currency.svelte';
 import { computeClickDamage, computeAttacksPerSecond, computeTeamDamagePerHit } from '../combat/damage';
 import { pickNextWildSpawn, spawnDebugWild, computeKillXp, computeKillBits } from '../combat/spawn';
 import { awardKillXp } from '../combat/xp';
+import { rollEggDrop } from '../eggs/eggs';
 
 export const combat: CombatState = $state({ wild: null, damagePopup: null });
 
@@ -35,6 +36,9 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
 
   awardKillXp(xpValue, team);
   currency.bits += bitsValue;
+
+  const egg = rollEggDrop(wild.speciesId);
+  if (egg) team.reserveMembers.push(egg);
 }
 
 export function handleClick() {

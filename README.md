@@ -59,10 +59,22 @@ game. They're only needed to refresh the data from the wiki:
    loads. Also resolves each species' `type` into one of four combat
    stat archetypes (Attack/Defense/Speed/SpecialAttack) via
    `evolution_type_mapping.py`'s curated table, falling back to a
-   deterministic hash for untaxonomied species.
+   deterministic hash for untaxonomied species, plus an egg flavor type
+   (`egg_type_mapping.py`) and stage-skipping evolvesTo edge
+   classification (`classify_evolution_skips`).
 
-Run them in order (Importer → EvolutionImporter → EvolutionGraphConverter)
-after wiki content changes or to pick up new species.
+4. **`InfoboxImageImporter.py`** - fallback for species step 1 missed.
+   `Importer.py` only grabs images tagged into the wiki's
+   `Category:Digimon Images`, a separate and incomplete curation from
+   `Category:Digimon species` - this fetches each still-unresolved
+   species' own wiki page (from step 3's output) and downloads its
+   infobox `|image=` directly (currently: 675 → 1583 of 1660 species
+   resolved). **Run `EvolutionGraphConverter.py` again afterward** to
+   pick up the newly downloaded images.
+
+Run steps 1-3 in order after wiki content changes or to pick up new
+species; run 4 + a second pass of 3 whenever sprite coverage needs
+topping up.
 
 Images aren't committed to git (~170MB+) - run step 1 to populate
 `public/digimon/images/` locally after cloning; everything else

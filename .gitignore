@@ -20,6 +20,9 @@ __pycache__/
 # Scraped Digimon sprites/art (~170MB+) - regenerate with Importer.py
 public/digimon/images/
 
+# Digi-Egg images, sourced by hand per egg type (see egg_type_mapping.py)
+public/digimon/eggs/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

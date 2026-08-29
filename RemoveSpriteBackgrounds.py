@@ -1,9 +1,17 @@
 """
-One-off cleanup: many downloaded Digimon PNGs (public/digimon/images/) carry
-a solid white background baked in rather than being transparent, which looks
+Many downloaded Digimon images (public/digimon/images/) carry a solid
+white background baked in rather than being transparent, which looks
 broken against the game's dark UI. This flood-fills near-white pixels
-connected to each image's border to transparent, in place, leaving any
-enclosed white areas inside the character's own art untouched.
+connected to each image's border to transparent, leaving any enclosed
+white areas inside the character's own art untouched.
+
+Covers every format either importer can produce (Importer.py: mostly
+.png; InfoboxImageImporter.py: whatever the wiki serves, commonly
+.jpg/.gif). JPEG/GIF can't hold a real alpha channel, so a non-PNG file
+that actually needed its background removed is re-saved as .png (same
+stem) and the original non-PNG file deleted - otherwise find_sprite() in
+EvolutionGraphConverter.py would end up with two candidate files for the
+same source image.
 """
 from pathlib import Path
 
@@ -21,35 +29,48 @@ def clean_background(path):
 
     changed = False
     for corner in corners:
-        pixel = img.getpixel(corner)
-        r, g, b, a = pixel
+        r, g, b, a = img.getpixel(corner)
         if a == 0:
             continue  # already transparent here, nothing to do
         if r >= 235 and g >= 235 and b >= 235:
             ImageDraw.floodfill(img, corner, (255, 255, 255, 0), thresh=THRESHOLD)
             changed = True
 
-    if changed:
+    if not changed:
+        return False
+
+    if path.suffix.lower() == ".png":
         img.save(path)
-    return changed
+        return True
+
+    new_path = path.with_suffix(".png")
+    if new_path.exists():
+        print(f"  [skip-rename] {path.name} would collide with existing {new_path.name} - left as-is")
+        return False
+
+    img.save(new_path)
+    path.unlink()
+    return True
 
 
 def main():
-    png_paths = sorted(IMAGES_DIR.glob("*/*.png"))
-    print(f"Scanning {len(png_paths)} images under {IMAGES_DIR}...")
+    image_paths = sorted(
+        p for ext in ("*.png", "*.jpg", "*.jpeg", "*.gif") for p in IMAGES_DIR.glob(f"*/{ext}")
+    )
+    print(f"Scanning {len(image_paths)} images under {IMAGES_DIR}...")
 
     changed_count = 0
-    for i, path in enumerate(png_paths, 1):
+    for i, path in enumerate(image_paths, 1):
         try:
             if clean_background(path):
                 changed_count += 1
         except Exception as e:
             print(f"  [error] {path.relative_to(ROOT)}: {e}")
 
-        if i % 200 == 0 or i == len(png_paths):
-            print(f"  {i}/{len(png_paths)} processed")
+        if i % 200 == 0 or i == len(image_paths):
+            print(f"  {i}/{len(image_paths)} processed")
 
-    print(f"Done. Cleaned backgrounds on {changed_count}/{len(png_paths)} images.")
+    print(f"Done. Cleaned backgrounds on {changed_count}/{len(image_paths)} images.")
 
 
 if __name__ == "__main__":

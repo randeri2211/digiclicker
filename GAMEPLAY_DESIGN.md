@@ -208,8 +208,65 @@ non-wash upgrade — more slots = strictly more total training throughput.
 ### Currency: Bits and Data
 - **Bits** (combat currency) buy **items**, including **Data**.
 - **Data** is spent to hatch Digi-Eggs; the amount/type of Data required
-  depends on the egg's type. Which egg types exist and their exact Data
-  costs are still to be figured out.
+  depends on the egg's type. Exact Data costs are still to be figured out
+  (egg types themselves are now confirmed - see "Digi-Eggs" below).
+
+### Digi-Eggs
+- **Egg type (confirmed):** every Digi-Egg has a flavor type - one of
+  **Dragon, Beast, Dinosaur, Bird, Aquatic, Insect, Plant, Machine,
+  Mineral, Evil, Holy** (11 types, `EggType` in `types.ts`). Resolved from
+  the same raw wiki `|type=` taxonomy already scraped for stat affinities
+  (see "Stat system" below), via a second curated mapping
+  (`egg_type_mapping.py`'s `TYPE_TO_EGG_TYPE`) that groups the same raw
+  values by thematic flavor instead of combat archetype - e.g. every
+  "___ Dragon" raw type folds into Dragon, Demon+Undead+Wizard fold into
+  Evil, Angel-adjacent types fold into Holy. Species whose raw type isn't
+  curated (the wiki's own "no signal" values, the long tail of rare raw
+  types, and "Slime" - the generic tag on 36 of the 49 Fresh-stage
+  species) fall back to a deterministic hash, same treatment as
+  stat-affinity fallback.
+- **Egg art (confirmed):** one real official Digitama image (Zurumon's,
+  sourced from wikimon.net) recolored per type - `EggImageGenerator.py`
+  isolates the source's stripe pattern via a color-key mask and remaps
+  both the shell and stripe colors per type from
+  `egg_assets/egg_type_colors.json` (fully data-driven, no code changes
+  needed to retune a palette), preserving the original shading gradient
+  and knocking out the background to transparent. Also writes
+  `egg_assets/montage.png` (all 11 side by side on a dark backdrop) for
+  quick comparison when retuning colors. Output lives at
+  `public/digimon/eggs/<Type>/egg-base.png` (gitignored, regenerate with
+  the script - same convention as `public/digimon/images/<Name>/`).
+- **Hatching (confirmed, built):** an egg is a normal `DigimonInstance`
+  with a non-null `eggState: { eggType, hatchAtLevel }` - its `speciesId`
+  is already resolved (decided the moment it dropped) but hidden behind
+  the egg sprite/name everywhere it's displayed. It hatches by being
+  leveled up like a real team member (occupying an active/training slot,
+  gaining xp through combat exactly like any other member - checked via
+  `tryHatch()` every time `awardKillXp` runs); once its level crosses
+  `EGG_HATCH_LEVEL`, `eggState` clears and **xp resets to 0**, same as
+  digivolve/de-digivolve - every form transition resets on the same
+  uniform rule, not just to bound a re-loop exploit (hatching has none,
+  since there's no un-hatching).
+- **Where a dropped egg lands (confirmed, built):** always
+  `reserveMembers` - since only active/training members gain xp, a
+  reserve-parked egg is naturally "not progressing" with zero
+  special-casing, and moving it into a real slot to start hatching reuses
+  the Digimon Hub / team-slot context menu UI already built for moving
+  any Digimon between buckets. A settings preference to auto-route
+  hatched Digimon to a chosen bucket is still a proposed future
+  refinement, not built.
+- **Acquisition - kill-drop (confirmed, built):** killing a wild has an
+  `EGG_DROP_CHANCE_PERCENT` chance (small placeholder, tunable in
+  `constants.ts`) to drop an egg. The drop resolves to a random *Fresh-stage*
+  ancestor reachable via the killed species' `evolvesFrom` chain
+  (`findRootAncestors` in `game/eggs/eggs.ts`, restricted to
+  `IN_GAME_STAGES` species) - e.g. killing a Mega can drop the egg of any
+  Fresh-stage line that provably evolves into it. If no Fresh ancestor is
+  traceable (a data gap), that roll is simply skipped rather than
+  substituting a wrong-stage fallback.
+- **Acquisition - shop (proposed, not yet built):** some egg types
+  purchasable directly with Data, per the "Currency: Bits and Data"
+  section above. A separate, self-contained feature for later.
 
 ## Technical notes
 
@@ -236,12 +293,72 @@ non-wash upgrade — more slots = strictly more total training throughput.
   Still open: picking one canonical continuity/game to treat as the game's
   actual digivolution rules, and cleaning ~121 non-Digimon nodes that leaked
   in from items/locations linked inline in those fields.
+- **Stage-skipping (and backward) edges are disabled in-game (confirmed):**
+  the scraped data mixes evolution paths from different games/continuities
+  for the same Digimon, so a single species' `evolvesTo` can include both
+  the canonical one-tier-at-a-time step *and* direct jumps 2+ tiers up
+  (e.g. Botamon, Fresh, listing direct edges to Rookie/Champion/Ultimate/
+  Armor targets alongside its real In-Training children) - or even edges
+  that go backward in stage entirely (e.g. DeckerGreymon, Ultimate,
+  listing an `evolvesTo` edge down to Bombmon, Fresh - not a digivolution
+  at all, just contaminated source data). `EvolutionGraphConverter.py`
+  classifies every such non-adjacent-stage edge as `shortcut` (the target
+  is *also* reachable via a fully legitimate multi-hop chain through the
+  species' own non-skip children - redundant), `path` (no such chain
+  exists - the skip is the only route to that target), or `backward`
+  (the target's stageOrder is lower than the source's - always invalid,
+  no shortcut/path distinction applies) and stores it as `evolutionSkips`
+  per species (608 found across the dataset: 297 backward, 254 path, 57
+  shortcut). The `backward` category was only added after a live bug
+  report - Bombmon, Fresh, was showing a de-digivolve option to
+  DeckerGreymon, Ultimate - traced to the classifier never flagging
+  negative-gap edges at all, and even letting them leak into the
+  reachability walk used for shortcut/path classification of *other*
+  species. For now `getDigivolveOptions`/`getDedigivolveOptions`/
+  `isReadyToDigivolve` (`src/lib/game/evolution/digivolve.ts`) exclude
+  **all** skip edges regardless of classification - only strict
+  one-tier-at-a-time evolution shows up as a player-facing option. The
+  `path`-classified edges this removes (essential, no alternate route)
+  are a real, if small, loss of content for now - a reasonable future
+  option is re-enabling just the `path` edges (since only `shortcut`
+  ones are truly redundant, and `backward` ones are never legitimate)
+  once there's a design for how to present a multi-tier jump in the UI.
+- **Same-stage evolvesTo edges (analysis only, not yet acted on):**
+  similarly, `evolvesTo` includes edges where source and target share
+  the exact same stage (e.g. Rookie -> Rookie) - not a real progression.
+  The Fukamon -> Fukamon self-loop (a pure scraping artifact) is now
+  dropped entirely at the source, in `build_species()`'s edge-processing
+  loop - it can never resurface on a future regeneration. Every
+  remaining same-stage edge is classified by
+  `classify_same_stage_evolutions` in `EvolutionGraphConverter.py`:
+  `mode-change` (alternate form/weapon of the same base Digimon, e.g.
+  Alphamon -> Alphamon Ouryuken, 8 found), `mutual` (the reverse edge
+  ALSO exists - not a fusion, a tangled web of forms evolving into each
+  other, usually one specific game's own shift-between-forms mechanic
+  scraped flat, e.g. the Apemon/Troopmon/MadLeomon cluster, 162 found),
+  `fusion` (target has 2+ evolvesFrom sources and this edge *isn't*
+  reciprocated - the best signal for a real DNA/Jogress result, 145
+  found - though a target can still mix multiple continuities' own
+  fusion rosters: Omnimon's real WarGreymon+MetalGarurumon pair
+  correctly lands here while its other 6 sources from a different
+  game's roster correctly land in `mutual` instead, since only those 6
+  have a reciprocal edge back to Omnimon), or `other` (unclassified
+  anomaly worth a manual look, 9 found). Stored as `sameStageEvolutions`
+  per species; full review list at `data/fusion_edges_review.md`, split
+  by classification. Unlike `evolutionSkips`, this isn't wired into
+  `getDigivolveOptions` yet - data/counts only for now.
+- **Level cap (confirmed):** `levelForXp` never returns above
+  `MAX_LEVEL` (100, placeholder, `src/lib/game/constants.ts`), and
+  `awardKillXp` skips a member entirely once it's already at the cap -
+  xp stops accumulating rather than piling up uselessly past the point
+  `levelForXp` would clamp it anyway.
 
 ## Proposed / not yet confirmed
 Carried over from initial brainstorm — still open for discussion:
 - Area bosses gate progression to new regions, themed by attribute
   (Vaccine/Data/Virus) or element. (Areas confirmed as PokeClicker-like
   in direction — see above — but this gating detail itself isn't decided.)
-- Digi-Egg types and their Data hatching costs (mechanic itself is now
-  confirmed — see Currency: Bits and Data above).
+- Digi-Egg Data hatching costs per type (egg types themselves are now
+  confirmed — see "Digi-Eggs" above; the mechanics around acquisition and
+  hatching are proposed there too, not yet built).
 - Possible prestige currency, further down the line.

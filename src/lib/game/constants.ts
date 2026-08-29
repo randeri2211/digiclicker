@@ -37,6 +37,7 @@ export const DEDIGIVOLVE_MIN_LEVEL = 4;
  * digivolve/de-digivolve option search - add a stage here to bring it
  * back into rotation, no data changes needed. */
 export const IN_GAME_STAGES: ReadonlySet<Stage> = new Set<Stage>([
+  'Fresh',
   'In-Training',
   'Rookie',
   'Champion',
@@ -70,7 +71,7 @@ export const STAGE_POWER: Record<Stage, number> = {
   Hybrid: 8,
   Unknown: 1,
 };
-/** A species' dominant stat (matching its statType) rolls at this
+/** A species' dominant stat (matching its statAffinity) rolls at this
  * multiplier; the other three stats roll at STAT_OFF_FACTOR. */
 export const STAT_DOMINANT_FACTOR = 1.5;
 export const STAT_OFF_FACTOR = 0.6;
@@ -91,6 +92,9 @@ export const LEVEL_IMPACT_SCALE = 0.1;
 /** xpToReachLevel(level) = LEVEL_CURVE_BASE_XP * (level - 1) ^ LEVEL_CURVE_EXPONENT */
 export const LEVEL_CURVE_BASE_XP = 50;
 export const LEVEL_CURVE_EXPONENT = 1.5;
+/** Hard cap - levelForXp never returns above this, no matter how much xp
+ * accumulates. Placeholder for now. */
+export const MAX_LEVEL = 100;
 
 // ---- Wild spawns & rewards --------------------------------------------
 /** maxHp = WILD_HP_BASE * WILD_HP_STAGE_MULTIPLIER[stage] * WILD_HP_LEVEL_GROWTH_FACTOR^level
@@ -121,6 +125,18 @@ export const TAME_CHANCE_BASE_PERCENT = 15;
 export const TAME_CHANCE_PER_LEVEL_DIFF_PERCENT = 3;
 export const TAME_CHANCE_MIN_PERCENT = 5;
 export const TAME_CHANCE_MAX_PERCENT = 90;
+
+// ---- Digi-Eggs -------------------------------------------------------
+/** Chance per wild kill that it drops a Digi-Egg (see rollEggDrop in
+ * src/lib/game/eggs/eggs.ts) - deliberately low, matches the "rare
+ * random drop" design in GAMEPLAY_DESIGN.md's Digi-Eggs section. */
+export const EGG_DROP_CHANCE_PERCENT = 0.1;
+/** Level an egg must reach (gained the same way any team member gains
+ * xp - it has to actually sit in an active/training slot) before it
+ * hatches. Same placeholder tier as DEDIGIVOLVE_MIN_LEVEL (4) - low
+ * enough to reach in a couple of kills so hatching isn't a second full
+ * grind on top of the rare drop itself. */
+export const EGG_HATCH_LEVEL = 10;
 
 // ---- Persistence -------------------------------------------------------
 export const AUTOSAVE_INTERVAL_MS = 15000;

@@ -1,11 +1,25 @@
 <script lang="ts">
   import type { DigimonInstance } from '../game/types';
-  import { getSpecies, getSpriteUrl } from '../game/images';
+  import { getSpecies, getSpriteUrl, getEggSpriteUrl } from '../game/images';
   import { levelForXp } from '../game/combat/levelCurve';
   import { team, getTeamSlotMenuItems } from '../game/state/game.svelte';
   import type { TeamBucket } from '../game/state/game.svelte';
   import ContextMenu from './shared/ContextMenu.svelte';
   import StatWindow from './shared/StatWindow.svelte';
+
+  // An unhatched egg's speciesId is already resolved but hidden until it
+  // hatches - show the per-type egg art/name instead of spoiling it.
+  function spriteFor(instance: DigimonInstance): string | null {
+    return instance.eggState ? getEggSpriteUrl(instance.eggState.eggType) : getSpriteUrl(instance.speciesId);
+  }
+  function nameFor(instance: DigimonInstance): string {
+    if (instance.eggState) return `Digi-Egg (${instance.eggState.eggType})`;
+    return getSpecies(instance.speciesId)?.name ?? instance.speciesId;
+  }
+  function stageFor(instance: DigimonInstance): string {
+    if (instance.eggState) return 'Egg';
+    return getSpecies(instance.speciesId)?.stage ?? 'Unknown';
+  }
 
   interface Props {
     onClose: () => void;
@@ -69,16 +83,15 @@
         <div class="empty-note">No Digimon here.</div>
       {:else}
         {#each entries as entry (entry.instance.instanceId)}
-          {@const species = getSpecies(entry.instance.speciesId)}
-          {@const sprite = getSpriteUrl(entry.instance.speciesId)}
+          {@const sprite = spriteFor(entry.instance)}
           <button class="card" onclick={(e) => openMenu(entry, e)}>
             <div class="card-sprite">
               {#if sprite}
                 <img src={sprite} alt="" />
               {/if}
             </div>
-            <div class="card-name">{species?.name ?? entry.instance.speciesId}</div>
-            <div class="card-meta">Lv {levelForXp(entry.instance.xp)} · {species?.stage ?? 'Unknown'}</div>
+            <div class="card-name">{nameFor(entry.instance)}</div>
+            <div class="card-meta">Lv {levelForXp(entry.instance.xp)} · {stageFor(entry.instance)}</div>
           </button>
         {/each}
       {/if}
