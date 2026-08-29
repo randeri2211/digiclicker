@@ -24,6 +24,8 @@
     tryHatch,
     inventory,
     buyItem,
+    areaProgress,
+    setActivePath,
   } from './lib/game/state/game.svelte';
   import { preloadImages } from './lib/game/preload';
   import { getSpriteUrl } from './lib/game/images';
@@ -75,6 +77,8 @@
       tryHatch,
       inventory,
       buyItem,
+      areaProgress,
+      setActivePath,
     };
   }
 </script>

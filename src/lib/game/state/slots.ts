@@ -1,13 +1,14 @@
 import { loadSaveFile, writeSaveFile } from './saveData';
 import type { SaveSlot, SaveSlotData } from './saveData';
 import { createStarterTeam } from '../roster/starterRoster';
+import { initialAreaProgress } from '../areas/areaProgress';
 
 function freshSlotData(): SaveSlotData {
   return {
     currency: { bits: 0, data: 0 },
     team: createStarterTeam(),
     wild: null,
-    spawnProgress: { spawnIndex: 0, nextLevel: 1 },
+    areaProgress: initialAreaProgress(),
   };
 }
 

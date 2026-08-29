@@ -2,14 +2,16 @@ import { currency } from './currency.svelte';
 import { team } from './team.svelte';
 import { combat } from './combat.svelte';
 import { inventory } from './inventory.svelte';
-import { getSpawnProgress, setSpawnProgress } from '../combat/spawn';
+import { areaProgress } from './areaProgress.svelte';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
-import type { DigimonInstance, InventoryState, TeamState } from '../types';
+import type { AreaProgressState, DigimonInstance, InventoryState, TeamState } from '../types';
 import { getSpecies } from '../images';
 import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
 import { AUTOSAVE_INTERVAL_MS } from '../constants';
 import { ITEM_CATALOG } from '../items/itemCatalog';
+import { initialAreaProgress } from '../areas/areaProgress';
+import { getPath } from '../areas/areaRegistry';
 
 export const activeSlot: { id: string | null } = $state({ id: null });
 
@@ -45,6 +47,16 @@ function normalizeInventory(loadedInventory: InventoryState | undefined): Invent
   return Object.fromEntries(entries) as InventoryState;
 }
 
+// Defaults to a fresh initialAreaProgress() if missing entirely, or if the
+// saved activePathId no longer resolves against current area data (area
+// content can change between plays) - falls back to the starting area's
+// starting path rather than leaving the player on a dangling reference.
+function normalizeAreaProgress(loaded: AreaProgressState | undefined): AreaProgressState {
+  if (!loaded) return initialAreaProgress();
+  if (!getPath(loaded.activeAreaId, loaded.activePathId)) return initialAreaProgress();
+  return loaded;
+}
+
 function normalizeTeam(loadedTeam: TeamState): TeamState {
   return {
     ...loadedTeam,
@@ -67,8 +79,8 @@ function snapshotLiveState(): SaveSlotData {
       currency,
       team,
       wild: combat.wild,
-      spawnProgress: getSpawnProgress(),
       inventory,
+      areaProgress,
     })
   );
 }
@@ -80,8 +92,8 @@ function applySlotToLiveState(data: SaveSlotData): void {
     ? { ...data.wild, lastTickAt: Date.now(), attackProgress: data.wild.attackProgress ?? 0 }
     : null;
   combat.damagePopup = null;
-  setSpawnProgress(data.spawnProgress);
   Object.assign(inventory, normalizeInventory(data.inventory));
+  Object.assign(areaProgress, normalizeAreaProgress(data.areaProgress));
 }
 
 export function loadSlotIntoLiveState(slotId: string): void {
@@ -130,12 +142,11 @@ function isValidSlotData(value: unknown): value is SaveSlotData {
     data.currency !== null &&
     typeof data.team === 'object' &&
     data.team !== null &&
-    typeof data.spawnProgress === 'object' &&
-    data.spawnProgress !== null &&
-    // inventory is optional (backward compat with pre-items saves,
-    // backfilled by normalizeInventory) - only reject it if present but
-    // malformed.
-    (data.inventory === undefined || (typeof data.inventory === 'object' && data.inventory !== null))
+    // inventory/areaProgress are optional (backward compat with saves made
+    // before those systems existed, backfilled by normalizeInventory/
+    // normalizeAreaProgress) - only reject one if present but malformed.
+    (data.inventory === undefined || (typeof data.inventory === 'object' && data.inventory !== null)) &&
+    (data.areaProgress === undefined || (typeof data.areaProgress === 'object' && data.areaProgress !== null))
   );
 }
 

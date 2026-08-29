@@ -170,3 +170,48 @@ export interface CombatState {
   wild: WildSpawnState | null;
   damagePopup: DamagePopupState | null;
 }
+
+/** One entry in a path's spawn pool. `weight` drives weighted-random
+ * species selection within the path; `levelRange`, when present,
+ * overrides the path's own `levelRange` for just this species (e.g. a
+ * weaker regional variant still appears in a higher-tier path, but capped
+ * to a narrower level band than the path's full range). */
+export interface AreaSpawnEntry {
+  id: string;
+  weight: number;
+  levelRange?: [number, number];
+}
+
+/** A single explorable location within an area (see data/areas/*.json).
+ * Paths form a DAG via `unlocks` (a list, not a single next-path) - a path
+ * can fork into multiple next paths, not just chain linearly. */
+export interface AreaPath {
+  name: string;
+  levelRange: [number, number];
+  digimonPool: AreaSpawnEntry[];
+  mastery: { kills: number };
+  /** Path ids unlocked once this path's mastery threshold is reached.
+   * Same-area only for now - a future `"areaId:pathId"` cross-area form
+   * is anticipated by the shape but nothing produces or resolves it yet. */
+  unlocks: string[];
+}
+
+export interface AreaData {
+  id: string;
+  name: string;
+  label: string;
+  startingPath: string;
+  paths: Record<string, AreaPath>;
+}
+
+/** Persisted player progress through the area/path graph - which path is
+ * currently active, which paths have been unlocked so far (per area), and
+ * how many kills have been racked up per path toward its mastery
+ * threshold. Keyed by `${areaId}:${pathId}` in killsByPath since kills are
+ * tracked per path, not globally. */
+export interface AreaProgressState {
+  activeAreaId: string;
+  activePathId: string;
+  unlockedPaths: Record<string, string[]>;
+  killsByPath: Record<string, number>;
+}

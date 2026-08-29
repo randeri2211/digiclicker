@@ -5,6 +5,8 @@ import { computeClickDamage, computeAttacksPerSecond, computeTeamDamagePerHit } 
 import { pickNextWildSpawn, spawnDebugWild, computeKillXp, computeKillBits } from '../combat/spawn';
 import { awardKillXp } from '../combat/xp';
 import { rollEggDrop } from '../eggs/eggs';
+import { areaProgress } from './areaProgress.svelte';
+import { getActivePath, recordActivePathKill } from '../areas/areaProgress';
 
 export const combat: CombatState = $state({ wild: null, damagePopup: null });
 
@@ -36,6 +38,7 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
 
   awardKillXp(xpValue, team);
   currency.bits += bitsValue;
+  recordActivePathKill(areaProgress);
 
   const egg = rollEggDrop(wild.speciesId);
   if (egg) team.reserveMembers.push(egg);
@@ -67,7 +70,10 @@ export function tick(now: number) {
   const wild = combat.wild;
   if (!wild) {
     combat.wild = debugSpawn.enabled ? spawnDebugWild(now, debugSpawn.stage, debugSpawn.level) : null;
-    if (!combat.wild) combat.wild = pickNextWildSpawn(now);
+    if (!combat.wild) {
+      const activePath = getActivePath(areaProgress);
+      if (activePath) combat.wild = pickNextWildSpawn(now, activePath);
+    }
     return;
   }
 

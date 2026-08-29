@@ -2,11 +2,13 @@
   import AreaHeader from './AreaHeader.svelte';
   import Arena from './Arena.svelte';
   import AreaTabs from './AreaTabs.svelte';
+  import PathTabs from './PathTabs.svelte';
   import DebugSpawnPanel from './DebugSpawnPanel.svelte';
 </script>
 
 <div class="combat">
   <AreaHeader />
+  <PathTabs />
   {#if import.meta.env.DEV}
     <DebugSpawnPanel />
   {/if}

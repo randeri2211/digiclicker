@@ -1,5 +1,4 @@
-import type { Stage, WildSpawnState } from '../types';
-import { WILD_SPAWN_POOL } from '../roster/starterRoster';
+import type { AreaPath, Stage, WildSpawnState } from '../types';
 import { getSpecies, getSpeciesIdsByStage } from '../images';
 import {
   WILD_HP_BASE,
@@ -14,9 +13,6 @@ import {
   TAME_CHANCE_MIN_PERCENT,
   TAME_CHANCE_MAX_PERCENT,
 } from '../constants';
-
-let spawnIndex = 0;
-let nextLevel = 1;
 
 export function computeWildMaxHp(speciesId: string, level: number): number {
   const stage = getSpecies(speciesId)?.stage ?? 'Unknown';
@@ -37,13 +33,26 @@ function makeWildSpawn(now: number, speciesId: string, level: number): WildSpawn
   };
 }
 
-export function pickNextWildSpawn(now: number): WildSpawnState {
-  const speciesId = WILD_SPAWN_POOL[spawnIndex % WILD_SPAWN_POOL.length];
-  spawnIndex += 1;
-  const level = nextLevel;
-  nextLevel += 1;
+// Weighted-random species pick within the active path's pool, then a
+// uniform level roll in whichever range applies - the entry's own
+// levelRange if it set one (e.g. a weaker regional variant capped lower
+// than the rest of the path), else the path's overall levelRange.
+export function pickNextWildSpawn(now: number, path: AreaPath): WildSpawnState {
+  const totalWeight = path.digimonPool.reduce((sum, entry) => sum + entry.weight, 0);
+  let roll = Math.random() * totalWeight;
+  let chosen = path.digimonPool[path.digimonPool.length - 1];
+  for (const entry of path.digimonPool) {
+    roll -= entry.weight;
+    if (roll <= 0) {
+      chosen = entry;
+      break;
+    }
+  }
 
-  return makeWildSpawn(now, speciesId, level);
+  const [min, max] = chosen.levelRange ?? path.levelRange;
+  const level = min + Math.floor(Math.random() * (max - min + 1));
+
+  return makeWildSpawn(now, chosen.id, level);
 }
 
 // DEBUG: spawns a specific stage+level wild on demand, bypassing the
@@ -67,23 +76,4 @@ export function computeKillBits(wildLevel: number): number {
 export function computeTameChancePercent(avgTeamLevel: number, wildLevel: number): number {
   const raw = TAME_CHANCE_BASE_PERCENT + (avgTeamLevel - wildLevel) * TAME_CHANCE_PER_LEVEL_DIFF_PERCENT;
   return Math.min(TAME_CHANCE_MAX_PERCENT, Math.max(TAME_CHANCE_MIN_PERCENT, Math.round(raw)));
-}
-
-export interface SpawnProgress {
-  spawnIndex: number;
-  nextLevel: number;
-}
-
-export function getSpawnProgress(): SpawnProgress {
-  return { spawnIndex, nextLevel };
-}
-
-export function setSpawnProgress(progress: SpawnProgress): void {
-  spawnIndex = progress.spawnIndex;
-  nextLevel = progress.nextLevel;
-}
-
-export function resetSpawnProgress(): void {
-  spawnIndex = 0;
-  nextLevel = 1;
 }

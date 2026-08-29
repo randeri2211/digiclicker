@@ -1,22 +1,21 @@
-import type { CurrencyState, InventoryState, TeamState, WildSpawnState } from '../types';
+import type { AreaProgressState, CurrencyState, InventoryState, TeamState, WildSpawnState } from '../types';
 
 export const CURRENT_SAVE_VERSION = 1;
 export const SAVE_KEY = 'digiclicker-saves-v1';
-
-export interface SpawnProgressData {
-  spawnIndex: number;
-  nextLevel: number;
-}
 
 export interface SaveSlotData {
   currency: CurrencyState;
   team: TeamState;
   wild: WildSpawnState | null;
-  spawnProgress: SpawnProgressData;
   /** Optional for backward compat with saves made before items existed -
    * normalizeInventory in persistence.svelte.ts backfills missing/partial
    * inventories to 0 per ITEM_CATALOG entry. */
   inventory?: InventoryState;
+  /** Optional for backward compat with saves made before areas existed -
+   * normalizeAreaProgress in persistence.svelte.ts defaults to the
+   * starting area/path if missing, or if the saved activePathId no longer
+   * resolves against current area data. */
+  areaProgress?: AreaProgressState;
 }
 
 export interface SaveSlot {

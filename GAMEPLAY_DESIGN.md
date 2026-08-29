@@ -192,10 +192,35 @@ non-wash upgrade — more slots = strictly more total training throughput.
   system, not folded into the Active/Training slot mechanic.
 
 ### Areas / regions
-- Directionally similar to PokeClicker (progress through areas, presumably
-  gated by defeating something to unlock the next). Exact structure —
-  how gating works, whether areas restrict which evolution stages spawn,
-  etc. — deferred to a later planning session.
+- **Confirmed, built (Forest Sector):** each area (`src/lib/data/areas/
+  *.json`, `AreaData`/`AreaPath` in `types.ts`) is a graph of **paths**,
+  not areas directly — the granular explorable unit is the path. Every
+  path has its own level-ranged wild spawn pool (`digimonPool`, weighted
+  per species — a species can also override the path's `levelRange` for
+  just itself, e.g. a weaker regional variant still shows up in a
+  higher-tier path but capped lower) and a `mastery.kills` threshold that,
+  once reached via kills in that path, unlocks every path listed in its
+  `unlocks` (a list, not a single next-path — paths form a DAG, so one
+  path can fork into several). Progress (`AreaProgressState`: active
+  area/path, unlocked paths per area, kills per path) is tracked in
+  `state/areaProgress.svelte.ts` and persisted like any other save data.
+  Wild spawning (`pickNextWildSpawn` in `combat/spawn.ts`) draws only from
+  the currently active path's pool — the old flat 3-species round-robin
+  is gone. `PathTabs.svelte` lets the player switch between unlocked
+  paths in the active area; `AreaTabs.svelte` (Forest Sector/Cave Sector/
+  Server Continent) stays a cosmetic stub until a second area has real
+  data behind it. `validate_areas.py` (run in CI, see
+  `.github/workflows/validate-areas.yml`) checks every area file for bad
+  species references, malformed level ranges, and — the main thing this
+  catches that nothing else would — paths that are unreachable from the
+  area's `startingPath` (an authoring typo in `unlocks`, not a design
+  choice).
+- Still open: Cave Sector/Server Continent have no real path data yet;
+  cross-area unlocks (a path's `unlocks` pointing at another area's
+  entry path) are anticipated by the schema (`"areaId:pathId"` form) but
+  nothing produces or resolves that yet, since only one area exists so
+  far; area bosses as an alternate mastery gate (proposed below) aren't
+  built - `mastery` is kill-count-only for now.
 
 ### Taming mechanic
 - Defeating a wild Digimon gives a chance to tame it: a flat **base
