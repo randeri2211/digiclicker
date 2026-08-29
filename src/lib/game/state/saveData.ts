@@ -1,4 +1,4 @@
-import type { AreaProgressState, CurrencyState, InventoryState, TeamState, WildSpawnState } from '../types';
+import type { AreaProgressState, CompendiumState, CurrencyState, InventoryState, TeamState, WildSpawnState } from '../types';
 
 export const CURRENT_SAVE_VERSION = 1;
 export const SAVE_KEY = 'digiclicker-saves-v1';
@@ -16,6 +16,10 @@ export interface SaveSlotData {
    * starting area/path if missing, or if the saved activePathId no longer
    * resolves against current area data. */
   areaProgress?: AreaProgressState;
+  /** Optional for backward compat with saves made before the compendium
+   * existed - normalizeCompendium in persistence.svelte.ts backfills it
+   * from the loaded team's formHistory on first load if missing. */
+  compendium?: CompendiumState;
 }
 
 export interface SaveSlot {

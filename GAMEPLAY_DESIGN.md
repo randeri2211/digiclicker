@@ -9,8 +9,26 @@ Running log of gameplay decisions. Split into **Confirmed** (locked in) and
 - Player tames a roster of Digimon (PokeClicker-style collection/breadth).
 - Each individual Digimon independently climbs its own digivolution line
   (Baby → In-Training → Rookie → Champion → Ultimate → Mega, branching paths).
-- Completionist goal is a **Digivolution Compendium**: having obtained every
-  evolution *form* of every line, not just one dex entry per species.
+- Completionist goal is a **Digivolution Compendium (confirmed, built)**:
+  having obtained every evolution *form* of every line, not just one dex
+  entry per species. Tracked as a **permanent record** (`CompendiumState`
+  in `types.ts`, `state/compendium.svelte.ts`) - once a species is
+  revealed to the player it stays credited forever, even if every
+  instance of that form is later lost (no release/discard mechanic
+  exists yet, but the record is built to behave like a real Pokédex
+  regardless). Recorded at the three actual reveal moments only -
+  starter team creation, egg hatch, and digivolve/de-digivolve - never
+  at raw instance creation, since a freshly-dropped egg's species is
+  already resolved internally (`formHistory`) well before the player
+  ever sees it; crediting on creation would leak the species early.
+  `CompendiumScreen.svelte` shows a stage-filterable grid over all 1296
+  `IN_GAME_STAGES` species (not just yours); undiscovered entries render
+  as a genuine "???" placeholder with nothing species-identifying in the
+  DOM, not just visually hidden. Old saves (pre-dating this feature) are
+  migrated once, on first load, by backfilling from each team member's
+  existing `formHistory` - so no progress is lost - while still excluding
+  any instance that's currently an unhatched egg. Pure tracker for now,
+  no completion rewards.
 
 ### Core click loop
 - Player is in a Digital World area; clicking attacks a wild Digimon spawn.

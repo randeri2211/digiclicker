@@ -12,6 +12,7 @@ import {
 import { levelForXp } from '../combat/levelCurve';
 import { IN_GAME_STAGES, DEDIGIVOLVE_ITEM_ID, DEDIGIVOLVE_ITEM_COUNT } from '../constants';
 import { removeItem } from '../state/inventory.svelte';
+import { recordDiscovery } from '../state/compendium.svelte';
 
 // Species whose stage isn't in IN_GAME_STAGES stay fully present in the
 // scraped data (so nothing is lost, and re-enabling a stage later is a
@@ -135,11 +136,11 @@ function applyTransition(instance: DigimonInstance, targetSpeciesId: string): vo
 
   // formHistory no longer drives de-digivolve options (that's graph-based
   // now, see getDedigivolveOptions), but it's still tracked here as a
-  // "every form this instance has ever been" record - useful later for
-  // Digivolution Compendium-style completion tracking.
+  // "every form this instance has ever been" record.
   if (!instance.formHistory.includes(targetSpeciesId)) {
     instance.formHistory.push(targetSpeciesId);
   }
+  recordDiscovery(targetSpeciesId);
   instance.xp = 0;
   instance.speciesId = targetSpeciesId;
   instance.digivolutionStats = addStatBlocks(instance.digivolutionStats, digivolutionStatsBonus);

@@ -3,9 +3,10 @@ import { team } from './team.svelte';
 import { combat } from './combat.svelte';
 import { inventory } from './inventory.svelte';
 import { areaProgress } from './areaProgress.svelte';
+import { compendium } from './compendium.svelte';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
-import type { AreaProgressState, DigimonInstance, InventoryState, TeamState } from '../types';
+import type { AreaProgressState, CompendiumState, DigimonInstance, InventoryState, TeamState } from '../types';
 import { getSpecies } from '../images';
 import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
 import { AUTOSAVE_INTERVAL_MS } from '../constants';
@@ -57,6 +58,27 @@ function normalizeAreaProgress(loaded: AreaProgressState | undefined): AreaProgr
   return loaded;
 }
 
+// One-time migration for saves made before the compendium existed - if
+// present, the loaded record is the permanent source of truth as-is. If
+// missing, backfill it from the (already-normalized) team's formHistory so
+// players don't lose credit for forms they already have. Skips an
+// instance's OWN current speciesId while it's still an unhatched egg -
+// same egg-safety rule as the live reveal-moment call sites (formHistory
+// is set at drop time, before the species is ever shown to the player).
+function normalizeCompendium(loaded: CompendiumState | undefined, normalizedTeam: TeamState): CompendiumState {
+  if (loaded) return loaded;
+
+  const backfilled: CompendiumState = {};
+  const allMembers = [...normalizedTeam.activeMembers, ...normalizedTeam.trainingMembers, ...normalizedTeam.reserveMembers];
+  for (const instance of allMembers) {
+    for (const speciesId of instance.formHistory) {
+      if (instance.eggState && speciesId === instance.speciesId) continue;
+      backfilled[speciesId] = true;
+    }
+  }
+  return backfilled;
+}
+
 function normalizeTeam(loadedTeam: TeamState): TeamState {
   return {
     ...loadedTeam,
@@ -81,19 +103,25 @@ function snapshotLiveState(): SaveSlotData {
       wild: combat.wild,
       inventory,
       areaProgress,
+      compendium,
     })
   );
 }
 
 function applySlotToLiveState(data: SaveSlotData): void {
   Object.assign(currency, data.currency);
-  Object.assign(team, normalizeTeam(data.team));
+  const normalizedTeam = normalizeTeam(data.team);
+  Object.assign(team, normalizedTeam);
   combat.wild = data.wild
     ? { ...data.wild, lastTickAt: Date.now(), attackProgress: data.wild.attackProgress ?? 0 }
     : null;
   combat.damagePopup = null;
   Object.assign(inventory, normalizeInventory(data.inventory));
   Object.assign(areaProgress, normalizeAreaProgress(data.areaProgress));
+  // Overwrite (not merge) - normalizeCompendium already returns either the
+  // loaded record as-is or a full backfill, never a partial one.
+  for (const key of Object.keys(compendium)) delete compendium[key];
+  Object.assign(compendium, normalizeCompendium(data.compendium, normalizedTeam));
 }
 
 export function loadSlotIntoLiveState(slotId: string): void {
@@ -146,7 +174,8 @@ function isValidSlotData(value: unknown): value is SaveSlotData {
     // before those systems existed, backfilled by normalizeInventory/
     // normalizeAreaProgress) - only reject one if present but malformed.
     (data.inventory === undefined || (typeof data.inventory === 'object' && data.inventory !== null)) &&
-    (data.areaProgress === undefined || (typeof data.areaProgress === 'object' && data.areaProgress !== null))
+    (data.areaProgress === undefined || (typeof data.areaProgress === 'object' && data.areaProgress !== null)) &&
+    (data.compendium === undefined || (typeof data.compendium === 'object' && data.compendium !== null))
   );
 }
 

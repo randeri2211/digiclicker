@@ -8,6 +8,7 @@ export { ITEM_CATALOG } from '../items/itemCatalog';
 export { areaProgress, setActivePath } from './areaProgress.svelte';
 export { AREAS, getArea, getPath } from '../areas/areaRegistry';
 export { isPathUnlocked } from '../areas/areaProgress';
+export { compendium, isDiscovered } from './compendium.svelte';
 export { combat, handleClick, debugSpawn, applyDebugSpawn } from './combat.svelte';
 export { startCombatTickLoop, stopCombatTickLoop } from '../combat/tickLoop';
 export { computeActiveTeamDps, computeMemberDps } from '../combat/damage';

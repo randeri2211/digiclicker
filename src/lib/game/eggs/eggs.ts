@@ -3,6 +3,7 @@ import { getSpecies } from '../images';
 import { createDigimonInstance } from '../roster/starterRoster';
 import { levelForXp } from '../combat/levelCurve';
 import { EGG_DROP_CHANCE_PERCENT, EGG_HATCH_LEVEL, IN_GAME_STAGES } from '../constants';
+import { recordDiscovery } from '../state/compendium.svelte';
 
 function isInGameSpecies(species: DigimonSpecies): boolean {
   return IN_GAME_STAGES.has(species.stage);
@@ -79,5 +80,9 @@ export function tryHatch(instance: DigimonInstance): boolean {
 
   instance.eggState = null;
   instance.xp = 0;
+  // The reveal moment - instance.speciesId was resolved back at drop time
+  // but hidden behind eggState until now, so this is the first point it's
+  // safe to credit toward the compendium.
+  recordDiscovery(instance.speciesId);
   return true;
 }

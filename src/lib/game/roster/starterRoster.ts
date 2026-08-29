@@ -2,6 +2,7 @@ import type { DigimonInstance, TeamState } from '../types';
 import { getSpecies } from '../images';
 import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
 import { getAllAreaSpeciesIds } from '../areas/areaRegistry';
+import { recordDiscovery } from '../state/compendium.svelte';
 import {
   STARTER_ACTIVE_CAPACITY,
   STARTER_ACTIVE_MAX_CAPACITY,
@@ -43,7 +44,13 @@ export function createDigimonInstance(speciesId: string, xp: number): DigimonIns
   };
 }
 
+// Starter instances are visible immediately (unlike a freshly-dropped egg,
+// see rollEggDrop in game/eggs/eggs.ts) - record their species right here
+// rather than inside the shared createDigimonInstance helper, so an egg's
+// still-hidden species is never accidentally credited to the compendium.
 export function createStarterTeam(): TeamState {
+  recordDiscovery(STARTER_ACTIVE_SPECIES);
+  recordDiscovery(STARTER_TRAINING_SPECIES);
   return {
     activeCapacity: STARTER_ACTIVE_CAPACITY,
     activeMaxCapacity: STARTER_ACTIVE_MAX_CAPACITY,

@@ -215,3 +215,9 @@ export interface AreaProgressState {
   unlockedPaths: Record<string, string[]>;
   killsByPath: Record<string, number>;
 }
+
+/** Permanent record of every species the player has ever had revealed to
+ * them (starter team, egg hatch, digivolve/de-digivolve) - a presence map
+ * keyed by speciesId, never entries removed even if the player later loses
+ * every instance of that form. See state/compendium.svelte.ts. */
+export type CompendiumState = Record<string, true>;

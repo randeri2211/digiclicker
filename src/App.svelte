@@ -8,6 +8,7 @@
   import EvolutionScreen from './lib/components/evolution/EvolutionScreen.svelte';
   import DigimonHubScreen from './lib/components/DigimonHubScreen.svelte';
   import InventoryScreen from './lib/components/InventoryScreen.svelte';
+  import CompendiumScreen from './lib/components/CompendiumScreen.svelte';
   import {
     startCombatTickLoop,
     stopCombatTickLoop,
@@ -26,6 +27,8 @@
     buyItem,
     areaProgress,
     setActivePath,
+    compendium,
+    isDiscovered,
   } from './lib/game/state/game.svelte';
   import { preloadImages } from './lib/game/preload';
   import { getSpriteUrl } from './lib/game/images';
@@ -38,6 +41,7 @@
   let evolutionOpen = $state(false);
   let hubOpen = $state(false);
   let inventoryOpen = $state(false);
+  let compendiumOpen = $state(false);
 
   $effect(() => {
     const urls = PRELOAD_SPECIES_IDS.map(getSpriteUrl).filter((url): url is string => url !== null);
@@ -79,6 +83,8 @@
       buyItem,
       areaProgress,
       setActivePath,
+      compendium,
+      isDiscovered,
     };
   }
 </script>
@@ -94,6 +100,7 @@
       onOpenEvolution={() => (evolutionOpen = true)}
       onOpenHub={() => (hubOpen = true)}
       onOpenInventory={() => (inventoryOpen = true)}
+      onOpenCompendium={() => (compendiumOpen = true)}
     />
     <div class="main">
       <CombatPanel />
@@ -115,6 +122,10 @@
 
   {#if inventoryOpen}
     <InventoryScreen onClose={() => (inventoryOpen = false)} />
+  {/if}
+
+  {#if compendiumOpen}
+    <CompendiumScreen onClose={() => (compendiumOpen = false)} />
   {/if}
 </div>
 
