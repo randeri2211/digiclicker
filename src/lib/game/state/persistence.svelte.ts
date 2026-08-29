@@ -1,13 +1,15 @@
 import { currency } from './currency.svelte';
 import { team } from './team.svelte';
 import { combat } from './combat.svelte';
+import { inventory } from './inventory.svelte';
 import { getSpawnProgress, setSpawnProgress } from '../combat/spawn';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
-import type { DigimonInstance, TeamState } from '../types';
+import type { DigimonInstance, InventoryState, TeamState } from '../types';
 import { getSpecies } from '../images';
 import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
 import { AUTOSAVE_INTERVAL_MS } from '../constants';
+import { ITEM_CATALOG } from '../items/itemCatalog';
 
 export const activeSlot: { id: string | null } = $state({ id: null });
 
@@ -35,6 +37,14 @@ function normalizeInstance(instance: DigimonInstance): DigimonInstance {
   };
 }
 
+// Backfills 0 for any ITEM_CATALOG key missing from an old save (saves made
+// before items existed, or before a future new item is added) - lookups
+// elsewhere assume InventoryState always has every ItemId present.
+function normalizeInventory(loadedInventory: InventoryState | undefined): InventoryState {
+  const entries = Object.keys(ITEM_CATALOG).map((id) => [id, loadedInventory?.[id as keyof InventoryState] ?? 0]);
+  return Object.fromEntries(entries) as InventoryState;
+}
+
 function normalizeTeam(loadedTeam: TeamState): TeamState {
   return {
     ...loadedTeam,
@@ -58,6 +68,7 @@ function snapshotLiveState(): SaveSlotData {
       team,
       wild: combat.wild,
       spawnProgress: getSpawnProgress(),
+      inventory,
     })
   );
 }
@@ -70,6 +81,7 @@ function applySlotToLiveState(data: SaveSlotData): void {
     : null;
   combat.damagePopup = null;
   setSpawnProgress(data.spawnProgress);
+  Object.assign(inventory, normalizeInventory(data.inventory));
 }
 
 export function loadSlotIntoLiveState(slotId: string): void {
@@ -119,7 +131,11 @@ function isValidSlotData(value: unknown): value is SaveSlotData {
     typeof data.team === 'object' &&
     data.team !== null &&
     typeof data.spawnProgress === 'object' &&
-    data.spawnProgress !== null
+    data.spawnProgress !== null &&
+    // inventory is optional (backward compat with pre-items saves,
+    // backfilled by normalizeInventory) - only reject it if present but
+    // malformed.
+    (data.inventory === undefined || (typeof data.inventory === 'object' && data.inventory !== null))
   );
 }
 

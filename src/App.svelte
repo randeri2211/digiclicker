@@ -7,6 +7,7 @@
   import SettingsScreen from './lib/components/SettingsScreen.svelte';
   import EvolutionScreen from './lib/components/evolution/EvolutionScreen.svelte';
   import DigimonHubScreen from './lib/components/DigimonHubScreen.svelte';
+  import InventoryScreen from './lib/components/InventoryScreen.svelte';
   import {
     startCombatTickLoop,
     stopCombatTickLoop,
@@ -17,9 +18,12 @@
     startNewGameInSlot,
     team,
     combat,
+    currency,
     findRootAncestors,
     rollEggDrop,
     tryHatch,
+    inventory,
+    buyItem,
   } from './lib/game/state/game.svelte';
   import { preloadImages } from './lib/game/preload';
   import { getSpriteUrl } from './lib/game/images';
@@ -31,6 +35,7 @@
   let settingsOpen = $state(false);
   let evolutionOpen = $state(false);
   let hubOpen = $state(false);
+  let inventoryOpen = $state(false);
 
   $effect(() => {
     const urls = PRELOAD_SPECIES_IDS.map(getSpriteUrl).filter((url): url is string => url !== null);
@@ -64,9 +69,12 @@
       startNewGameInSlot,
       team,
       combat,
+      currency,
       findRootAncestors,
       rollEggDrop,
       tryHatch,
+      inventory,
+      buyItem,
     };
   }
 </script>
@@ -81,6 +89,7 @@
       onOpenSettings={() => (settingsOpen = true)}
       onOpenEvolution={() => (evolutionOpen = true)}
       onOpenHub={() => (hubOpen = true)}
+      onOpenInventory={() => (inventoryOpen = true)}
     />
     <div class="main">
       <CombatPanel />
@@ -98,6 +107,10 @@
 
   {#if hubOpen}
     <DigimonHubScreen onClose={() => (hubOpen = false)} />
+  {/if}
+
+  {#if inventoryOpen}
+    <InventoryScreen onClose={() => (inventoryOpen = false)} />
   {/if}
 </div>
 

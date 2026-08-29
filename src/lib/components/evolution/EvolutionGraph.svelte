@@ -7,8 +7,10 @@
     getDedigivolveOptions,
     digivolve,
     dedigivolve,
+    ITEM_CATALOG,
   } from '../../game/state/game.svelte';
   import type { DigivolutionOption } from '../../game/state/game.svelte';
+  import { getItemCount } from '../../game/state/inventory.svelte';
 
   function formatStatBlock(block: StatBlock, signed: boolean): string {
     const fmt = (n: number) => (signed ? `${n >= 0 ? '+' : ''}${n}` : `${n}`);
@@ -85,7 +87,11 @@
     <div class="option-bonus">{formatStatRange(option.digivolutionStatsBonusRange, true)}</div>
     <div class="option-growth">Growth/lvl: {formatStatRange(option.growthPerLevelRange, false)}</div>
     <div class="option-req">
-      {#if option.requirement?.minLevel !== undefined}
+      {#if option.requirement?.itemId !== undefined}
+        {@const count = option.requirement.itemCount ?? 1}
+        {@const have = getItemCount(option.requirement.itemId)}
+        Needs {count}x {ITEM_CATALOG[option.requirement.itemId].name} (have {have})
+      {:else if option.requirement?.minLevel !== undefined}
         Requires Lv {option.requirement.minLevel}
       {:else}
         No requirements

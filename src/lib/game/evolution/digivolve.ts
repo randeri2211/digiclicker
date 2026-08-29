@@ -10,7 +10,8 @@ import {
   addStatBlocks,
 } from '../combat/stats';
 import { levelForXp } from '../combat/levelCurve';
-import { IN_GAME_STAGES, DEDIGIVOLVE_MIN_LEVEL } from '../constants';
+import { IN_GAME_STAGES, DEDIGIVOLVE_ITEM_ID, DEDIGIVOLVE_ITEM_COUNT } from '../constants';
+import { removeItem } from '../state/inventory.svelte';
 
 // Species whose stage isn't in IN_GAME_STAGES stay fully present in the
 // scraped data (so nothing is lost, and re-enabling a stage later is a
@@ -79,9 +80,13 @@ export function getDigivolveOptions(instance: DigimonInstance): DigivolutionOpti
  * down shows whatever the graph says leads to the current form, regardless
  * of which specific path this instance actually took to get here.
  *
- * Requirement is a flat DEDIGIVOLVE_MIN_LEVEL (not stage-based like
- * digivolving up) - de-digivolving doesn't care which lower stage you're
- * heading into, just that the Digimon has reached a minimum level first.
+ * Requirement is a flat item cost (DEDIGIVOLVE_ITEM_ID x
+ * DEDIGIVOLVE_ITEM_COUNT, not stage-based like digivolving up) - de-
+ * digivolving doesn't care which lower stage you're heading into, just
+ * that the player is willing to spend the item. This deliberately replaces
+ * the old level-gate: leveling up and then bouncing a Digimon down for a
+ * free digivolutionStats re-roll was too cheap, so the cost now has to be
+ * earned/bought (see items/itemCatalog.ts) rather than just waited out.
  */
 export function getDedigivolveOptions(instance: DigimonInstance): DigivolutionOption[] {
   if (instance.eggState) return [];
@@ -89,7 +94,7 @@ export function getDedigivolveOptions(instance: DigimonInstance): DigivolutionOp
   const current = getSpecies(instance.speciesId);
   if (!current) return [];
 
-  const requirement: DigivolutionRequirement = { minLevel: DEDIGIVOLVE_MIN_LEVEL };
+  const requirement: DigivolutionRequirement = { itemId: DEDIGIVOLVE_ITEM_ID, itemCount: DEDIGIVOLVE_ITEM_COUNT };
   const requirementMet = isRequirementMet(instance, requirement);
 
   return current.evolvesFrom
@@ -145,6 +150,11 @@ export function digivolve(instance: DigimonInstance, targetSpeciesId: string): v
   applyTransition(instance, targetSpeciesId);
 }
 
+// Trusts the caller to have already checked requirementMet (same
+// convention digivolve() follows for its level requirement) - the UI only
+// ever commits a blocked option if it bypasses the requirementMet guard
+// itself, so this doesn't re-check before consuming the item.
 export function dedigivolve(instance: DigimonInstance, targetSpeciesId: string): void {
+  removeItem(DEDIGIVOLVE_ITEM_ID, DEDIGIVOLVE_ITEM_COUNT);
   applyTransition(instance, targetSpeciesId);
 }

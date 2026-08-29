@@ -2,6 +2,7 @@
   import CurrencyPill from './CurrencyPill.svelte';
   import EvolutionBadgeButton from './EvolutionBadgeButton.svelte';
   import HubButton from './HubButton.svelte';
+  import InventoryButton from './InventoryButton.svelte';
   import SettingsButton from './SettingsButton.svelte';
   import { currency } from '../../game/state/game.svelte';
 
@@ -9,9 +10,10 @@
     onOpenSettings: () => void;
     onOpenEvolution: () => void;
     onOpenHub: () => void;
+    onOpenInventory: () => void;
   }
 
-  const { onOpenSettings, onOpenEvolution, onOpenHub }: Props = $props();
+  const { onOpenSettings, onOpenEvolution, onOpenHub, onOpenInventory }: Props = $props();
 </script>
 
 <div class="topbar">
@@ -22,6 +24,7 @@
   </div>
   <EvolutionBadgeButton onClick={onOpenEvolution} />
   <HubButton onClick={onOpenHub} />
+  <InventoryButton onClick={onOpenInventory} />
   <SettingsButton onClick={onOpenSettings} />
 </div>
 

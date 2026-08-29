@@ -1,4 +1,4 @@
-import type { Stage } from './types';
+import type { ItemId, Stage } from './types';
 
 // ============================================================
 // DigiClicker tunable parameters - single source of truth. Every
@@ -26,10 +26,6 @@ export const DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE: Partial<Record<Stage, number>>
   Ultimate: 36,
   Mega: 56,
 };
-
-/** Flat level requirement to de-digivolve at all, regardless of target
- * stage. */
-export const DEDIGIVOLVE_MIN_LEVEL = 4;
 
 /** Stages actually playable right now. Every other stage (Fresh, Armor,
  * Hybrid, Ultra, Burst Mode, Unknown) stays fully present in the scraped
@@ -137,6 +133,17 @@ export const EGG_DROP_CHANCE_PERCENT = 0.1;
  * enough to reach in a couple of kills so hatching isn't a second full
  * grind on top of the rare drop itself. */
 export const EGG_HATCH_LEVEL = 10;
+
+// ---- Items -----------------------------------------------------------
+/** De-digivolving requires spending this many of DEDIGIVOLVE_ITEM_ID
+ * (replaces the old flat DEDIGIVOLVE_MIN_LEVEL gate - see
+ * getDedigivolveOptions/dedigivolve in evolution/digivolve.ts) - makes
+ * de-digivolving a deliberate spend instead of a free repeatable action. */
+export const DEDIGIVOLVE_ITEM_ID: ItemId = 'dedigivolve-crystal';
+export const DEDIGIVOLVE_ITEM_COUNT = 1;
+/** Bits price for one De-Digivolution Crystal in the Inventory shop (see
+ * items/itemCatalog.ts). */
+export const DEDIGIVOLVE_CRYSTAL_COST_BITS = 250;
 
 // ---- Persistence -------------------------------------------------------
 export const AUTOSAVE_INTERVAL_MS = 15000;

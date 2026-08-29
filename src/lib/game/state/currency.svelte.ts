@@ -9,3 +9,10 @@ export function addBits(amount: number) {
 export function addData(amount: number) {
   currency.data += amount;
 }
+
+/** False and no-op if bits are insufficient - never allows going negative. */
+export function spendBits(amount: number): boolean {
+  if (currency.bits < amount) return false;
+  currency.bits -= amount;
+  return true;
+}

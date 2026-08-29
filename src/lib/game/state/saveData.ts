@@ -1,4 +1,4 @@
-import type { CurrencyState, TeamState, WildSpawnState } from '../types';
+import type { CurrencyState, InventoryState, TeamState, WildSpawnState } from '../types';
 
 export const CURRENT_SAVE_VERSION = 1;
 export const SAVE_KEY = 'digiclicker-saves-v1';
@@ -13,6 +13,10 @@ export interface SaveSlotData {
   team: TeamState;
   wild: WildSpawnState | null;
   spawnProgress: SpawnProgressData;
+  /** Optional for backward compat with saves made before items existed -
+   * normalizeInventory in persistence.svelte.ts backfills missing/partial
+   * inventories to 0 per ITEM_CATALOG entry. */
+  inventory?: InventoryState;
 }
 
 export interface SaveSlot {

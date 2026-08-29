@@ -29,6 +29,22 @@ export type EggType =
   | 'Evil'
   | 'Holy';
 
+/** One member for now (the de-digivolve item) - a plain string union so
+ * adding a new item later is just adding a new member here plus a matching
+ * ITEM_CATALOG entry (see src/lib/game/items/itemCatalog.ts). */
+export type ItemId = 'dedigivolve-crystal';
+
+export interface ItemDefinition {
+  id: ItemId;
+  name: string;
+  description: string;
+  costBits: number;
+}
+
+/** Always has an entry for every ItemId (see inventory.svelte.ts's
+ * initialization) - lookups never need a `?? 0` fallback. */
+export type InventoryState = Record<ItemId, number>;
+
 export interface StatBlock {
   attack: number;
   defense: number;

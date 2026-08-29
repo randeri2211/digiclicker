@@ -2,6 +2,9 @@
 // than reaching into individual state modules directly.
 export { currency } from './currency.svelte';
 export { team } from './team.svelte';
+export { inventory } from './inventory.svelte';
+export { buyItem, canAffordItem } from '../items/items';
+export { ITEM_CATALOG } from '../items/itemCatalog';
 export { combat, handleClick, debugSpawn, applyDebugSpawn } from './combat.svelte';
 export { startCombatTickLoop, stopCombatTickLoop } from '../combat/tickLoop';
 export { computeActiveTeamDps, computeMemberDps } from '../combat/damage';
