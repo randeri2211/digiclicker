@@ -29,8 +29,9 @@ As each feature ships, move its description into `GAMEPLAY_DESIGN.md`'s "Confirm
 | 5 | Unlock flags + quests framework (story content: undecided) | 2 |
 | 6 | Crest requirement for Ultimate/Mega (how Crests are obtained: undecided) | 5 |
 | 7 | Special digivolutions: Armor (Digimentals) and DNA (unlock triggers: undecided) | 5, 3 |
+| 8 | Farming: Digi-Meat and other food (needs a design pass) | 3 |
 
-Features 1–4 are fully specified; 5–7 get a design pass (story, Crest sources/timing) before they're built.
+Features 1–4 are fully specified; 5–8 get a design pass (story, Crest sources/timing, farming details) before they're built.
 
 Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs in `constants.ts`) and, where it has a curve or matters for pacing, gets a control/chart in the Balance Lab (`src/balance/`). Every new saved state goes into `SaveSlotData` (`state/saveData.ts`) with a `normalize*` default in `persistence.svelte.ts`, so v2 saves keep loading.
 
@@ -72,7 +73,7 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - **Loot:** Data (always), eggs (of the destination's egg families, into the hatchery via `addEgg`), and **unique items** that give expeditions their own identity. Two kinds, kept strictly apart:
   - **Consumables** (stackable, worth finding repeatedly) - draft list, each with a real use:
     - **Recovery Floppy / Attack Chip / Defense Disk** - boss-fight buffs (feature 2).
-    - **Digi-Food** (Meat, Giant Meat) - instant XP for one Digimon.
+    - **Seeds / rare crop cuttings** for the farm (feature 8) - expeditions find them, the farm grows them. Food itself mainly comes from farming, so the two loops don't overlap.
     These go through the existing `ITEM_CATALOG` / `inventory` system (`items/itemCatalog.ts`, `state/inventory.svelte.ts`).
   - **Key items** (permanent unlocks, found **once** - never consumed, so duplicates are never dropped): e.g. **Digimentals** (Armor digivolution, feature 7) as rare one-time discoveries at specific destinations. Stored as unlock flags (feature 5), not inventory counts; once found, that key item is removed from every loot table.
 - **No Crest drops:** Crests are permanent keys too, so farming them makes no sense - expeditions never drop Crests or Crest pieces.
@@ -113,6 +114,20 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - **Armor:** re-add `'Armor'` to `IN_GAME_STAGES`; a Rookie can Armor-digivolve into the targets its data lists (`evolvesTo` edges into Armor species) by **owning** the matching **Digimental** (Courage, Friendship, Love, ... - permanent key items found once, see feature 3; never consumed), once the flag `armor-unlocked` is set (trigger to be decided). Adds the target as a new roster entry, like normal digivolve (reuse `digivolve()` with a key-item requirement - `DigivolutionRequirement` gains `keyItem`, checked against the unlock flags).
 - **DNA:** the `fusion`-classified `sameStageEvolutions` edges (EvolutionGraphConverter.py, `data/fusion_edges_review.md`) define pairs → result (e.g. WarGreymon + MetalGarurumon → Omnimon). Requires **owning both sources**, a flag per fusion (e.g. `dna:omnimon`; trigger to be decided), and consumes nothing (both stay - roster rules). Fusion data needs a curated `fusions.json` (pairs), since the raw edges list sources per result, not pairs.
 - **UI:** Evolution screen gains an "Armor" and a "DNA" tab; locked entries explain their quest.
+
+## 8. Farming: Digi-Meat and other food
+**Goal:** a second idle loop - growing food - with its own small decisions, feeding Digimon directly. **Needs a design pass before building** (the points below are a draft, nothing here is decided).
+
+- **Model (Digimon World flavor):** a **farm** with a few **plots** (more unlockable with bits). Each plot grows one crop over real time (`Date.now()`-based like expeditions, so it grows offline) and is harvested when ready - draft crops:
+  - **Digi-Meat** - common, fast; feed for a little XP.
+  - **Giant Meat** - slower; a lot of XP.
+  - **Sirloin / Supercarrot / Deluxe Mushroom** - rare (grown from expedition seeds, feature 3); boss-fight buffs (e.g. +20% Attack for the next boss fight) or a small permanent bonus.
+- **Farmhands:** optionally assign roster Digimon to a plot to speed it up or raise its yield - **Plant/Earth** elements (feature 1) and level help. Like an expedition party, farmhands **don't fight** while assigned (reuse feature 3's "Digimon away" state rather than a second one).
+- **Feeding:** a "Feed" action on a roster entry (roster menu / Stats window) spends food for XP - a way to push a chosen Digimon toward a digivolution level without farming kills for the whole roster.
+- **Division of labour with expeditions:** expeditions *explore* (Data, eggs, key items, seeds); the farm *produces* (food). Food isn't a regular expedition drop.
+- **Hooks already waiting:** the "farming specialization" special abilities parked in GAMEPLAY_DESIGN.md ("Special Abilities") plug in here - e.g. a +yield ability for farmhands.
+- **Tunables:** grow times, yields, XP per food, plot costs in `balance.json`; a Balance Lab chart of food XP per hour vs. kill XP per hour, so feeding stays a supplement to combat rather than a replacement.
+- **Open questions for the design pass:** is food bought/planted with bits or seeds only; how many plots; does a plot need care (watering) or is it pure idle; is farming unlocked from the start or after the first boss.
 
 ## Parked
 - **Signature moves** - per-species active moves; revisit when a small curated set (e.g. only Megas or boss-relevant lines) is feasible.
