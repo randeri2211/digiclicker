@@ -1,17 +1,13 @@
 import { currency } from './currency.svelte';
-import { team } from './team.svelte';
+import { roster } from './roster.svelte';
+import { hatchery } from './hatchery.svelte';
 import { combat } from './combat.svelte';
 import { inventory } from './inventory.svelte';
 import { areaProgress } from './areaProgress.svelte';
-import { compendium } from './compendium.svelte';
 import { automation } from './digivolveAutomation.svelte';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
-import type { AreaProgressState, CompendiumState, DigimonInstance, DigivolveAutomationState, InventoryState, StatBlock, TeamState } from '../types';
-import { getSpecies } from '../images';
-import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
-import { computeTeamHp } from '../combat/damage';
-import { computeFightTimeLimitMs } from '../combat/spawn';
+import type { AreaProgressState, InventoryState, RosterState } from '../types';
 import { AUTOSAVE_INTERVAL_MS } from '../constants';
 import { ITEM_CATALOG } from '../items/itemCatalog';
 import { initialAreaProgress } from '../areas/areaProgress';
@@ -19,92 +15,38 @@ import { getPath } from '../areas/areaRegistry';
 
 export const activeSlot: { id: string | null } = $state({ id: null });
 
-// Saves made before formHistory/baseStats/growthPerLevel existed (or from
-// before digivolutionStats became a StatBlock instead of a bare number) are
-// missing/mismatched on those fields - backfill them so old saves don't
-// crash the first time evolution/combat code touches a loaded instance.
-// baseStats/growthPerLevel are rolled fresh from the instance's CURRENT
-// species (the only information available at load time - the original
-// birth-form/most-recent-transition context is gone).
-// Old saves' StatBlocks have a `defense` key, not `hp` (Defense was
-// renamed to HP once it gained a live effect - see combat/stats.ts).
-// Prefers hp if present (already-migrated or freshly-rolled blocks),
-// else falls back to the old defense value, else 0 - a no-op on a block
-// already in the new shape.
-function migrateStatBlock(block: StatBlock & { defense?: number }): StatBlock {
-  return { ...block, hp: block.hp ?? block.defense ?? 0 };
-}
-
-function normalizeInstance(instance: DigimonInstance): DigimonInstance {
-  const species = getSpecies(instance.speciesId);
-  const stage = species?.stage ?? 'Unknown';
-  const statAffinity = species?.statAffinity ?? 'Attack';
-  const hasStatBlockDigivolutionStats =
-    instance.digivolutionStats !== undefined && typeof instance.digivolutionStats === 'object';
-
-  return {
-    ...instance,
-    formHistory: instance.formHistory ?? [instance.speciesId],
-    baseStats: migrateStatBlock(instance.baseStats ?? rollBaseStats(stage, statAffinity)),
-    growthPerLevel: migrateStatBlock(instance.growthPerLevel ?? rollGrowthPerLevel(stage, statAffinity)),
-    digivolutionStats: migrateStatBlock(hasStatBlockDigivolutionStats ? instance.digivolutionStats : zeroStatBlock()),
-    eggState: instance.eggState ? { ...instance.eggState, isMystery: instance.eggState.isMystery ?? false } : null,
-    abilityId: instance.abilityId ?? null,
-  };
-}
-
-// Backfills 0 for any ITEM_CATALOG key missing from an old save (saves made
-// before items existed, or before a future new item is added) - lookups
-// elsewhere assume InventoryState always has every ItemId present.
-function normalizeInventory(loadedInventory: InventoryState | undefined): InventoryState {
-  const entries = Object.keys(ITEM_CATALOG).map((id) => [id, loadedInventory?.[id as keyof InventoryState] ?? 0]);
+// Keeps only current ITEM_CATALOG keys, backfilling 0 for any added after
+// the save was made - lookups elsewhere assume InventoryState always has
+// every ItemId present.
+function normalizeInventory(loadedInventory: InventoryState): InventoryState {
+  const entries = Object.keys(ITEM_CATALOG).map((id) => [id, loadedInventory[id as keyof InventoryState] ?? 0]);
   return Object.fromEntries(entries) as InventoryState;
 }
 
-// Defaults to a fresh initialAreaProgress() if missing entirely, or if the
-// saved activePathId no longer resolves against current area data (area
-// content can change between plays) - falls back to the starting area's
-// starting path rather than leaving the player on a dangling reference.
-function normalizeAreaProgress(loaded: AreaProgressState | undefined): AreaProgressState {
-  if (!loaded) return initialAreaProgress();
+// Falls back to the starting area's starting path if the saved
+// activePathId no longer resolves against current area data (area
+// content can change between plays), rather than leaving the player on a
+// dangling reference.
+function normalizeAreaProgress(loaded: AreaProgressState): AreaProgressState {
   if (!getPath(loaded.activeAreaId, loaded.activePathId)) return initialAreaProgress();
   return loaded;
 }
 
-// One-time migration for saves made before the compendium existed - if
-// present, the loaded record is the permanent source of truth as-is. If
-// missing, backfill it from the (already-normalized) team's formHistory so
-// players don't lose credit for forms they already have. Skips an
-// instance's OWN current speciesId while it's still an unhatched egg -
-// same egg-safety rule as the live reveal-moment call sites (formHistory
-// is set at drop time, before the species is ever shown to the player).
-function normalizeCompendium(loaded: CompendiumState | undefined, normalizedTeam: TeamState): CompendiumState {
-  if (loaded) return loaded;
-
-  const backfilled: CompendiumState = {};
-  const allMembers = [...normalizedTeam.activeMembers, ...normalizedTeam.trainingMembers, ...normalizedTeam.reserveMembers];
-  for (const instance of allMembers) {
-    for (const speciesId of instance.formHistory) {
-      if (instance.eggState && speciesId === instance.speciesId) continue;
-      backfilled[speciesId] = true;
-    }
-  }
-  return backfilled;
+// v2 saves made before inheritedFromLevel existed lack it - 0 means "never
+// digivolved into", which is exactly right for them (any upgrade shows as
+// an improvement over "no level recorded").
+function normalizeRoster(loaded: RosterState): RosterState {
+  return Object.fromEntries(
+    Object.entries(loaded).map(([id, entry]) => [id, { ...entry, inheritedFromLevel: entry.inheritedFromLevel ?? 0 }])
+  );
 }
 
-// Defaults to disabled/no-preferences if missing (saves made before
-// auto-digivolve existed).
-function normalizeAutomation(loaded: DigivolveAutomationState | undefined): DigivolveAutomationState {
-  return loaded ?? { enabled: false, preferences: {} };
-}
-
-function normalizeTeam(loadedTeam: TeamState): TeamState {
-  return {
-    ...loadedTeam,
-    activeMembers: loadedTeam.activeMembers.map(normalizeInstance),
-    trainingMembers: loadedTeam.trainingMembers.map(normalizeInstance),
-    reserveMembers: (loadedTeam.reserveMembers ?? []).map(normalizeInstance),
-  };
+// Overwrites a keyed-record $state object in place (not merge) - its key
+// set is dynamic, so keys from whichever slot was previously live have to
+// be cleared before assigning the newly loaded ones.
+function replaceRecord<T>(target: Record<string, T>, source: Record<string, T>): void {
+  for (const key of Object.keys(target)) delete target[key];
+  Object.assign(target, source);
 }
 
 function snapshotLiveState(): SaveSlotData {
@@ -118,11 +60,11 @@ function snapshotLiveState(): SaveSlotData {
   return JSON.parse(
     JSON.stringify({
       currency,
-      team,
+      roster,
+      hatchery,
       wild: combat.wild,
       inventory,
       areaProgress,
-      compendium,
       automation,
     })
   );
@@ -130,35 +72,14 @@ function snapshotLiveState(): SaveSlotData {
 
 function applySlotToLiveState(data: SaveSlotData): void {
   Object.assign(currency, data.currency);
-  const normalizedTeam = normalizeTeam(data.team);
-  Object.assign(team, normalizedTeam);
-  combat.wild = data.wild
-    ? {
-        ...data.wild,
-        lastTickAt: Date.now(),
-        attackProgress: data.wild.attackProgress ?? 0,
-        // Saves made before the fight timer existed have neither field -
-        // resume as if the encounter just started, with a real timer
-        // computed from the current (already-normalized) team's HP.
-        spawnedAt: data.wild.spawnedAt ?? Date.now(),
-        timeLimitMs: data.wild.timeLimitMs ?? computeFightTimeLimitMs(computeTeamHp(normalizedTeam.activeMembers)),
-      }
-    : null;
+  replaceRecord(roster, normalizeRoster(data.roster));
+  Object.assign(hatchery, data.hatchery);
+  combat.wild = data.wild ? { ...data.wild, lastTickAt: Date.now() } : null;
   combat.damagePopup = null;
   Object.assign(inventory, normalizeInventory(data.inventory));
   Object.assign(areaProgress, normalizeAreaProgress(data.areaProgress));
-  // Overwrite (not merge) - normalizeCompendium already returns either the
-  // loaded record as-is or a full backfill, never a partial one.
-  for (const key of Object.keys(compendium)) delete compendium[key];
-  Object.assign(compendium, normalizeCompendium(data.compendium, normalizedTeam));
-
-  // preferences has the same dynamic/unbounded key set as compendium -
-  // clear stale entries from whichever slot was previously live before
-  // assigning the newly loaded ones.
-  const normalizedAutomation = normalizeAutomation(data.automation);
-  for (const key of Object.keys(automation.preferences)) delete automation.preferences[key];
-  Object.assign(automation.preferences, normalizedAutomation.preferences);
-  automation.enabled = normalizedAutomation.enabled;
+  replaceRecord(automation.preferences, data.automation.preferences);
+  automation.enabled = data.automation.enabled;
 }
 
 export function loadSlotIntoLiveState(slotId: string): void {
@@ -199,21 +120,23 @@ export function exportSlotToFile(id: string): void {
   URL.revokeObjectURL(url);
 }
 
+function isObject(value: unknown): boolean {
+  return typeof value === 'object' && value !== null;
+}
+
+// Shape check only - an exported v1 save (active/training team, no
+// roster/hatchery) fails here and is rejected cleanly rather than
+// crashing the first time the roster is read.
 function isValidSlotData(value: unknown): value is SaveSlotData {
-  if (typeof value !== 'object' || value === null) return false;
+  if (!isObject(value)) return false;
   const data = value as Record<string, unknown>;
   return (
-    typeof data.currency === 'object' &&
-    data.currency !== null &&
-    typeof data.team === 'object' &&
-    data.team !== null &&
-    // inventory/areaProgress are optional (backward compat with saves made
-    // before those systems existed, backfilled by normalizeInventory/
-    // normalizeAreaProgress) - only reject one if present but malformed.
-    (data.inventory === undefined || (typeof data.inventory === 'object' && data.inventory !== null)) &&
-    (data.areaProgress === undefined || (typeof data.areaProgress === 'object' && data.areaProgress !== null)) &&
-    (data.compendium === undefined || (typeof data.compendium === 'object' && data.compendium !== null)) &&
-    (data.automation === undefined || (typeof data.automation === 'object' && data.automation !== null))
+    isObject(data.currency) &&
+    isObject(data.roster) &&
+    isObject(data.hatchery) &&
+    isObject(data.inventory) &&
+    isObject(data.areaProgress) &&
+    isObject(data.automation)
   );
 }
 

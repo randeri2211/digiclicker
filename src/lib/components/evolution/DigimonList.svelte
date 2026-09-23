@@ -1,41 +1,32 @@
 <script lang="ts">
-  import type { DigimonInstance } from '../../game/types';
-  import { getSpecies, getSpriteUrl, getEggSpriteUrl, getInstanceDisplayName, isMysteryEgg } from '../../game/images';
+  import type { RosterEntry } from '../../game/types';
+  import { getSpecies, getSpriteUrl, getSpeciesName } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import { isReadyToDigivolve } from '../../game/state/game.svelte';
+  import XpBar from '../shared/XpBar.svelte';
 
   interface Props {
-    members: DigimonInstance[];
-    selectedInstanceId: string | null;
-    onSelect: (instanceId: string) => void;
+    entries: RosterEntry[];
+    selectedSpeciesId: string | null;
+    onSelect: (speciesId: string) => void;
   }
 
-  const { members, selectedInstanceId, onSelect }: Props = $props();
+  const { entries, selectedSpeciesId, onSelect }: Props = $props();
 
   const sorted = $derived(
-    [...members].sort((a, b) => Number(isReadyToDigivolve(b)) - Number(isReadyToDigivolve(a)))
+    [...entries].sort((a, b) => Number(isReadyToDigivolve(b)) - Number(isReadyToDigivolve(a)))
   );
-
-  // An unhatched egg's speciesId is already resolved but hidden until it
-  // hatches - show the per-type egg art/name instead of spoiling it.
-  function spriteFor(member: DigimonInstance): string | null {
-    return member.eggState ? getEggSpriteUrl(member.eggState.eggType) : getSpriteUrl(member.speciesId);
-  }
-  function stageFor(member: DigimonInstance): string {
-    if (member.eggState) return 'Egg';
-    return getSpecies(member.speciesId)?.stage ?? 'Unknown';
-  }
 </script>
 
 <div class="list">
-  {#each sorted as member (member.instanceId)}
-    {@const sprite = spriteFor(member)}
-    {@const ready = isReadyToDigivolve(member)}
+  {#each sorted as entry (entry.speciesId)}
+    {@const sprite = getSpriteUrl(entry.speciesId)}
+    {@const ready = isReadyToDigivolve(entry)}
     <div
       class="row"
-      class:selected={member.instanceId === selectedInstanceId}
-      onclick={() => onSelect(member.instanceId)}
-      onkeydown={(e) => e.key === 'Enter' && onSelect(member.instanceId)}
+      class:selected={entry.speciesId === selectedSpeciesId}
+      onclick={() => onSelect(entry.speciesId)}
+      onkeydown={(e) => e.key === 'Enter' && onSelect(entry.speciesId)}
       role="button"
       tabindex="0"
     >
@@ -46,13 +37,11 @@
         {#if ready}
           <span class="ready-dot"></span>
         {/if}
-        {#if isMysteryEgg(member)}
-          <span class="mystery-badge">?</span>
-        {/if}
       </div>
       <div class="info">
-        <div class="name">{getInstanceDisplayName(member)}</div>
-        <div class="meta">Lv {levelForXp(member.xp)} · {stageFor(member)}</div>
+        <div class="name">{getSpeciesName(entry.speciesId)}</div>
+        <div class="meta">Lv {levelForXp(entry.xp)} · {getSpecies(entry.speciesId)?.stage ?? 'Unknown'}</div>
+        <div class="row-xp"><XpBar xp={entry.xp} /></div>
       </div>
     </div>
   {/each}
@@ -108,25 +97,12 @@
     box-shadow: 0 0 6px var(--warn);
     border-radius: 50%;
   }
-  .mystery-badge {
-    position: absolute;
-    bottom: -3px;
-    right: -3px;
-    font-family: var(--head);
-    font-size: 9px;
-    font-weight: 800;
-    color: var(--text-h);
-    background: var(--accent-soft);
-    border: 1px solid var(--accent);
-    width: 13px;
-    height: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-  }
   .info {
+    flex: 1;
     min-width: 0;
+  }
+  .row-xp {
+    margin-top: 5px;
   }
   .name {
     font-size: 13px;

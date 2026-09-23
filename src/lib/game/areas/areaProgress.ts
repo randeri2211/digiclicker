@@ -27,7 +27,7 @@ export function getActivePath(progress: AreaProgressState): AreaPath | undefined
 // Called on every wild kill - increments the active path's kill count and,
 // once its mastery threshold is crossed, unlocks every path it lists in
 // `unlocks` (idempotent - already-unlocked ids aren't re-added). Mutates
-// progress in place, matching how other state modules (currency, team)
+// progress in place, matching how other state modules (currency, roster)
 // mutate their $state objects directly rather than returning a new one.
 export function recordActivePathKill(progress: AreaProgressState): void {
   const path = getActivePath(progress);

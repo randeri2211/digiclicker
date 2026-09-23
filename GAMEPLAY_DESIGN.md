@@ -5,170 +5,169 @@ Running log of gameplay decisions. Split into **Confirmed** (locked in) and
 
 ## Confirmed
 
-### Core approach: Hybrid model
-- Player tames a roster of Digimon (PokeClicker-style collection/breadth).
-- Each individual Digimon independently climbs its own digivolution line
-  (Baby → In-Training → Rookie → Champion → Ultimate → Mega, branching paths).
-- Completionist goal is a **Digivolution Compendium (confirmed, built)**:
-  having obtained every evolution *form* of every line, not just one dex
-  entry per species. Tracked as a **permanent record** (`CompendiumState`
-  in `types.ts`, `state/compendium.svelte.ts`) - once a species is
-  revealed to the player it stays credited forever, even if every
-  instance of that form is later lost (no release/discard mechanic
-  exists yet, but the record is built to behave like a real Pokédex
-  regardless). Recorded at the three actual reveal moments only -
-  starter team creation, egg hatch, and digivolve/de-digivolve - never
-  at raw instance creation, since a freshly-dropped egg's species is
-  already resolved internally (`formHistory`) well before the player
-  ever sees it; crediting on creation would leak the species early.
-  `CompendiumScreen.svelte` shows a stage-filterable grid over all 1296
-  `IN_GAME_STAGES` species (not just yours); undiscovered entries render
-  as a genuine "???" placeholder with nothing species-identifying in the
-  DOM, not just visually hidden. Old saves (pre-dating this feature) are
-  migrated once, on first load, by backfilling from each team member's
-  existing `formHistory` - so no progress is lost - while still excluding
-  any instance that's currently an unhatched egg. Pure tracker for now,
-  no completion rewards.
+### Core approach: one-per-species roster (confirmed, built)
+- PokeClicker-style collection: the player owns a **roster** holding at
+  most **one entry per species** (`RosterState` in `types.ts`, keyed by
+  speciesId - the key itself enforces uniqueness; `state/
+  roster.svelte.ts`). There is no party: **every** owned Digimon
+  contributes its stats to combat and receives full kill XP.
+- Digivolving never replaces a Digimon - it **adds** the target species
+  as a new roster entry (see "Stat system" below). So the collection only
+  grows, and the branching evolution graph (Baby -> In-Training -> Rookie
+  -> Champion -> Ultimate -> Mega) becomes "which branch first", not
+  either/or.
+- Completionist goal is the **Digivolution Compendium (confirmed,
+  built)**: every in-game species obtained. Since roster entries can
+  never be lost and an egg's species stays hidden until it hatches,
+  "discovered" is simply "owned" - `CompendiumScreen.svelte` reads
+  `isOwned` straight from the roster rather than keeping a separate
+  record that could drift. It shows a stage-filterable grid over all
+  1296 `IN_GAME_STAGES` species; undiscovered entries render as a genuine
+  "???" placeholder with nothing species-identifying in the DOM, not
+  just visually hidden. Pure tracker for now, no completion rewards.
+- **Replaced the old party model** (Active/Training/Reserve buckets with
+  capped slots, multiple copies of a species, one Digimon *changing*
+  species as it digivolved). Saves from that model (save format v1) are
+  not converted - see "Technical notes".
 
 ### Core click loop
 - Player is in a Digital World area; clicking attacks a wild Digimon spawn.
+- **Click damage scales with the roster (confirmed, built):** each click
+  deals `CLICK_DAMAGE_BASE + rosterDps * CLICK_DAMAGE_DPS_FRACTION`
+  (8 + 10% of DPS, placeholders - `computeClickDamage` in
+  `combat/damage.ts`). The flat base keeps early clicks meaningful while
+  DPS is tiny; the DPS share keeps clicking a proportional boost on top
+  of idle damage (~80% extra at ~8 clicks/sec) instead of fading into
+  irrelevance as the roster grows. Shown in the sidebar's Roster DPS
+  panel.
 - Defeating a wild Digimon grants Bits (currency) and a rare chance to
   drop a Digi-Egg (see "Digi-Eggs" below).
 
-### Team structure
-Two independently expandable sets of team slots:
-- **Active slots** — Digimon that deal damage in the click/combat loop.
-  Base (starting) active capacity is **6** slots
-  (`STARTER_ACTIVE_CAPACITY` in `src/lib/game/constants.ts`), all
-  unlocked from the start of a new game - only 1 is filled by the
-  starter Digimon, the rest are empty until roster growth (hatching
-  Digi-Eggs, or later mechanics) fills them.
-- **Training slots** — Digimon that don't fight, but passively receive a
-  share of combat XP.
+### XP distribution
+**Flat-XP rule:** XP-per-kill is a flat amount awarded to *every* roster
+entry (and every incubating egg, see "Digi-Eggs") - it is never
+divided/diluted as the roster grows. E.g. a kill worth 35 XP gives every
+owned Digimon 35 XP. Net effect: growing the roster is a pure multiplier
+on total XP earned per kill.
 
-**XP distribution rule:** XP-per-kill is a flat amount awarded to *every*
-team member (active + training) — it does not get divided/diluted as team
-size grows. E.g. a kill worth 35 XP gives all 5 members 35 XP each;
-expanding to 10 slots still gives every member 35 XP, not 17.5 XP each.
-Net effect: growing team size is a pure multiplier on total XP earned per
-kill, which makes slot expansion (via currency/progression) a meaningful,
-non-wash upgrade — more slots = strictly more total training throughput.
-
-### Team slot menu & Digimon Hub
-- Clicking a filled Active or Training team slot opens a context menu
-  (positioned next to the cursor, closes on outside click/Escape) with
-  per-slot actions: **Open Stats** (a small table of Attack/HP/
-  Speed/SpecialAttack, Base vs. Digivolution columns), and moving the
-  Digimon between buckets - **Send To Training Team** / **Send To
-  Active Team** (greyed out when the destination is full), and
-  **Remove From Team** (sends it to the Digimon Hub).
-- **Digimon Hub**: a new screen (reachable from the top bar) listing
-  every caught Digimon that isn't on the Active or Training team. A
-  checkbox toggle ("Also show Active/Training Team members") widens
-  the list to include the current teams too, rather than a fixed
-  filter - each card there opens the same bucket-aware context menu.
-- Implementation is deliberately generic rather than one menu per team
-  kind: a single `ContextMenu.svelte` (pure popup, no game logic) plus
-  a single `getTeamSlotMenuItems(instance, bucket, callbacks)` builder
-  (`src/lib/game/team/teamMenu.ts`) that switches on
-  `'active' | 'training' | 'reserve'` - adding a new action later is a
-  one-line change there, not a new component. `TeamState` gained a
-  third, uncapped `reserveMembers` bucket (the Hub's backing store)
-  alongside the existing capacity-limited `activeMembers`/
-  `trainingMembers`; `moveMember(instanceId, toBucket)`
-  (`src/lib/game/team/teamActions.ts`) is the one generic mover between
-  all three buckets.
+### Roster screen & entry menu
+- Clicking a roster entry (a card on the **Roster** screen, reachable
+  from the top bar, or one of the sidebar's top contributors) opens a
+  context menu (next to the cursor, closes on outside click/Escape) with
+  **Open Stats** (Base / Per Level / Inherited / Current table),
+  **Digivolve...** (opens the Evolution screen with that entry
+  selected), and **Use Ability Reroll**.
+- The Roster screen lists every owned Digimon with a stage filter and a
+  sort (DPS / Level / Stage), each card showing that entry's DPS share.
+- Implementation stays generic: a single `ContextMenu.svelte` (pure
+  popup, no game logic) plus one `getRosterEntryMenuItems(callbacks)`
+  builder (`src/lib/game/roster/rosterMenu.ts`) - adding an action is a
+  one-line change there, not a new component.
 
 ### Digivolution UI & automation
 - Digimon level up through normal play; once eligible to digivolve, they're
   flagged "ready."
 - A small button (likely in the main HUD) shows a badge/indicator with the
   count of Digimon currently ready to evolve.
-- Clicking that button opens an **Evolution screen** listing all Digimon
-  ready to evolve. Clicking one shows its available next-stage options
-  (branching digivolutions) for the player to pick from manually.
+- Clicking that button opens an **Evolution screen** listing the roster
+  (ready entries first). Clicking one shows its available next-stage
+  options (branching digivolutions) for the player to pick from manually.
+  Already-owned targets are shown with an "Owned" badge but can't be
+  picked - the roster holds one entry per species. "Ready" means at least
+  one **unowned** target's requirement is met.
 - **Auto-Digivolve (confirmed, built):** the original design called for
   three separate modes (Off / Repeat last path / Digivolve by pin) - built
   instead as **one unified preference system**, since "repeat last" and
   "pin ahead of time" are really just two ways of setting the same thing.
   `DigivolveAutomationState` (`types.ts`) holds a global `enabled` toggle
   (Settings screen checkbox) plus `preferences: Record<sourceSpeciesId,
-  {targetSpeciesId, minLevel}>` - keyed by the Digimon's *current* species,
-  not an abstract "line" (the evolution graph is a multi-parent DAG, so
-  "current form" is the only well-defined key). Every manual digivolve
-  (`digivolve()` in `evolution/digivolve.ts`) records/overwrites that
-  source species' preference automatically, regardless of whether
-  automation is enabled - turning it on later immediately benefits from
-  however you already played. The Evolution screen also lets you pin a
+  {targetSpeciesId, minLevel}>` - keyed by the source species, not an
+  abstract "line" (the evolution graph is a multi-parent DAG, so the
+  species is the only well-defined key). Every digivolve (`digivolve()`
+  in `evolution/digivolve.ts`) records that source species' choice
+  automatically, regardless of whether automation is enabled - turning
+  it on later immediately benefits from however you already played. A
+  preference that already points at the same target is left untouched,
+  so a pinned custom minLevel survives every digivolve it triggers; only
+  picking a *different* target replaces it. Since an owned target can't
+  be digivolved into again, each preference fires **at most once** -
+  only the pinned target auto-unlocks, other branches stay manual. The Evolution screen also lets you pin a
   target ahead of time with a custom **minLevel** - an extra floor on top
   of (never replacing) the target's normal level requirement, letting a
-  Digimon "cook" longer before auto-firing (relevant since pre-transition
-  level feeds the digivolution-stat bonus). Pinning is explicit two-step
+  Digimon "cook" longer before auto-firing (relevant since the source's
+  pre-digivolve level feeds the new entry's inherited bonus). Pinning is explicit two-step
   (Pin -> edit the level -> **Confirm**) rather than live-as-you-type -
   nothing is written until Confirm, and the entered level is capped to
   `MAX_LEVEL`. Confirm also checks eligibility immediately: if the
   Digimon already meets both the normal requirement and the level just
   confirmed, it digivolves right then instead of silently waiting for the
   next kill to notice. Checked on every xp award (`tryAutoDigivolve` in
-  `awardKillXp`, alongside egg-hatch checking) - otherwise fires
-  silently, no screen visit needed. Scoped to digivolve-**up** only;
-  de-digivolve stays manual, since it now costs a purchased item and
-  auto-spending currency without an explicit per-instance action wasn't
-  part of the ask.
+  `awardKillXp`) - otherwise fires silently, no screen visit needed.
 
-### Stat system: base stats vs. digivolution stats
-- Each Digimon has two categories of stats:
-  - **Base stats** — determined by current form; change whenever the
-    Digimon's form changes (digivolve or de-digivolve).
-  - **Digivolution stats** — NOT dependent on current form. A persistent
-    bonus pool layered on top of whatever base stats the current form has.
-- **De-digivolution**: a Digimon can revert **one level down** to whatever
-  the evolution graph says leads to its current form (the current species'
-  direct predecessors) — not an arbitrary earlier point in the instance's
-  own personal history, and not further back than one step at a time.
-- De-digivolving to a lower form grants Digivolution stat bonuses, added on
-  top of that lower form's base stats (not replacing them).
-- The Digimon's **level right before the transition** (digivolve or
-  de-digivolve resets it to 0 afterward) also feeds into that
-  transition's Digivolution stat bonus, on top of the usual stage/type
-  amount - a small `LEVEL_IMPACT_SCALE` (0.1, placeholder) added per
-  level, scaled by the same dominant/off factor as everything else so
-  attack-type Digimon still gain more Attack than HP/Speed/
-  SpecialAttack from the level they're cashing in
-  (`src/lib/game/combat/stats.ts`).
-- Because digivolution stats are form-independent and only accumulate, they
-  persist through every future form change. This makes repeated
-  digivolve/de-digivolve cycling a permanent, grindable progression layer
-  on top of raw form/level progression — total power = current form's base
-  stats + the Digimon's accumulated digivolution stats.
-- **Cost mechanism (confirmed):** both digivolving and de-digivolving reset
-  the Digimon's level back to 1, so reaching the next digivolution threshold
-  again means re-grinding combat XP from scratch either way — this is the
-  natural cost that bounds the digivolve/de-digivolve/re-digivolve loop, no
-  separate currency needed. The reset happens as a result of the
-  transition, not as a precondition for starting one.
+### Stat system: base, growth, inherited bonus
+- Each roster entry (`RosterEntry` in `types.ts`) has:
+  - **Base stats** and **growth per level** - rolled once when the entry
+    is created, from its species' stage/statAffinity, never rerolled
+    (Pokemon-IV-style individual variance).
+  - **Inherited bonus** - a one-time bonus rolled when the entry is
+    created *by a digivolve*; zero for starters and hatched entries.
+- Current stat = `base + level * growth + inheritedBonus`, then
+  `* (1 + ability%)` (see "Special Abilities").
+- **Digivolving (confirmed, built):** creates the target species as a
+  **new roster entry** at level 1 - the source stays in the roster. The
+  source then **resets to level 1**: its levels are "spent" on the new
+  form, so each further branch from the same source needs its own grind.
+  The new entry's inherited bonus is rolled from the target's
+  stage/affinity plus the source's **level right before digivolving**
+  (`INHERITED_BONUS_SCALE` + `INHERITED_BONUS_LEVEL_SCALE` per level,
+  scaled by the same dominant/off factor as everything else, so
+  attack-type Digimon still gain more Attack than HP/Speed from the
+  levels they're cashing in - `rollInheritedBonus` in
+  `src/lib/game/combat/stats.ts`). Levelling a source longer before
+  digivolving therefore produces a stronger new form - the reason a
+  custom pinned minLevel is worth setting.
+- Digivolving is never a net loss for the roster: the source keeps its
+  base stats, growth, inherited bonus and ability, and a whole new
+  contributor is added on top. (The old model replaced the Digimon and
+  reset its level, which made the first moments after a digivolve
+  weaker than before it.)
+- **Re-digivolving into an owned form = upgrade (confirmed, built):** an
+  owned target stays selectable. Digivolving into it again rolls a fresh
+  inherited bonus from the source's current level and keeps the **higher
+  value per stat** (old vs. new), so the owned form can only ever
+  improve - rerolling at a similar level is a free second chance at a
+  better roll, a higher level shifts the whole range up. The source
+  still resets to level 1. Each entry records `inheritedFromLevel` (the
+  highest source level it has inherited from, 0 if never digivolved
+  into), shown on the Evolution screen ("Best from Lv X") next to its
+  current bonus and the possible upgrade outcome. An upgrade that can't
+  improve any stat even with a perfect roll is blocked, so a source's
+  levels are never thrown away for nothing.
+- Upgrades are **manual only** - automation only unlocks new forms. An
+  auto-upgrade into a target with no level requirement would re-fire on
+  every kill and pin the source at level 1 forever. The "ready" badge
+  likewise counts new forms only (almost every entry past its level gate
+  could upgrade *something*, which would leave it permanently lit).
+- `digivolve()` refuses (returns false, no-op) unless the target is a
+  real in-game option for that source, its requirement is met, and - for
+  an owned target - the upgrade could improve something. No caller can
+  create a duplicate, skip the level gate, or waste a source's levels.
+- **De-digivolution: removed.** With the source kept in the roster
+  there's nothing to go back *to*; the De-Digivolution Crystal, its
+  Shop entry and the de-digivolve UI are gone.
 - **Level-gate baseline (confirmed):** digivolving up requires a minimum
   level first, keyed off the *target's* stage (see
   `DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE` in `src/lib/game/constants.ts`):
   - Digivolve to Champion: **Lv 16**
   - Digivolve to Ultimate: **Lv 36**
   - Digivolve to Mega: **Lv 56**
-  - Digivolve to In-Training/Rookie: no requirement yet (not specified,
+  - Digivolve to Rookie: **Lv 4**
+  - Digivolve to In-Training: no requirement yet (not specified,
     defaults to open).
-- **De-digivolve requirement (confirmed, superseded the old level gate):**
-  de-digivolving no longer uses a level gate at all - it costs a
-  consumable **De-Digivolution Crystal** (bought with Bits, see the
-  Inventory/Shop screen; `DEDIGIVOLVE_ITEM_ID`/`DEDIGIVOLVE_ITEM_COUNT` in
-  `constants.ts`), consumed on commit. This directly closes the
-  farm-by-cycling concern that used to be an open question here (a flat
-  Lv 4 gate made digivolve-up-then-immediately-de-digivolve-down a nearly
-  free repeatable loop) - de-digivolving now costs a real, earned
-  resource every time, not just a trivial level checkpoint.
-- **Playable stage scope (confirmed, temporary):** only In-Training,
-  Rookie, Champion, Ultimate, and Mega stage Digimon are searched/offered
-  as digivolve or de-digivolve options right now
-  (`IN_GAME_STAGES` in `src/lib/game/constants.ts`). Fresh, Armor,
-  Hybrid, Ultra, Burst Mode, and Unknown-stage species stay fully present
+- **Playable stage scope (confirmed, temporary):** only Fresh,
+  In-Training, Rookie, Champion, Ultimate, and Mega stage Digimon are
+  searched/offered as digivolve options right now (`IN_GAME_STAGES` in
+  `src/lib/game/constants.ts`). Armor, Hybrid, Ultra, Burst Mode, and Unknown-stage species stay fully present
   in the scraped data (`src/lib/data/digimon-evolution.json`) - nothing
   is deleted - they're just excluded from the live evolution-option
   search until support for them (item-triggered Armor evolution,
@@ -177,36 +176,32 @@ non-wash upgrade — more slots = strictly more total training throughput.
   `IN_GAME_STAGES`, no data regeneration needed.
 
 ### Special Abilities (confirmed, built - stat-boost tier)
-- Each Digimon **instance** can hold one special ability
-  (`DigimonInstance.abilityId`) - null until an **Ability Reroll
-  Crystal** (bought in the Shop, same pattern as the De-Digivolution
-  Crystal) is used on it via a new "Use Ability Reroll" action in the
-  Hub/team context menu (`getTeamSlotMenuItems`). The item is the *only*
-  source - nothing rolls an ability automatically at creation.
+- Each roster entry can hold one special ability
+  (`RosterEntry.abilityId`) - null until an **Ability Reroll Crystal**
+  (bought in the Shop) is used on it via the "Use Ability Reroll" action
+  in the roster entry menu (`getRosterEntryMenuItems`). The item is the
+  *only* source - nothing rolls an ability automatically at creation.
 - `ABILITY_CATALOG` (`src/lib/game/abilities/abilityCatalog.ts`) has 12
   entries: 4 stats (Attack/HP/Speed/SpecialAttack) x 3 rarity tiers
   (Minor +5%, Major +10%, Superior +20%, placeholders) - a weighted pool
   (Minor common, Superior rare), same convention as area spawn weights
   and Mystery Egg pools. Using the item re-rolls a fresh weighted pick,
   can reroll into the same ability again (no dedup).
-- **Persists across digivolve/de-digivolve** - a property of this
-  specific Digimon, not its current form, unlike `baseStats`/
-  `growthPerLevel` which reroll every transition (same permanence as
-  `digivolutionStats`).
-- The bonus applies via one shared `computeInstanceStatValue(instance,
+- Belongs to that entry only - a new entry created by digivolving starts
+  with no ability, the source keeps its own.
+- The bonus applies via one shared `computeEntryStatValue(entry,
   statKey)` (`combat/damage.ts`) - `base + level*growth +
-  digivolutionStats`, then `* (1 + ability%)` if the ability targets
-  that exact stat. Every combat formula (damage/hit, attack rate, the
-  fight timer's team HP sum) *and* the Stat window's "Current" column
-  now call this one function, replacing what used to be two separately-
-  maintained copies of the same formula.
+  inheritedBonus`, then `* (1 + ability%)` if the ability targets that
+  exact stat. Every combat formula (damage/hit, attack rate, the fight
+  timer's roster HP sum) *and* the Stat window's "Current" column call
+  this one function, so they can never drift apart.
 - Planned but explicitly deferred: farming/resource-gathering
   specialization abilities, once a farming system exists to specialize
   in (see "Idle production" above - still not built).
 
 ### Combat: attack ticks and damage
 - Combat runs on **discrete attack ticks**, not a smooth per-second HP
-  drain: the active team shares one attack clock (attacks/second), and
+  drain: the whole roster shares one attack clock (attacks/second), and
   each attack that lands deals a flat amount of damage (damage/hit).
   Total damage over time still works out to `attacksPerSecond *
   damagePerHit * secondsPassed`, same total as a continuous rate - the
@@ -217,20 +212,34 @@ non-wash upgrade — more slots = strictly more total training throughput.
   carries over (`WildSpawnState.attackProgress`) so the long-run rate
   stays accurate regardless of polling cadence.
 - **Speed drives attack rate**: `attacksPerSecond = BASE_ATTACKS_PER_SECOND
-  + teamSpeedSum * SPEED_TO_APS_SCALE` (placeholder constants, see
-  `src/lib/game/constants.ts`). This is a shared, team-wide rate - one
-  clock for the whole active team, not a rate per Digimon.
-- **Attack + SpecialAttack drive damage/hit**: each active member
+  + rosterSpeedSum * SPEED_TO_APS_SCALE` (placeholder constants, see
+  `src/lib/game/constants.ts`). This is a shared, roster-wide rate - one
+  clock for the whole roster, not a rate per Digimon.
+- **Attack + SpecialAttack drive damage/hit**: each roster entry
   contributes `attack + specialAttack` (from baseStats + level *
-  growthPerLevel + digivolutionStats) to the team's flat per-hit
-  damage total; the whole team hits as one combined blow each tick,
-  not member-by-member.
+  growthPerLevel + inheritedBonus) to the roster's flat per-hit damage
+  total; the whole roster hits as one combined blow each tick, not
+  entry-by-entry.
 - **Fights are timed - HP funds the timer (confirmed, built):** every
-  wild encounter has a time limit, `FIGHT_TIMER_BASE_SECONDS` (5,
-  placeholder) plus a flat `FIGHT_TIMER_SECONDS_PER_HP` bonus per point
-  of the active team's summed **HP** stat (`computeFightTimeLimitMs` in
-  `combat/spawn.ts`, `computeTeamHp` in `combat/damage.ts`) - fixed once
-  at spawn, doesn't change if team HP changes mid-fight. If the timer
+  wild encounter has a time limit, `FIGHT_TIMER_BASE_SECONDS` plus a
+  **capped** bonus of up to `FIGHT_TIMER_MAX_BONUS_SECONDS` funded by the
+  roster's summed **HP** stat. The curve shape is a setting,
+  `FIGHT_TIMER_FORMULA` (all values in `balance.json`, pickable in the
+  Balance Lab):
+  - `halfLife` - `max * (1 - 0.5 ^ (hp / FIGHT_TIMER_HALF_BONUS_HP))`:
+    fast early gains, approaches the ceiling without reaching it.
+  - `parabola` - `max * (1 - (1 - hp / FIGHT_TIMER_FULL_BONUS_HP)^2)`:
+    gains taper off steadily and reach the ceiling exactly at "full
+    bonus" HP, flat after.
+  - `power` - `max * (hp / FIGHT_TIMER_FULL_BONUS_HP) ^
+    FIGHT_TIMER_POWER_EXPONENT`, capped: 0.5 = square root, 1 = linear.
+  The formulas live in `combat/fightTimer.ts` as pure functions, shared by
+  the game (`computeFightTimeLimitMs` in `combat/spawn.ts`) and the
+  Balance Lab, so the lab's timer chart can never drift from the game; an
+  unknown formula name falls back to `halfLife`. The cap matters because
+  roster HP grows with every Digimon collected - an uncapped bonus would
+  balloon into minutes-long fights. Fixed once at spawn, doesn't change
+  if roster HP changes mid-fight. If the timer
   runs out before the wild is defeated, the encounter ends with **no
   reward** (no XP/Bits/egg roll) - same as never having fought it - and
   a fresh wild spawns right after, same gap as a normal kill. This is
@@ -240,27 +249,41 @@ non-wash upgrade — more slots = strictly more total training throughput.
   HP (fight duration) all matter. A `TimerBar` next to the HP bar shows
   the countdown, reading the wild's already-ticking `lastTickAt` as its
   clock rather than polling a separate timer.
-- The sidebar shows a live **Team DPS** panel (total + each active
-  member's individual DPS share at the shared team attack rate) above
-  the Active Team section.
-- **Tuning note:** per-hit damage currently reads as too high (base
-  stat/growth/digivolution-bonus scale constants in
-  `src/lib/game/constants.ts` - `BASE_STAT_SCALE`,
-  `GROWTH_PER_LEVEL_SCALE`, `DIGIVOLUTION_BONUS_SCALE` - are still
-  early placeholders). Not yet retuned - open balance work.
-- **All tunable numbers now live in one file**:
-  `src/lib/game/constants.ts` centralizes every placeholder/balance
-  constant across the game (team size, level requirements, in-game
-  stage scope, combat/attack-rate constants, stat-roll scales, level
-  curve, wild spawn/reward formulas, autosave interval), grouped by
-  relevance - edit there to rebalance instead of hunting through
-  individual combat/evolution files.
+- The sidebar shows a live **Roster DPS** panel (totals for every stat,
+  the shared attack rate, and the top 5 contributors by DPS share -
+  the roster can hold hundreds of entries, so only the biggest are
+  listed) above the Hatchery.
+- **Tuning note (open):** all stat/wild-HP constants in
+  `src/lib/game/constants.ts` are still early placeholders, and wild HP
+  was tuned against a small party - now that the whole roster
+  contributes, damage and the fight timer scale with collection size, so
+  the difficulty curve needs a full retune.
+- **All tunable numbers live in one settings file**:
+  `src/lib/game/balance.json` holds every balance value (hatchery size,
+  level requirements, combat/attack-rate constants, fight timer,
+  stat-roll scales, level curve, wild HP/reward formulas, egg and shop
+  numbers). `src/lib/game/constants.ts` re-exports each one under the
+  same name with its explanation, and every other module imports from
+  there - never from the JSON directly.
+- **Balance Lab (dev tool):** with the dev server running, open
+  `/balance.html` (e.g. http://localhost:5173/balance.html). Every value
+  in `balance.json` is editable there, and the charts update as you type:
+  wild HP by stage against an example roster's damage per fight (with the
+  real area paths' level ranges marked), the fight timer curve, and kills
+  per level, plus an area-by-area "wins idle / needs clicking / too
+  hard" check. **Save** (or Ctrl+S) writes `balance.json` through a
+  dev-server-only endpoint (`balanceFilePlugin` in `vite.config.ts`,
+  which refuses anything but same-shape numeric values); Vite then
+  hot-reloads, so an open game tab picks up the new numbers immediately.
+  The lab's formulas live in `src/balance/model.ts` and **mirror** the
+  game's - change a formula in the game and change it there too. The
+  page isn't part of the production build.
 
 ### Idle production
-- Active-slot auto-attack (see Core click loop) *is* the idle/offline
+- Roster auto-attack (see Core click loop) *is* the idle/offline
   production mechanic for now — no separate farm/area-assignment system.
-- A dedicated farming system may be added later, but as a fully independent
-  system, not folded into the Active/Training slot mechanic.
+- A dedicated farming system may be added later, but as a fully
+  independent system.
 
 ### Areas / regions
 - **Confirmed, built (Forest Sector):** each area (`src/lib/data/areas/
@@ -332,25 +355,24 @@ non-wash upgrade — more slots = strictly more total training throughput.
   quick comparison when retuning colors. Output lives at
   `public/digimon/eggs/<Type>/egg-base.png` (gitignored, regenerate with
   the script - same convention as `public/digimon/images/<Name>/`).
-- **Hatching (confirmed, built):** an egg is a normal `DigimonInstance`
-  with a non-null `eggState: { eggType, hatchAtLevel }` - its `speciesId`
-  is already resolved (decided the moment it dropped) but hidden behind
-  the egg sprite/name everywhere it's displayed. It hatches by being
-  leveled up like a real team member (occupying an active/training slot,
-  gaining xp through combat exactly like any other member - checked via
-  `tryHatch()` every time `awardKillXp` runs); once its level crosses
-  `EGG_HATCH_LEVEL`, `eggState` clears and **xp resets to 0**, same as
-  digivolve/de-digivolve - every form transition resets on the same
-  uniform rule, not just to bound a re-loop exploit (hatching has none,
-  since there's no un-hatching).
-- **Where a dropped egg lands (confirmed, built):** always
-  `reserveMembers` - since only active/training members gain xp, a
-  reserve-parked egg is naturally "not progressing" with zero
-  special-casing, and moving it into a real slot to start hatching reuses
-  the Digimon Hub / team-slot context menu UI already built for moving
-  any Digimon between buckets. A settings preference to auto-route
-  hatched Digimon to a chosen bucket is still a proposed future
-  refinement, not built.
+- **Hatchery (confirmed, built):** eggs never sit in the roster - they
+  live in a separate **hatchery** (`HatcheryState` in `types.ts`,
+  `state/hatchery.svelte.ts`). An `Egg` already has its `speciesId`
+  resolved (decided the moment it dropped/was bought) but hidden behind
+  the egg sprite/name everywhere it's displayed. Only **incubating** eggs
+  (up to `capacity` - `HATCHERY_STARTING_CAPACITY` 2, up to
+  `HATCHERY_MAX_CAPACITY` 6, placeholders) gain kill XP; extra eggs wait
+  in uncapped **storage** and move into a free incubating slot
+  automatically, oldest first, so the hatchery drains with no player
+  action. New eggs (kill-drops and Shop purchases alike) go straight into
+  a free incubating slot if there is one, else storage.
+- **Hatching (confirmed, built):** once an incubating egg's level crosses
+  `EGG_HATCH_LEVEL`, `tryHatch()` (checked every time `awardKillXp`
+  runs) removes it from the hatchery. If its species isn't owned yet it
+  joins the roster as a new entry (the reveal moment - also what credits
+  it in the Compendium). If the species is **already owned**, it becomes
+  a bonus for the existing entry instead of a second copy
+  (`DUPLICATE_HATCH_XP`, placeholder), so an egg is never wasted.
 - **Acquisition - kill-drop (confirmed, built):** killing a wild has an
   `EGG_DROP_CHANCE_PERCENT` chance (small placeholder, tunable in
   `constants.ts`) to drop an egg. The drop resolves to a random *Fresh-stage*
@@ -371,12 +393,11 @@ non-wash upgrade — more slots = strictly more total training throughput.
   (`src/lib/data/mysteryEggWeights.json`, seeded from the same eggType
   taxonomy every species already has, hand-tunable afterward like area
   spawn weights; validated in CI by `validate_mystery_eggs.py`) and
-  drops it straight into `reserveMembers`, same landing spot as a
-  kill-drop egg. Same hatching mechanics either way - only display
-  differs: a Mystery egg shows "Mystery {Type} Digi-Egg" (vs. a
-  kill-drop's plain "Digi-Egg ({Type})") and a "?" badge overlaid on the
-  sprite (`DigimonInstance.eggState.isMystery`, `isMysteryEgg`/
-  `getInstanceDisplayName` in `images.ts`), so a mystery egg is never
+  adds it to the hatchery, same as a kill-drop egg. Same hatching
+  mechanics either way - only display differs: a Mystery egg shows
+  "Mystery {Type} Digi-Egg" (vs. a kill-drop's plain "Digi-Egg
+  ({Type})") and a "?" badge overlaid on the sprite (`Egg.isMystery`,
+  `getEggDisplayName` in `images.ts`), so a mystery egg is never
   mistaken for a real wild-caught one.
 
 ## Technical notes
@@ -385,17 +406,14 @@ non-wash upgrade — more slots = strictly more total training throughput.
 - Evolution relationships need to be modeled as a graph, not a flat list:
   each Digimon *form* is a node, each "digivolves to" relationship is a
   directed edge from a lower form to a higher form.
-- De-digivolution is just traversing an edge backwards — no separate
-  structure needed, the same graph serves both directions (query outgoing
-  edges for "what can this digivolve to," incoming edges for "what forms
-  led here").
+- The same graph serves both directions (outgoing edges for "what can
+  this digivolve to", incoming edges for "what forms led here" - used by
+  egg drops to find a killed species' Fresh ancestors).
 - Nodes need queryable/sortable properties beyond identity, at minimum:
   **stage** (In-Training / Rookie / Champion / Ultimate / Mega / ...), and
   likely attribute (Vaccine/Data/Virus/...) and type/element down the line.
-- Needed early since it directly underpins already-confirmed mechanics: the
-  Evolution screen (listing a Digimon's available next forms), de-digivolution
-  (listing prior forms), and the base-vs-digivolution stat system (tracking
-  which forms a given Digimon has passed through).
+- Directly underpins the Evolution screen (listing a Digimon's available
+  next forms) and egg drops (walking back to Fresh ancestors).
 - **Sourced (raw link data):** `EvolutionImporter.py` scrapes the wiki's
   per-Digimon `from`/`to`/`lateral to` infobox links into a directed graph
   (1698 nodes, 2298 edges), exported as `data/evolution_graph.gexf` for
@@ -421,12 +439,11 @@ non-wash upgrade — more slots = strictly more total training throughput.
   no shortcut/path distinction applies) and stores it as `evolutionSkips`
   per species (608 found across the dataset: 297 backward, 254 path, 57
   shortcut). The `backward` category was only added after a live bug
-  report - Bombmon, Fresh, was showing a de-digivolve option to
-  DeckerGreymon, Ultimate - traced to the classifier never flagging
+  report - Bombmon, Fresh, was showing a (since-removed) de-digivolve
+  option to DeckerGreymon, Ultimate - traced to the classifier never flagging
   negative-gap edges at all, and even letting them leak into the
   reachability walk used for shortcut/path classification of *other*
-  species. For now `getDigivolveOptions`/`getDedigivolveOptions`/
-  `isReadyToDigivolve` (`src/lib/game/evolution/digivolve.ts`) exclude
+  species. For now `getDigivolveOptions`/`isReadyToDigivolve` (`src/lib/game/evolution/digivolve.ts`) exclude
   **all** skip edges regardless of classification - only strict
   one-tier-at-a-time evolution shows up as a player-facing option. The
   `path`-classified edges this removes (essential, no alternate route)
@@ -458,11 +475,40 @@ non-wash upgrade — more slots = strictly more total training throughput.
   per species; full review list at `data/fusion_edges_review.md`, split
   by classification. Unlike `evolutionSkips`, this isn't wired into
   `getDigivolveOptions` yet - data/counts only for now.
+- **Leveling = two independent curves (confirmed, built):** the **XP
+  cost** of each level-up L -> L + 1 (`LEVEL_XP_*` in `balance.json`) and
+  the **kill XP** a level-L wild gives (`KILL_XP_*`, used by
+  `computeKillXp` in `combat/spawn.ts` - replaces the old linear
+  `KILL_XP_BASE + level * KILL_XP_PER_LEVEL`). Each curve picks its own
+  formula: `power` (`FIRST * L ^ EXPONENT`), `exponential` (`FIRST *
+  GROWTH ^ (L - 1)`) or `parabola` (`FIRST` to `LAST` along progress²,
+  gentle early and steep near max level). **Kills per level-up are not a
+  setting** - they're calculated for each level as XP cost ÷ kill XP at
+  that level (fighting same-level wilds). Defaults: both parabolas, XP
+  50 -> 15,000 per level-up and kill XP 25 -> 515 (the old linear kill XP
+  at Lv 1 and Lv 99), giving 2 kills for the first level-up, ≈11 at
+  Lv 16, ≈22 at Lv 36, ≈29 near max (≈88 kills to Lv 16, ≈2,150 to
+  Lv 100). The formulas live in `combat/levelCurveFormulas.ts`, shared by
+  the game (XP table in `combat/levelCurve.ts`, kill XP in `spawn.ts`,
+  both fed through `combat/levelCurveParams.ts`) and the Balance Lab,
+  which charts XP per level-up and kill XP separately (other formulas as
+  grey comparison lines) plus the calculated kills per level-up with
+  running totals. (Before this, one `power` XP curve plus linear kill XP
+  made kills per level *fall* at high levels - ≈3.3 at Lv 10, ≈1.4 at
+  Lv 99, ~212 kills to Lv 100 in total.)
 - **Level cap (confirmed):** `levelForXp` never returns above
   `MAX_LEVEL` (100, placeholder, `src/lib/game/constants.ts`), and
-  `awardKillXp` skips a member entirely once it's already at the cap -
+  `awardKillXp` skips an entry entirely once it's already at the cap -
   xp stops accumulating rather than piling up uselessly past the point
   `levelForXp` would clamp it anyway.
+
+- **Save format v2 (confirmed):** the roster rework changed the save
+  shape (`roster` + `hatchery` instead of `team`, no compendium field),
+  so `CURRENT_SAVE_VERSION` is 2 under a new localStorage key
+  (`digiclicker-saves-v2`). v1 saves are deliberately not converted -
+  they stay untouched under the old key (never read, never deleted), so
+  a converter could still be written later. Importing a v1 export file
+  is rejected cleanly by the shape check.
 
 ## Proposed / not yet confirmed
 Carried over from initial brainstorm — still open for discussion:

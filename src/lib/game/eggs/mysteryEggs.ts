@@ -1,10 +1,10 @@
-import type { DigimonInstance, EggType } from '../types';
+import type { Egg, EggType } from '../types';
 import mysteryEggWeightsData from '../../data/mysteryEggWeights.json';
-import { createDigimonInstance } from '../roster/starterRoster';
+import { createEgg } from './eggs';
 import { weightedPick } from '../util/random';
-import { EGG_HATCH_LEVEL, MYSTERY_EGG_COST_BITS } from '../constants';
+import { MYSTERY_EGG_COST_BITS } from '../constants';
 import { spendBits } from '../state/currency.svelte';
-import { team } from '../state/team.svelte';
+import { addEgg } from '../state/hatchery.svelte';
 
 interface MysteryEggEntry {
   id: string;
@@ -17,21 +17,18 @@ export const MYSTERY_EGG_WEIGHTS = mysteryEggWeightsData as unknown as Record<Eg
  * EggType's pool (seeded from the same eggType taxonomy every species
  * already has - see egg_type_mapping.py - so every type has a real,
  * non-empty pool; validated by validate_mystery_eggs.py). */
-export function rollMysteryEgg(eggType: EggType): DigimonInstance {
+export function rollMysteryEgg(eggType: EggType): Egg {
   const pool = MYSTERY_EGG_WEIGHTS[eggType];
   const chosen = weightedPick(pool, (entry) => entry.weight);
-
-  const instance = createDigimonInstance(chosen.id, 0);
-  instance.eggState = { eggType, hatchAtLevel: EGG_HATCH_LEVEL, isMystery: true };
-  return instance;
+  return createEgg(chosen.id, eggType, true);
 }
 
 /** Spends MYSTERY_EGG_COST_BITS and, on success, rolls a mystery egg of
- * the given type straight into reserveMembers - same landing spot as a
- * kill-drop egg (see GAMEPLAY_DESIGN.md's Digi-Eggs section). False and
- * no-op if bits are insufficient. */
+ * the given type into the hatchery - same landing spot as a kill-drop egg
+ * (see GAMEPLAY_DESIGN.md's Digi-Eggs section). False and no-op if bits
+ * are insufficient. */
 export function buyMysteryEgg(eggType: EggType): boolean {
   if (!spendBits(MYSTERY_EGG_COST_BITS)) return false;
-  team.reserveMembers.push(rollMysteryEgg(eggType));
+  addEgg(rollMysteryEgg(eggType));
   return true;
 }

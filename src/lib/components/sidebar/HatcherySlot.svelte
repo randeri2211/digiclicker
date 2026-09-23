@@ -3,29 +3,20 @@
     variant: 'filled' | 'empty' | 'locked';
     spriteUrl?: string | null;
     level?: number;
-    /** Digivolution-eligibility indicator. */
-    ready?: boolean;
-    isActive?: boolean;
-    /** True only for a still-unhatched Mystery Digi-Egg - see
-     * game/images.ts's isMysteryEgg. */
+    /** True only for a Mystery Digi-Egg (bought from the Shop). */
     isMystery?: boolean;
-    /** Only fired for filled slots - empty/locked slots have nothing to act on. */
-    onClick?: (event: MouseEvent) => void;
   }
 
-  const { variant, spriteUrl = null, level, ready = false, isActive = false, isMystery = false, onClick }: Props = $props();
+  const { variant, spriteUrl = null, level, isMystery = false }: Props = $props();
 </script>
 
-{#snippet slotContent()}
+<div class="slot" class:empty={variant === 'empty'} class:locked={variant === 'locked'}>
   {#if variant === 'filled'}
     {#if spriteUrl}
       <img src={spriteUrl} alt="" />
     {/if}
     {#if level !== undefined}
       <span class="slot-lv">Lv {level}</span>
-    {/if}
-    {#if ready}
-      <span class="slot-ready"></span>
     {/if}
     {#if isMystery}
       <span class="slot-mystery">?</span>
@@ -38,33 +29,7 @@
       <path d="M8 11V7a4 4 0 018 0v4" stroke="currentColor" stroke-width="1.8" />
     </svg>
   {/if}
-{/snippet}
-
-{#if variant === 'filled' && onClick}
-  <div
-    class="slot clickable"
-    class:active-slot={isActive}
-    onclick={onClick}
-    onkeydown={(e) => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      e.preventDefault();
-      e.currentTarget.click();
-    }}
-    role="button"
-    tabindex="0"
-  >
-    {@render slotContent()}
-  </div>
-{:else}
-  <div
-    class="slot"
-    class:active-slot={isActive}
-    class:empty={variant === 'empty'}
-    class:locked={variant === 'locked'}
-  >
-    {@render slotContent()}
-  </div>
-{/if}
+</div>
 
 <style>
   .slot {
@@ -76,15 +41,6 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-  }
-  .slot.active-slot {
-    border-color: var(--panel-border-strong);
-  }
-  .slot.clickable {
-    cursor: pointer;
-  }
-  .slot.clickable:hover {
-    border-color: var(--accent);
   }
   .slot img {
     width: 78%;
@@ -100,16 +56,6 @@
     background: rgba(10, 14, 20, 0.85);
     color: var(--text-h);
     border: 1px solid var(--panel-border);
-  }
-  .slot-ready {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 8px;
-    height: 8px;
-    background: var(--warn);
-    box-shadow: 0 0 6px var(--warn);
-    border-radius: 50%;
   }
   .slot-mystery {
     position: absolute;

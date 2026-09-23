@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { team, isReadyToDigivolve } from '../../game/state/game.svelte';
+  import { getRosterList, isReadyToDigivolve } from '../../game/state/game.svelte';
 
   interface Props {
     onClick: () => void;
@@ -7,9 +7,7 @@
 
   const { onClick }: Props = $props();
 
-  const readyCount = $derived(
-    [...team.activeMembers, ...team.trainingMembers].filter(isReadyToDigivolve).length
-  );
+  const readyCount = $derived(getRosterList().filter(isReadyToDigivolve).length);
 </script>
 
 <button class="evolve-btn" class:inactive={readyCount === 0} onclick={onClick}>

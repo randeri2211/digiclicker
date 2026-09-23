@@ -1,44 +1,44 @@
 <script lang="ts">
-  import type { DigimonInstance, StatBlock } from '../../game/types';
-  import { getSpecies } from '../../game/images';
+  import type { RosterEntry } from '../../game/types';
+  import { getSpeciesName } from '../../game/images';
   import {
-    computeActiveTeamDps,
-    computeMemberDps,
-    computeInstanceStatValue,
+    getRosterList,
+    computeRosterDps,
+    computeClickDamage,
+    computeEntryDps,
+    computeRosterStatTotal,
     computeAttacksPerSecond,
-    computeTeamDamagePerHit,
+    computeRosterDamagePerHit,
   } from '../../game/state/game.svelte';
 
   interface Props {
-    members: DigimonInstance[];
+    onEntryClick?: (entry: RosterEntry, event: MouseEvent) => void;
   }
 
-  const { members }: Props = $props();
+  const { onEntryClick }: Props = $props();
 
-  const totalDps = $derived(computeActiveTeamDps(members));
-  const attacksPerSecond = $derived(computeAttacksPerSecond(members));
-  const damagePerHit = $derived(computeTeamDamagePerHit(members));
+  // The whole roster contributes, which can be hundreds of entries - only
+  // the biggest contributors are listed, the totals cover everyone.
+  const TOP_CONTRIBUTOR_COUNT = 5;
 
-  function teamStatTotal(statKey: keyof StatBlock): number {
-    return members.reduce((sum, member) => sum + computeInstanceStatValue(member, statKey), 0);
-  }
+  const entries = $derived(getRosterList());
+  const totalDps = $derived(computeRosterDps(entries));
+  const attacksPerSecond = $derived(computeAttacksPerSecond(entries));
+  const damagePerHit = $derived(computeRosterDamagePerHit(entries));
+  const clickDamage = $derived(computeClickDamage(entries));
 
-  // Speed and Attack/SpecialAttack both feed attacksPerSecond/damagePerHit
-  // (see combat/damage.ts) - shown alongside each so the two DPS factors
-  // (rate x damage/hit) are visible in context, not just the final number.
   const totals = $derived({
-    attack: teamStatTotal('attack'),
-    specialAttack: teamStatTotal('specialAttack'),
-    speed: teamStatTotal('speed'),
-    hp: teamStatTotal('hp'),
+    attack: computeRosterStatTotal(entries, 'attack'),
+    specialAttack: computeRosterStatTotal(entries, 'specialAttack'),
+    speed: computeRosterStatTotal(entries, 'speed'),
+    hp: computeRosterStatTotal(entries, 'hp'),
   });
 
-  const memberDps = $derived(
-    members.map((member) => ({
-      instanceId: member.instanceId,
-      name: getSpecies(member.speciesId)?.name ?? member.speciesId,
-      dps: computeMemberDps(member, members),
-    }))
+  const topContributors = $derived(
+    entries
+      .map((entry) => ({ entry, dps: computeEntryDps(entry, attacksPerSecond) }))
+      .sort((a, b) => b.dps - a.dps)
+      .slice(0, TOP_CONTRIBUTOR_COUNT)
   );
 
   const fmt = (n: number) => n.toFixed(1);
@@ -46,7 +46,7 @@
 
 <div class="stats-panel">
   <div class="stats-head">
-    <div class="stats-title">Team DPS</div>
+    <div class="stats-title">Roster DPS</div>
     <div class="stats-total">{fmt(totalDps)}</div>
   </div>
   <div class="totals-grid">
@@ -67,19 +67,25 @@
       <span class="total-value">{fmt(totals.hp)}</span>
     </div>
   </div>
-  <div class="dmg-summary">Dmg/hit {fmt(damagePerHit)} &times; {fmt(attacksPerSecond)}/s</div>
-  {#if memberDps.length > 0}
-    <div class="stats-rows">
-      {#each memberDps as row (row.instanceId)}
-        <div class="stats-row">
-          <span class="row-name">{row.name}</span>
-          <span class="row-dps">{fmt(row.dps)}</span>
-        </div>
-      {/each}
-    </div>
-  {:else}
-    <div class="stats-empty">No active Digimon.</div>
-  {/if}
+  <div class="dmg-summary">
+    Dmg/hit {fmt(damagePerHit)} &times; {fmt(attacksPerSecond)}/s · Click {fmt(clickDamage)} · {entries.length} Digimon
+  </div>
+  <div class="stats-subtitle">Top contributors</div>
+  <div class="stats-rows">
+    {#each topContributors as row (row.entry.speciesId)}
+      <div
+        class="stats-row"
+        class:clickable={onEntryClick}
+        onclick={(e) => onEntryClick?.(row.entry, e)}
+        onkeydown={(e) => e.key === 'Enter' && e.currentTarget.click()}
+        role="button"
+        tabindex="0"
+      >
+        <span class="row-name">{getSpeciesName(row.entry.speciesId)}</span>
+        <span class="row-dps">{fmt(row.dps)}</span>
+      </div>
+    {/each}
+  </div>
 </div>
 
 <style>
@@ -157,9 +163,17 @@
     color: var(--text-dim);
     font-variant-numeric: tabular-nums;
   }
-  .stats-empty {
-    margin-top: 8px;
-    font-size: 11px;
+  .stats-row.clickable {
+    cursor: pointer;
+  }
+  .stats-row.clickable:hover .row-name {
+    color: var(--text-h);
+  }
+  .stats-subtitle {
+    margin-top: 10px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     color: var(--text-dim);
   }
 </style>

@@ -8,7 +8,7 @@
 
 <div
   class="icon-btn"
-  title="Digimon Hub"
+  title="Roster"
   onclick={onClick}
   onkeydown={(e) => e.key === 'Enter' && onClick()}
   role="button"

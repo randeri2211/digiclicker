@@ -1,61 +1,50 @@
 <script lang="ts">
   import EvolveCta from './EvolveCta.svelte';
-  import TeamSection from './TeamSection.svelte';
-  import TeamStatsPanel from './TeamStatsPanel.svelte';
+  import HatcherySection from './HatcherySection.svelte';
+  import RosterStatsPanel from './RosterStatsPanel.svelte';
   import ContextMenu from '../shared/ContextMenu.svelte';
   import StatWindow from '../shared/StatWindow.svelte';
-  import { team, getTeamSlotMenuItems, useAbilityReroll } from '../../game/state/game.svelte';
-  import type { TeamBucket } from '../../game/state/game.svelte';
-  import type { DigimonInstance } from '../../game/types';
+  import { getRosterEntryMenuItems, useAbilityReroll } from '../../game/state/game.svelte';
+  import type { RosterEntry } from '../../game/types';
 
   interface Props {
-    onOpenEvolution: () => void;
+    /** speciesId preselects that entry on the Evolution screen. */
+    onOpenEvolution: (speciesId?: string) => void;
   }
 
   const { onOpenEvolution }: Props = $props();
 
-  let menuState: { instance: DigimonInstance; bucket: TeamBucket; x: number; y: number } | null = $state(null);
-  let statsFor: DigimonInstance | null = $state(null);
+  let menuState: { entry: RosterEntry; x: number; y: number } | null = $state(null);
+  let statsFor: RosterEntry | null = $state(null);
 
-  function openMenu(bucket: TeamBucket, member: DigimonInstance, event: MouseEvent) {
+  function openMenu(entry: RosterEntry, event: MouseEvent) {
     event.stopPropagation();
-    menuState = { instance: member, bucket, x: event.clientX, y: event.clientY };
+    menuState = { entry, x: event.clientX, y: event.clientY };
   }
 </script>
 
 <div class="sidebar">
-  <EvolveCta onClick={onOpenEvolution} />
-  <TeamStatsPanel members={team.activeMembers} />
-  <TeamSection
-    kind="active"
-    capacity={team.activeCapacity}
-    maxCapacity={team.activeMaxCapacity}
-    members={team.activeMembers}
-    onSlotClick={(member, event) => openMenu('active', member, event)}
-  />
-  <TeamSection
-    kind="training"
-    capacity={team.trainingCapacity}
-    maxCapacity={team.trainingMaxCapacity}
-    members={team.trainingMembers}
-    onSlotClick={(member, event) => openMenu('training', member, event)}
-  />
+  <EvolveCta onClick={() => onOpenEvolution()} />
+  <RosterStatsPanel onEntryClick={openMenu} />
+  <HatcherySection />
 </div>
 
 {#if menuState}
+  {@const entry = menuState.entry}
   <ContextMenu
     x={menuState.x}
     y={menuState.y}
-    items={getTeamSlotMenuItems(menuState.instance, menuState.bucket, {
-      onOpenStats: () => (statsFor = menuState?.instance ?? null),
-      onUseAbilityReroll: () => menuState && useAbilityReroll(menuState.instance),
+    items={getRosterEntryMenuItems({
+      onOpenStats: () => (statsFor = entry),
+      onUseAbilityReroll: () => useAbilityReroll(entry),
+      onOpenDigivolve: () => onOpenEvolution(entry.speciesId),
     })}
     onClose={() => (menuState = null)}
   />
 {/if}
 
 {#if statsFor}
-  <StatWindow instance={statsFor} onClose={() => (statsFor = null)} />
+  <StatWindow entry={statsFor} onClose={() => (statsFor = null)} />
 {/if}
 
 <style>

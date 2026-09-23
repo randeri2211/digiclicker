@@ -6,7 +6,7 @@
   import MainMenu from './lib/components/MainMenu.svelte';
   import SettingsScreen from './lib/components/SettingsScreen.svelte';
   import EvolutionScreen from './lib/components/evolution/EvolutionScreen.svelte';
-  import DigimonHubScreen from './lib/components/DigimonHubScreen.svelte';
+  import RosterScreen from './lib/components/RosterScreen.svelte';
   import InventoryScreen from './lib/components/InventoryScreen.svelte';
   import ShopScreen from './lib/components/ShopScreen.svelte';
   import CompendiumScreen from './lib/components/CompendiumScreen.svelte';
@@ -18,7 +18,9 @@
     saveGame,
     loadSlotIntoLiveState,
     startNewGameInSlot,
-    team,
+    roster,
+    hatchery,
+    addEgg,
     combat,
     currency,
     findRootAncestors,
@@ -28,13 +30,12 @@
     buyItem,
     areaProgress,
     setActivePath,
-    compendium,
-    isDiscovered,
+    isOwned,
     automation,
     buyMysteryEgg,
     useAbilityReroll,
     ABILITY_CATALOG,
-    computeInstanceStatValue,
+    computeEntryStatValue,
   } from './lib/game/state/game.svelte';
   import { preloadImages } from './lib/game/preload';
   import { getSpriteUrl } from './lib/game/images';
@@ -45,7 +46,10 @@
   let screen: 'main-menu' | 'game' = $state('main-menu');
   let settingsOpen = $state(false);
   let evolutionOpen = $state(false);
-  let hubOpen = $state(false);
+  // Preselected entry for the Evolution screen (a roster menu's
+  // "Digivolve…" action) - null lets the screen pick its own default.
+  let evolutionInitialSpeciesId: string | null = $state(null);
+  let rosterOpen = $state(false);
   let inventoryOpen = $state(false);
   let shopOpen = $state(false);
   let compendiumOpen = $state(false);
@@ -69,6 +73,12 @@
     screen = 'game';
   }
 
+  function openEvolution(speciesId: string | null = null) {
+    evolutionInitialSpeciesId = speciesId;
+    rosterOpen = false;
+    evolutionOpen = true;
+  }
+
   function backToMenu() {
     saveGame();
     settingsOpen = false;
@@ -80,7 +90,9 @@
       saveGame,
       loadSlotIntoLiveState,
       startNewGameInSlot,
-      team,
+      roster,
+      hatchery,
+      addEgg,
       combat,
       currency,
       findRootAncestors,
@@ -90,13 +102,12 @@
       buyItem,
       areaProgress,
       setActivePath,
-      compendium,
-      isDiscovered,
+      isOwned,
       automation,
       buyMysteryEgg,
       useAbilityReroll,
       ABILITY_CATALOG,
-      computeInstanceStatValue,
+      computeEntryStatValue,
     };
   }
 </script>
@@ -109,15 +120,15 @@
   {:else}
     <TopBar
       onOpenSettings={() => (settingsOpen = true)}
-      onOpenEvolution={() => (evolutionOpen = true)}
-      onOpenHub={() => (hubOpen = true)}
+      onOpenEvolution={() => openEvolution()}
+      onOpenRoster={() => (rosterOpen = true)}
       onOpenInventory={() => (inventoryOpen = true)}
       onOpenShop={() => (shopOpen = true)}
       onOpenCompendium={() => (compendiumOpen = true)}
     />
     <div class="main">
       <CombatPanel />
-      <Sidebar onOpenEvolution={() => (evolutionOpen = true)} />
+      <Sidebar onOpenEvolution={openEvolution} />
     </div>
   {/if}
 
@@ -126,11 +137,11 @@
   {/if}
 
   {#if evolutionOpen}
-    <EvolutionScreen onClose={() => (evolutionOpen = false)} />
+    <EvolutionScreen initialSpeciesId={evolutionInitialSpeciesId} onClose={() => (evolutionOpen = false)} />
   {/if}
 
-  {#if hubOpen}
-    <DigimonHubScreen onClose={() => (hubOpen = false)} />
+  {#if rosterOpen}
+    <RosterScreen onOpenEvolution={openEvolution} onClose={() => (rosterOpen = false)} />
   {/if}
 
   {#if inventoryOpen}

@@ -2,7 +2,7 @@
   import type { Stage } from '../game/types';
   import { IN_GAME_STAGES } from '../game/constants';
   import { getSpecies, getSpeciesIdsByStage, getSpriteUrl } from '../game/images';
-  import { compendium, isDiscovered } from '../game/state/game.svelte';
+  import { getRosterList, isOwned } from '../game/state/game.svelte';
 
   interface Props {
     onClose: () => void;
@@ -20,17 +20,14 @@
 
   const speciesIds = $derived(SPECIES_IDS_BY_STAGE[selectedStage]);
 
-  // isDiscovered reads compendium directly, so this recomputes whenever a
-  // new species is discovered while the screen is open, not just on stage
-  // switch.
+  // Discovered = owned (see state/roster.svelte.ts). isOwned reads the
+  // roster directly, so this recomputes whenever a new species is added
+  // while the screen is open, not just on stage switch.
   function discoveredCountFor(stage: Stage): number {
-    return SPECIES_IDS_BY_STAGE[stage].filter((id) => isDiscovered(id)).length;
+    return SPECIES_IDS_BY_STAGE[stage].filter((id) => isOwned(id)).length;
   }
 
-  const totalDiscovered = $derived.by(() => {
-    void compendium;
-    return Object.keys(compendium).length;
-  });
+  const totalDiscovered = $derived(getRosterList().length);
 
   $effect(() => {
     function handleKeydown(e: KeyboardEvent) {
@@ -79,7 +76,7 @@
 
     <div class="grid">
       {#each speciesIds as speciesId (speciesId)}
-        {#if isDiscovered(speciesId)}
+        {#if isOwned(speciesId)}
           {@const species = getSpecies(speciesId)}
           {@const sprite = getSpriteUrl(speciesId)}
           <div class="card">

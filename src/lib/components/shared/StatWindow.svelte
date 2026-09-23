@@ -1,22 +1,20 @@
 <script lang="ts">
-  import type { DigimonInstance, StatBlock } from '../../game/types';
-  import { getInstanceDisplayName } from '../../game/images';
+  import type { RosterEntry, StatBlock } from '../../game/types';
+  import { getSpeciesName } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
-  import { computeInstanceStatValue, ABILITY_CATALOG } from '../../game/state/game.svelte';
+  import { computeEntryStatValue, ABILITY_CATALOG } from '../../game/state/game.svelte';
+  import XpBar from './XpBar.svelte';
 
   interface Props {
-    instance: DigimonInstance;
+    entry: RosterEntry;
     onClose: () => void;
   }
 
-  const { instance, onClose }: Props = $props();
+  const { entry, onClose }: Props = $props();
 
-  const level = $derived(levelForXp(instance.xp));
-  // The instance's real speciesId is already resolved even while it's an
-  // unhatched egg - hide the name (the whole point of an egg) but the
-  // stat numbers below still reflect the real, hidden species.
-  const displayName = $derived(getInstanceDisplayName(instance));
-  const ability = $derived(instance.abilityId ? ABILITY_CATALOG[instance.abilityId] : null);
+  const level = $derived(levelForXp(entry.xp));
+  const displayName = $derived(getSpeciesName(entry.speciesId));
+  const ability = $derived(entry.abilityId ? ABILITY_CATALOG[entry.abilityId] : null);
 
   const ROWS: { label: string; key: keyof StatBlock }[] = [
     { label: 'Attack', key: 'attack' },
@@ -56,13 +54,15 @@
       <button class="close-btn" onclick={onClose}>Close</button>
     </div>
 
+    <XpBar xp={entry.xp} showNumbers />
+
     <table class="stat-table">
       <thead>
         <tr>
           <th>Stat</th>
           <th>Base</th>
           <th>Per Level</th>
-          <th>Digivolution</th>
+          <th>Inherited</th>
           <th>Current</th>
         </tr>
       </thead>
@@ -70,14 +70,18 @@
         {#each ROWS as row (row.key)}
           <tr>
             <td>{row.label}</td>
-            <td>{instance.baseStats[row.key]}</td>
-            <td>{instance.growthPerLevel[row.key]}</td>
-            <td>{instance.digivolutionStats[row.key]}</td>
-            <td class="current">{Math.round(computeInstanceStatValue(instance, row.key))}</td>
+            <td>{entry.baseStats[row.key]}</td>
+            <td>{entry.growthPerLevel[row.key]}</td>
+            <td>{entry.inheritedBonus[row.key]}</td>
+            <td class="current">{Math.round(computeEntryStatValue(entry, row.key))}</td>
           </tr>
         {/each}
       </tbody>
     </table>
+
+    {#if entry.inheritedFromLevel > 0}
+      <div class="inherited-note">Inherited bonus: best roll from a Lv {entry.inheritedFromLevel} source</div>
+    {/if}
 
     <div class="ability-row">
       <span class="ability-label">Special Ability</span>
@@ -176,6 +180,10 @@
   .stat-table td.current {
     color: var(--pos);
     font-weight: 600;
+  }
+  .inherited-note {
+    font-size: 11px;
+    color: var(--text-dim);
   }
   .ability-row {
     display: flex;
