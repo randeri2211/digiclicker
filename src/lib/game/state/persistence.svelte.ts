@@ -27,9 +27,10 @@ function normalizeInventory(loadedInventory: InventoryState): InventoryState {
 // activePathId no longer resolves against current area data (area
 // content can change between plays), rather than leaving the player on a
 // dangling reference.
+// Saves made before bosses existed lack bossesDefeated - nothing beaten.
 function normalizeAreaProgress(loaded: AreaProgressState): AreaProgressState {
   if (!getPath(loaded.activeAreaId, loaded.activePathId)) return initialAreaProgress();
-  return loaded;
+  return { ...loaded, bossesDefeated: loaded.bossesDefeated ?? [] };
 }
 
 // v2 saves made before inheritedFromLevel existed lack it - 0 means "never
@@ -62,7 +63,9 @@ function snapshotLiveState(): SaveSlotData {
       currency,
       roster,
       hatchery,
-      wild: combat.wild,
+      // A boss fight in progress isn't saved - after a reload the player is
+      // back in normal combat and can simply start the boss again.
+      wild: combat.boss ? null : combat.wild,
       inventory,
       areaProgress,
       automation,
@@ -74,7 +77,11 @@ function applySlotToLiveState(data: SaveSlotData): void {
   Object.assign(currency, data.currency);
   replaceRecord(roster, normalizeRoster(data.roster));
   Object.assign(hatchery, data.hatchery);
-  combat.wild = data.wild ? { ...data.wild, lastTickAt: Date.now() } : null;
+  // Normal wild fights are untimed - saves from when every fight had a
+  // timer get theirs dropped.
+  combat.wild = data.wild ? { ...data.wild, lastTickAt: Date.now(), timeLimitMs: null } : null;
+  combat.boss = null;
+  combat.lastBossResult = null;
   combat.damagePopup = null;
   Object.assign(inventory, normalizeInventory(data.inventory));
   Object.assign(areaProgress, normalizeAreaProgress(data.areaProgress));

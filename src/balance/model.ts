@@ -53,6 +53,12 @@ export interface Scenario {
   /** Source level the digivolved entries inherited from. */
   inheritedFromLevel: number;
   clicksPerSecond: number;
+  /** Normal wild fights are untimed, so "can the roster win" becomes "how
+   * fast": kills slower than this count as slow. */
+  targetKillSeconds: number;
+  /** Boss check: the matchup multiplier assumed for every squad member
+   * (1 = neutral, 1.5 = one edge won, 2 = both). */
+  bossMatchup: number;
 }
 
 export const DEFAULT_SCENARIO: Scenario = {
@@ -60,6 +66,8 @@ export const DEFAULT_SCENARIO: Scenario = {
   level: 20,
   inheritedFromLevel: 20,
   clicksPerSecond: 6,
+  targetKillSeconds: 10,
+  bossMatchup: 1.5,
 };
 
 // combat/stats.ts computeStatRange midpoint: (power * scale + level *
@@ -158,7 +166,9 @@ export interface RosterSummary {
   damagePerHit: number;
   dps: number;
   clickDamage: number;
-  timerSeconds: number;
+  /** DPS while clicking at the example roster's clicks per second. */
+  activeDps: number;
+  /** Damage dealt within the example roster's target kill time. */
   idleDamagePerFight: number;
   activeDamagePerFight: number;
 }
@@ -177,7 +187,6 @@ export function summarizeRoster(b: Balance, s: Scenario): RosterSummary {
   const damagePerHit = totals.attack + totals.specialAttack;
   const dps = attacksPerSecond * damagePerHit;
   const clickDamage = b.CLICK_DAMAGE_BASE + dps * b.CLICK_DAMAGE_DPS_FRACTION;
-  const timerSeconds = fightTimerSeconds(b, totals.hp);
   return {
     size,
     totals,
@@ -185,14 +194,14 @@ export function summarizeRoster(b: Balance, s: Scenario): RosterSummary {
     damagePerHit,
     dps,
     clickDamage,
-    timerSeconds,
-    idleDamagePerFight: dps * timerSeconds,
-    activeDamagePerFight: (dps + s.clicksPerSecond * clickDamage) * timerSeconds,
+    activeDps: dps + s.clicksPerSecond * clickDamage,
+    idleDamagePerFight: dps * s.targetKillSeconds,
+    activeDamagePerFight: (dps + s.clicksPerSecond * clickDamage) * s.targetKillSeconds,
   };
 }
 
-/** Highest wild level of this stage the roster can finish inside the
- * timer with `damagePerFight`, or 0 if not even level 1. */
+/** Highest wild level of this stage the roster kills within the target
+ * time (i.e. `damagePerFight` covers its HP), or 0 if not even level 1. */
 export function maxWinnableLevel(b: Balance, stage: InGameStage, damagePerFight: number): number {
   let best = 0;
   for (let level = 1; level <= b.MAX_LEVEL; level++) {
@@ -212,11 +221,16 @@ export interface PathCheck {
   toughestName: string;
   toughestLevel: number;
   toughestHp: number;
+  /** Seconds to kill the toughest spawn, idle and while clicking. */
+  idleKillSeconds: number;
+  activeKillSeconds: number;
   verdict: Verdict;
 }
 
 // Checks every real area path (src/lib/data/areas) against the roster:
-// can it beat the toughest spawn idle, only with clicking, or not at all?
+// does it kill the toughest spawn within the target time idle, only while
+// clicking, or not at all (normal fights are untimed - "too-hard" here
+// means slow, not unwinnable).
 export function checkPaths(b: Balance, summary: RosterSummary): PathCheck[] {
   return Object.values(AREAS).flatMap((area) =>
     Object.values(area.paths).map((path) => {
@@ -242,10 +256,81 @@ export function checkPaths(b: Balance, summary: RosterSummary): PathCheck[] {
         toughestName: toughest.name,
         toughestLevel: toughest.level,
         toughestHp: toughest.hp,
+        idleKillSeconds: summary.dps > 0 ? toughest.hp / summary.dps : Infinity,
+        activeKillSeconds: summary.activeDps > 0 ? toughest.hp / summary.activeDps : Infinity,
         verdict,
       };
     })
   );
+}
+
+export interface BossCheck {
+  areaName: string;
+  pathName: string;
+  bossName: string;
+  level: number;
+  hp: number;
+  squadSize: number;
+  /** "3 Champion", "2 Ultimate + 1 Champion", ... from the example roster. */
+  squadText: string;
+  squadHp: number;
+  timerSeconds: number;
+  idleKillSeconds: number;
+  activeKillSeconds: number;
+  verdict: Verdict;
+}
+
+// Every boss in the area data, fought by a squad of the example roster's
+// highest-stage members (up to the boss's squad size), each at the assumed
+// matchup multiplier - the same squad formulas as combat/damage.ts, and
+// the game's own fight timer on the squad's HP.
+export function checkBosses(b: Balance, s: Scenario): BossCheck[] {
+  const out: BossCheck[] = [];
+  for (const area of Object.values(AREAS)) {
+    for (const path of Object.values(area.paths)) {
+      const boss = path.boss;
+      const bossSpecies = boss ? getSpecies(boss.speciesId) : undefined;
+      const bossStage = bossSpecies?.stage as InGameStage | undefined;
+      if (!boss || !bossSpecies || !bossStage || !STAGES.includes(bossStage)) continue;
+
+      const picked: { stage: InGameStage; count: number }[] = [];
+      let left = boss.squadSize;
+      for (const stage of [...STAGES].reverse()) {
+        const take = Math.min(left, s.counts[stage] ?? 0);
+        if (take > 0) picked.push({ stage, count: take });
+        left -= take;
+        if (left <= 0) break;
+      }
+      const totals: StatBlock = { attack: 0, hp: 0, speed: 0, specialAttack: 0 };
+      for (const { stage, count } of picked) {
+        for (const stat of STAT_KEYS) {
+          totals[stat] += count * entryStat(b, stage, stat, s.level, s.inheritedFromLevel) * s.bossMatchup;
+        }
+      }
+      const dps = (b.BASE_ATTACKS_PER_SECOND + totals.speed * b.SPEED_TO_APS_SCALE) * (totals.attack + totals.specialAttack);
+      const click = b.CLICK_DAMAGE_BASE + dps * b.CLICK_DAMAGE_DPS_FRACTION;
+      const hp = Math.round(wildHp(b, bossStage, boss.level) * boss.hpMultiplier);
+      const timerSeconds = fightTimerSeconds(b, totals.hp);
+      const idleKillSeconds = dps > 0 ? hp / dps : Infinity;
+      const activeDps = dps + s.clicksPerSecond * click;
+      const activeKillSeconds = activeDps > 0 ? hp / activeDps : Infinity;
+      out.push({
+        areaName: area.name,
+        pathName: path.name,
+        bossName: bossSpecies.name,
+        level: boss.level,
+        hp,
+        squadSize: boss.squadSize,
+        squadText: picked.length ? picked.map((p) => `${p.count} ${p.stage}`).join(' + ') : 'none',
+        squadHp: totals.hp,
+        timerSeconds,
+        idleKillSeconds,
+        activeKillSeconds,
+        verdict: idleKillSeconds <= timerSeconds ? 'idle' : activeKillSeconds <= timerSeconds ? 'clicking' : 'too-hard',
+      });
+    }
+  }
+  return out;
 }
 
 /** Compact number for labels: 1234 -> 1.23k, 4.4e7 -> 44M. */

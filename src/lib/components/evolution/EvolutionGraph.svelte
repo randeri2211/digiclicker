@@ -12,6 +12,7 @@
   } from '../../game/state/game.svelte';
   import type { DigivolutionOption } from '../../game/state/game.svelte';
   import { MAX_LEVEL } from '../../game/constants';
+  import SpeciesTags from '../shared/SpeciesTags.svelte';
 
   function formatStatBlock(block: StatBlock): string {
     return `ATK ${block.attack} · HP ${block.hp} · SPD ${block.speed} · SPA ${block.specialAttack}`;
@@ -139,6 +140,7 @@
     </div>
     <div class="option-name">{option.species.name}</div>
     <div class="option-stage">{option.species.stage} · {option.species.statAffinity}</div>
+    <SpeciesTags speciesId={option.species.id} />
     {#if option.owned}
       {@const ownedEntry = roster[option.species.id]}
       <div class="option-req">
@@ -220,6 +222,7 @@
     <div class="current-meta">
       {currentSpecies?.stage ?? 'Unknown'} · Lv {levelForXp(entry.xp)}
     </div>
+    <SpeciesTags speciesId={entry.speciesId} />
     <div class="current-stats">Inherited bonus: {formatStatBlock(entry.inheritedBonus)}</div>
   </div>
 </div>

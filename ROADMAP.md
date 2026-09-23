@@ -23,7 +23,7 @@ As each feature ships, move its description into `GAMEPLAY_DESIGN.md`'s "Confirm
 | # | Feature | Depends on |
 |---|---|---|
 | 1 | Elements data + advantage math **(done)** | - |
-| 2 | Boss fights + squads | 1 |
+| 2 | Boss fights + squads **(done)** | 1 |
 | 3 | Expeditions (first real Data source) + unique items | - (uses 1 for element bonuses) |
 | 4 | Data-gated hatching | 3 (players need Data first) |
 | 5 | Unlock flags + quests framework (story content: undecided) | 2 |
@@ -50,7 +50,9 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - **Where it applies:** boss fights only (feature 2) - scales **all four stats** of a squad member vs. that boss. Normal wild fights are unchanged (`computeRosterDamagePerHit` etc. stay as they are).
 - **UI:** show attribute + element as small chips on the Stats window, roster cards and Compendium entries (reuse `getSpecies`).
 
-## 2. Boss fights + squads
+## 2. Boss fights + squads - done
+
+*Shipped: see GAMEPLAY_DESIGN.md "Boss fights & squads". Changes from the plan: beating a boss only marks the area cleared for now (no next region exists yet); rewards are bits + Data only (no roster prize); the timer is funded by squad HP via the fight-timer formula, and **normal wild fights are now untimed**.*
 **Goal:** each region ends in a boss; picking the right squad matters.
 
 - **Flow:** reaching `mastery.kills` on a region's final path (existing `recordActivePathKill` in `areas/areaProgress.ts`) now unlocks the **boss** (not the next region). Beating the boss unlocks the next region's starting path (cross-area unlock - the `"areaId:pathId"` form `AreaPath.unlocks` already anticipates).

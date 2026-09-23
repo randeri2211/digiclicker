@@ -199,6 +199,34 @@ on total XP earned per kill.
   specialization abilities, once a farming system exists to specialize
   in (see "Idle production" above - still not built).
 
+### Boss fights & squads (confirmed, built)
+- A region's final path can carry a **boss** (`boss` in the area JSON:
+  species, level, `squadSize`, `hpMultiplier`, rewards, unlocks;
+  validated by `validate_areas.py`). It becomes available once that path's
+  mastery kill count is reached - a boss bar under the path tabs shows it
+  locked (with mastery progress), ready (**Challenge**) or cleared
+  (**Rematch**). Forest Sector: **Leomon** Lv 32 at Forest Heart, squad of
+  3, 5x HP, +500 bits / +50 Data per win (drafts).
+- **Squad:** picked on the boss prep screen before every attempt (free
+  choice, no lock-in), up to the boss's `squadSize`. The roster is listed
+  best matchup first with each Digimon's multiplier (x0.5 .. x2.0, see
+  "Elements & matchups"); **Auto-pick** fills the squad with the
+  strongest matchups, and a live estimate shows squad DPS, the timer from
+  squad HP, kill time idle / clicking, and "Wins idle / Needs clicking /
+  Too strong".
+- **In the fight** only the squad fights, every stat scaled by its
+  locked-in multiplier (`computeSquad*` in `combat/damage.ts`); clicks
+  scale with squad DPS; the rest of the roster sits out and path
+  switching is blocked. **Retreat** ends it. A win pays the rewards
+  **every** time and records the area as cleared (`bossesDefeated`) on
+  the first - applying `unlocks` (cross-area `"areaId:pathId"` supported;
+  empty until more regions exist). No roster or XP reward. A boss fight in
+  progress isn't saved - a reload returns to normal combat.
+- **Balance Lab:** a "Boss check" table fights each boss with a squad of
+  the example roster's highest-stage members at an assumed matchup, and
+  the "Boss fight timer" chart marks each squad's HP. The wild-fight
+  checks now grade kill speed against a target kill time.
+
 ### Elements & matchups (confirmed, built - used by boss fights, see ROADMAP.md)
 - Every species has an **attribute** (the wiki's Vaccine / Data / Virus;
   anything else - Free, None, Unknown - is neutral) and an **element**:
@@ -253,35 +281,17 @@ on total XP earned per kill.
   growthPerLevel + inheritedBonus) to the roster's flat per-hit damage
   total; the whole roster hits as one combined blow each tick, not
   entry-by-entry.
-- **Fights are timed - HP funds the timer (confirmed, built):** every
-  wild encounter has a time limit, `FIGHT_TIMER_BASE_SECONDS` plus a
-  **capped** bonus of up to `FIGHT_TIMER_MAX_BONUS_SECONDS` funded by the
-  roster's summed **HP** stat. The curve shape is a setting,
-  `FIGHT_TIMER_FORMULA` (all values in `balance.json`, pickable in the
-  Balance Lab):
-  - `halfLife` - `max * (1 - 0.5 ^ (hp / FIGHT_TIMER_HALF_BONUS_HP))`:
-    fast early gains, approaches the ceiling without reaching it.
-  - `parabola` - `max * (1 - (1 - hp / FIGHT_TIMER_FULL_BONUS_HP)^2)`:
-    gains taper off steadily and reach the ceiling exactly at "full
-    bonus" HP, flat after.
-  - `power` - `max * (hp / FIGHT_TIMER_FULL_BONUS_HP) ^
-    FIGHT_TIMER_POWER_EXPONENT`, capped: 0.5 = square root, 1 = linear.
-  The formulas live in `combat/fightTimer.ts` as pure functions, shared by
-  the game (`computeFightTimeLimitMs` in `combat/spawn.ts`) and the
-  Balance Lab, so the lab's timer chart can never drift from the game; an
-  unknown formula name falls back to `halfLife`. The cap matters because
-  roster HP grows with every Digimon collected - an uncapped bonus would
-  balloon into minutes-long fights. Fixed once at spawn, doesn't change
-  if roster HP changes mid-fight. If the timer
-  runs out before the wild is defeated, the encounter ends with **no
-  reward** (no XP/Bits/egg roll) - same as never having fought it - and
-  a fresh wild spawns right after, same gap as a normal kill. This is
-  what finally gives the renamed **HP** stat (formerly Defense) a live
-  mechanical effect - it was the last of the four stats with no formula
-  behind it; Speed (attack rate), Attack/SpecialAttack (damage), and now
-  HP (fight duration) all matter. A `TimerBar` next to the HP bar shows
-  the countdown, reading the wild's already-ticking `lastTickAt` as its
-  clock rather than polling a separate timer.
+- **Wild fights are untimed; only boss fights have a timer (confirmed,
+  built):** a normal wild stays until it falls - idle progress is about
+  kill *speed*, not a race. A **boss fight** is timed: `FIGHT_TIMER_BASE_SECONDS`
+  plus a capped bonus of up to `FIGHT_TIMER_MAX_BONUS_SECONDS` funded by
+  the **squad's** summed HP (after matchup multipliers), shaped by
+  `FIGHT_TIMER_FORMULA` - `halfLife`, `parabola` or `power` (formulas in
+  `combat/fightTimer.ts`, shared by the game and the Balance Lab; an
+  unknown name falls back to `halfLife`). Running out is a loss with no
+  rewards. So HP's one live effect is lasting longer in boss fights -
+  HP-heavy Digimon earn a squad slot. Fixed once when the fight starts.
+
 - The sidebar shows a live **Roster DPS** panel (totals for every stat,
   the shared attack rate, and the top 5 contributors by DPS share -
   the roster can hold hundreds of entries, so only the biggest are

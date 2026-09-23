@@ -4,11 +4,19 @@
   import AreaTabs from './AreaTabs.svelte';
   import PathTabs from './PathTabs.svelte';
   import DebugSpawnPanel from './DebugSpawnPanel.svelte';
+  import BossBar from './BossBar.svelte';
+
+  interface Props {
+    onChallengeBoss: (areaId: string, pathId: string) => void;
+  }
+
+  const { onChallengeBoss }: Props = $props();
 </script>
 
 <div class="combat">
   <AreaHeader />
   <PathTabs />
+  <BossBar onChallenge={onChallengeBoss} />
   {#if import.meta.env.DEV}
     <DebugSpawnPanel />
   {/if}

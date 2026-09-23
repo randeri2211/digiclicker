@@ -64,22 +64,20 @@ export const DISADVANTAGE_PENALTY = balance.DISADVANTAGE_PENALTY;
 export const COMBAT_TICK_INTERVAL_MS = 250;
 
 // ---- Combat: fight timer ---------------------------------------------
-/** Every wild encounter has a time limit: FIGHT_TIMER_BASE_SECONDS plus a
- * bonus of up to FIGHT_TIMER_MAX_BONUS_SECONDS funded by the roster's
- * summed HP, shaped by FIGHT_TIMER_FORMULA (see combat/fightTimer.ts for
- * the formulas - 'halfLife', 'parabola' or 'power'). The bonus is always
- * capped - roster HP grows with every Digimon collected, so an uncapped
- * timer would balloon into minutes-long fights. If it runs out before the
- * wild is defeated, the encounter ends with no reward and a fresh wild
- * spawns - HP's one live mechanical effect. */
+/** Boss fights only - normal wild fights are untimed. A boss fight's time
+ * limit is FIGHT_TIMER_BASE_SECONDS plus a bonus of up to
+ * FIGHT_TIMER_MAX_BONUS_SECONDS funded by the SQUAD's summed HP (after
+ * matchup multipliers), shaped by FIGHT_TIMER_FORMULA (see
+ * combat/fightTimer.ts - 'halfLife', 'parabola' or 'power'). Running out
+ * is a loss with no rewards. This is HP's one live mechanical effect. */
 export const FIGHT_TIMER_FORMULA = balance.FIGHT_TIMER_FORMULA as FightTimerFormula;
 export const FIGHT_TIMER_BASE_SECONDS = balance.FIGHT_TIMER_BASE_SECONDS;
 /** The ceiling of the bonus - fights top out at base + this. */
 export const FIGHT_TIMER_MAX_BONUS_SECONDS = balance.FIGHT_TIMER_MAX_BONUS_SECONDS;
-/** 'halfLife' only: roster HP at which half the max bonus is reached;
+/** 'halfLife' only: squad HP at which half the max bonus is reached;
  * every further multiple of it halves the remaining gap to the ceiling. */
 export const FIGHT_TIMER_HALF_BONUS_HP = balance.FIGHT_TIMER_HALF_BONUS_HP;
-/** 'parabola' / 'power' only: roster HP at which the full max bonus is
+/** 'parabola' / 'power' only: squad HP at which the full max bonus is
  * reached - the timer stays at the ceiling beyond it. */
 export const FIGHT_TIMER_FULL_BONUS_HP = balance.FIGHT_TIMER_FULL_BONUS_HP;
 /** 'power' only: curve exponent (0.5 = square root, 1 = straight line). */
