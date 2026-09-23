@@ -3,6 +3,18 @@
 export { currency } from './currency.svelte';
 export { roster, isOwned, getRosterList } from './roster.svelte';
 export { hatchery, addEgg } from './hatchery.svelte';
+export {
+  expeditions,
+  isAway,
+  getFightingRoster,
+  startExpedition,
+  claimExpedition,
+  dismissHaul,
+} from './expeditions.svelte';
+export { progress, hasFlag, setFlag } from './progress.svelte';
+export { notifications, pushToast, dismissToast } from './notifications.svelte';
+export { QUESTS, getQuest, questStatus, requirementProgress, completeQuest } from '../quests/quests';
+export type { QuestStatus } from '../quests/quests';
 export { inventory } from './inventory.svelte';
 export { buyItem, canAffordItem } from '../items/items';
 export { ITEM_CATALOG } from '../items/itemCatalog';
@@ -47,6 +59,6 @@ export {
 export type { SaveSlot } from './saveData';
 export { getDigivolveOptions, isReadyToDigivolve, digivolve } from '../evolution/digivolve';
 export type { DigivolutionOption } from '../evolution/digivolve';
-export { findRootAncestors, rollEggDrop, tryHatch } from '../eggs/eggs';
+export { findRootAncestors, rollEggDrop, hatchEgg, isEggReady } from '../eggs/eggs';
 export { buyMysteryEgg } from '../eggs/mysteryEggs';
 export { getRosterEntryMenuItems } from '../roster/rosterMenu';

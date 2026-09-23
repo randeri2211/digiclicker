@@ -227,6 +227,45 @@ on total XP earned per kill.
   the "Boss fight timer" chart marks each squad's HP. The wild-fight
   checks now grade kill speed against a target kill time.
 
+### Expeditions (confirmed, built)
+- Send a **party** of up to `EXPEDITION_MAX_PARTY` (3) roster Digimon to a
+  **destination** (`src/lib/data/expeditions.json`); `EXPEDITION_MAX_CONCURRENT`
+  (1) can run at once. While away they **don't fight, earn no kill XP and
+  can't join a boss squad** - the trade-off. Time-based, so they come back
+  even while the game is closed; the haul waits until **claimed** (the
+  expedition keeps its slot until then; a top-bar badge shows ready ones).
+- Forest Sector destinations (each unlocks with a path): **Misty Lake
+  Shore** (10 min, Water/Plant), **Overgrown Server Ruins** (30 min,
+  Metal/Electric), **Beast Tracks** (60 min, Earth/Fire).
+- Duration = base / (1 + `EXPEDITION_LEVEL_SPEED_SCALE` x party's average
+  level); haul x (1 + `EXPEDITION_ELEMENT_MATCH_BONUS` x members of a
+  favored element + `EXPEDITION_STAGE_BONUS` x average stage order). Loot
+  is rolled on claim: **Data** (the game's first real Data source), maybe
+  an **egg** of the destination's families (non-Mystery, straight to the
+  hatchery), and **boss chips**.
+- **Boss chips** (Attack Chip, Speed Chip, HP Disk - not sold in the
+  Shop): slotted in on the boss prep screen, each adds `BOSS_CHIP_BONUS`
+  (+25%) to its stat(s) for the whole squad for that one fight.
+
+### Quests & progress flags (confirmed, built - story content still to be written)
+- Quests are **data** (`src/lib/data/quests.json`, validated in CI by
+  `validate_quests.py`): a giver (NPC name + species sprite), an area,
+  text, **prerequisites** (other quests / flags - the story's ordering),
+  **requirements** (own a species, own N of a stage or element, reach a
+  level, kills on a path, defeat a boss, deliver items, have a flag) and
+  **rewards** (bits, Data, items, **flags**).
+- **Flags** (`progress.flags`) are the generic unlock mechanism: other
+  systems check a flag, anything can set one - so Crests, Armor and DNA
+  digivolution can be gated on story beats that aren't written yet.
+- A quest is locked until its prerequisites are done, then active, then
+  **ready** once every requirement holds; the player turns it in
+  (consuming delivered items). A toast announces newly ready quests; the
+  area's quest givers appear as an **NPC strip** above the arena, and a
+  **Quests** log (top bar, with a ready badge) lists current and completed
+  quests with live progress.
+- The four quests in the file now are **placeholders** to exercise the
+  system, to be replaced by the storyline.
+
 ### Elements & matchups (confirmed, built - used by boss fights, see ROADMAP.md)
 - Every species has an **attribute** (the wiki's Vaccine / Data / Virus;
   anything else - Free, None, Unknown - is neutral) and an **element**:
@@ -368,10 +407,9 @@ on total XP earned per kill.
   removed rather than left as dead code.
 
 ### Currency: Bits and Data
-- **Bits** (combat currency) buy **items**, including **Data**.
-- **Data** is spent to hatch Digi-Eggs; the amount/type of Data required
-  depends on the egg's type. Exact Data costs are still to be figured out
-  (egg types themselves are now confirmed - see "Digi-Eggs" below).
+- **Bits** - earned from every kill and boss win; spent in the Shop.
+- **Data** - earned from expeditions, boss wins and quests; spent to hatch
+  eggs (see "Digi-Eggs").
 
 ### Digi-Eggs
 - **Egg type (confirmed):** every Digi-Egg has a flavor type - one of
@@ -409,13 +447,13 @@ on total XP earned per kill.
   automatically, oldest first, so the hatchery drains with no player
   action. New eggs (kill-drops and Shop purchases alike) go straight into
   a free incubating slot if there is one, else storage.
-- **Hatching (confirmed, built):** once an incubating egg's level crosses
-  `EGG_HATCH_LEVEL`, `tryHatch()` (checked every time `awardKillXp`
-  runs) removes it from the hatchery. If its species isn't owned yet it
-  joins the roster as a new entry (the reveal moment - also what credits
-  it in the Compendium). If the species is **already owned**, it becomes
-  a bonus for the existing entry instead of a second copy
-  (`DUPLICATE_HATCH_XP`, placeholder), so an egg is never wasted.
+- **Hatching costs Data (confirmed, built):** an incubating egg gains kill
+  XP until it reaches `EGG_HATCH_LEVEL`, then waits as **Ready**, holding
+  its slot and gaining nothing more, until the player pays
+  `HATCH_DATA_COST` (20 Data) to hatch it (`hatchEgg` in `eggs/eggs.ts`).
+  A new species joins the roster (the reveal moment - also what credits it
+  in the Compendium); an already-owned species instead gives the existing
+  entry `DUPLICATE_HATCH_XP`. The freed slot takes the next stored egg.
 - **Acquisition - kill-drop (confirmed, built):** killing a wild has an
   `EGG_DROP_CHANCE_PERCENT` chance (small placeholder, tunable in
   `constants.ts`) to drop an egg. The drop resolves to a random *Fresh-stage*

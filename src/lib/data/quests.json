@@ -1,0 +1,45 @@
+[
+  {
+    "id": "placeholder-first-steps",
+    "title": "First Steps",
+    "giver": { "name": "Jijimon", "speciesId": "jijimon" },
+    "areaId": "forest-sector",
+    "text": "Placeholder quest - to be replaced by the storyline. \"The forest is restless, youngster. Show me your partners can hold their own.\"",
+    "completeText": "\"Good, good. You might just survive out there.\"",
+    "requirements": [{ "kind": "reach-level", "level": 5 }],
+    "rewards": { "bits": 100, "flags": ["intro-done"] }
+  },
+  {
+    "id": "placeholder-forest-patrol",
+    "title": "Forest Patrol",
+    "giver": { "name": "Jijimon", "speciesId": "jijimon" },
+    "areaId": "forest-sector",
+    "text": "Placeholder quest. \"Wild Digimon keep spilling out of the Forest Clearing. Thin them out a little.\"",
+    "completeText": "\"Much quieter. Take this Data - you've earned it.\"",
+    "prerequisites": { "quests": ["placeholder-first-steps"] },
+    "requirements": [{ "kind": "path-kills", "areaId": "forest-sector", "pathId": "forest-clearing", "kills": 25 }],
+    "rewards": { "data": 30 }
+  },
+  {
+    "id": "placeholder-circuit-scraps",
+    "title": "Circuit Scraps",
+    "giver": { "name": "Tentomon", "speciesId": "tentomon" },
+    "areaId": "forest-sector",
+    "text": "Placeholder quest. \"I'm building something! Could you bring me a Speed Chip from the old server ruins?\"",
+    "completeText": "\"Bzzt! Perfect. Here, have some of my spare Data.\"",
+    "prerequisites": { "quests": ["placeholder-first-steps"] },
+    "requirements": [{ "kind": "deliver-item", "itemId": "speed-chip", "count": 1 }],
+    "rewards": { "data": 60, "items": [{ "id": "hp-disk", "count": 1 }] }
+  },
+  {
+    "id": "placeholder-guardian-of-the-forest",
+    "title": "Guardian of the Forest",
+    "giver": { "name": "Leomon", "speciesId": "leomon" },
+    "areaId": "forest-sector",
+    "text": "Placeholder quest. \"If you wish to go deeper, you must first prove yourself against me.\"",
+    "completeText": "\"You fight with heart. The forest is open to you.\"",
+    "prerequisites": { "quests": ["placeholder-forest-patrol"] },
+    "requirements": [{ "kind": "defeat-boss", "areaId": "forest-sector", "pathId": "forest-heart" }],
+    "rewards": { "bits": 300, "data": 50, "flags": ["forest-sector-cleared"] }
+  }
+]

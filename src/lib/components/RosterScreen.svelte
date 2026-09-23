@@ -5,6 +5,7 @@
   import { IN_GAME_STAGES } from '../game/constants';
   import {
     getRosterList,
+    isAway,
     getRosterEntryMenuItems,
     useAbilityReroll,
     computeAttacksPerSecond,
@@ -122,6 +123,7 @@
             </div>
             <div class="card-xp"><XpBar xp={row.entry.xp} /></div>
             <SpeciesTags speciesId={row.entry.speciesId} />
+            {#if isAway(row.entry.speciesId)}<span class="away">On expedition</span>{/if}
             <div class="card-meta">{row.dps.toFixed(1)} DPS</div>
           </button>
         {/each}
@@ -274,5 +276,11 @@
   }
   .card-xp {
     width: 100%;
+  }
+  .away {
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--warn);
   }
 </style>

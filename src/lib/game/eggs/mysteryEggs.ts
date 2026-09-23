@@ -18,9 +18,15 @@ export const MYSTERY_EGG_WEIGHTS = mysteryEggWeightsData as unknown as Record<Eg
  * already has - see egg_type_mapping.py - so every type has a real,
  * non-empty pool; validated by validate_mystery_eggs.py). */
 export function rollMysteryEgg(eggType: EggType): Egg {
+  return rollEggOfType(eggType, true);
+}
+
+/** An egg of the given family from the same weighted pool - also what
+ * expeditions find (as ordinary, non-Mystery eggs). */
+export function rollEggOfType(eggType: EggType, isMystery: boolean): Egg {
   const pool = MYSTERY_EGG_WEIGHTS[eggType];
   const chosen = weightedPick(pool, (entry) => entry.weight);
-  return createEgg(chosen.id, eggType, true);
+  return createEgg(chosen.id, eggType, isMystery);
 }
 
 /** Spends MYSTERY_EGG_COST_BITS and, on success, rolls a mystery egg of

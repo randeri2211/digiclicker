@@ -54,24 +54,28 @@ export interface WeightedEntry {
   multiplier: number;
 }
 
-export function computeSquadStat(members: WeightedEntry[], statKey: keyof StatBlock): number {
-  return members.reduce((total, m) => total + computeEntryStatValue(m.entry, statKey) * m.multiplier, 0);
+/** Extra fraction per stat for the whole squad (boss chips). */
+export type SquadStatBonus = Partial<Record<keyof StatBlock, number>>;
+
+export function computeSquadStat(members: WeightedEntry[], statKey: keyof StatBlock, bonus: SquadStatBonus = {}): number {
+  const total = members.reduce((sum, m) => sum + computeEntryStatValue(m.entry, statKey) * m.multiplier, 0);
+  return total * (1 + (bonus[statKey] ?? 0));
 }
 
-export function computeSquadDamagePerHit(members: WeightedEntry[]): number {
-  return computeSquadStat(members, 'attack') + computeSquadStat(members, 'specialAttack');
+export function computeSquadDamagePerHit(members: WeightedEntry[], bonus: SquadStatBonus = {}): number {
+  return computeSquadStat(members, 'attack', bonus) + computeSquadStat(members, 'specialAttack', bonus);
 }
 
-export function computeSquadAttacksPerSecond(members: WeightedEntry[]): number {
-  return BASE_ATTACKS_PER_SECOND + computeSquadStat(members, 'speed') * SPEED_TO_APS_SCALE;
+export function computeSquadAttacksPerSecond(members: WeightedEntry[], bonus: SquadStatBonus = {}): number {
+  return BASE_ATTACKS_PER_SECOND + computeSquadStat(members, 'speed', bonus) * SPEED_TO_APS_SCALE;
 }
 
-export function computeSquadDps(members: WeightedEntry[]): number {
-  return computeSquadAttacksPerSecond(members) * computeSquadDamagePerHit(members);
+export function computeSquadDps(members: WeightedEntry[], bonus: SquadStatBonus = {}): number {
+  return computeSquadAttacksPerSecond(members, bonus) * computeSquadDamagePerHit(members, bonus);
 }
 
-export function computeSquadClickDamage(members: WeightedEntry[]): number {
-  return CLICK_DAMAGE_BASE + computeSquadDps(members) * CLICK_DAMAGE_DPS_FRACTION;
+export function computeSquadClickDamage(members: WeightedEntry[], bonus: SquadStatBonus = {}): number {
+  return CLICK_DAMAGE_BASE + computeSquadDps(members, bonus) * CLICK_DAMAGE_DPS_FRACTION;
 }
 
 // Aggregate rate (attacks/sec * damage/hit) - not used by the tick loop

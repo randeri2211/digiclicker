@@ -5,18 +5,21 @@
   import PathTabs from './PathTabs.svelte';
   import DebugSpawnPanel from './DebugSpawnPanel.svelte';
   import BossBar from './BossBar.svelte';
+  import NpcStrip from './NpcStrip.svelte';
 
   interface Props {
     onChallengeBoss: (areaId: string, pathId: string) => void;
+    onOpenQuests: () => void;
   }
 
-  const { onChallengeBoss }: Props = $props();
+  const { onChallengeBoss, onOpenQuests }: Props = $props();
 </script>
 
 <div class="combat">
   <AreaHeader />
   <PathTabs />
   <BossBar onChallenge={onChallengeBoss} />
+  <NpcStrip {onOpenQuests} />
   {#if import.meta.env.DEV}
     <DebugSpawnPanel />
   {/if}

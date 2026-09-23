@@ -1,11 +1,19 @@
 import { tick } from '../state/combat.svelte';
+import { updateExpeditions } from '../state/expeditions.svelte';
+import { newlyReadyQuests } from '../quests/quests';
+import { pushToast } from '../state/notifications.svelte';
 import { COMBAT_TICK_INTERVAL_MS } from '../constants';
 
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 export function startCombatTickLoop() {
   if (intervalId !== null) return;
-  intervalId = setInterval(() => tick(Date.now()), COMBAT_TICK_INTERVAL_MS);
+  intervalId = setInterval(() => {
+    const now = Date.now();
+    updateExpeditions(now);
+    tick(now);
+    for (const quest of newlyReadyQuests()) pushToast('Quest ready', quest.title);
+  }, COMBAT_TICK_INTERVAL_MS);
 }
 
 export function stopCombatTickLoop() {

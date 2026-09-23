@@ -2,7 +2,7 @@
   import type { RosterEntry } from '../../game/types';
   import { getSpeciesName } from '../../game/images';
   import {
-    getRosterList,
+    getFightingRoster,
     computeRosterDps,
     computeClickDamage,
     computeEntryDps,
@@ -21,7 +21,8 @@
   // the biggest contributors are listed, the totals cover everyone.
   const TOP_CONTRIBUTOR_COUNT = 5;
 
-  const entries = $derived(getRosterList());
+  // Only who's actually fighting - Digimon away on an expedition sit out.
+  const entries = $derived(getFightingRoster());
   const totalDps = $derived(computeRosterDps(entries));
   const attacksPerSecond = $derived(computeAttacksPerSecond(entries));
   const damagePerHit = $derived(computeRosterDamagePerHit(entries));

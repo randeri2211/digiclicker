@@ -3,14 +3,17 @@ import { ITEM_CATALOG } from './itemCatalog';
 import { currency, spendBits } from '../state/currency.svelte';
 import { addItem } from '../state/inventory.svelte';
 
+/** False for items the Shop doesn't sell (costBits null). */
 export function canAffordItem(id: ItemId): boolean {
-  return currency.bits >= ITEM_CATALOG[id].costBits;
+  const cost = ITEM_CATALOG[id].costBits;
+  return cost !== null && currency.bits >= cost;
 }
 
 /** False and no-op if bits are insufficient - spendBits already guards
  * against going negative, so this never partially applies. */
 export function buyItem(id: ItemId): boolean {
-  if (!spendBits(ITEM_CATALOG[id].costBits)) return false;
+  const cost = ITEM_CATALOG[id].costBits;
+  if (cost === null || !spendBits(cost)) return false;
   addItem(id);
   return true;
 }

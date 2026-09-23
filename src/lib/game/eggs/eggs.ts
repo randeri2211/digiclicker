@@ -2,9 +2,10 @@ import type { DigimonSpecies, Egg, EggType } from '../types';
 import { getSpecies } from '../images';
 import { createRosterEntry } from '../roster/starterRoster';
 import { levelForXp } from '../combat/levelCurve';
-import { DUPLICATE_HATCH_XP, EGG_DROP_CHANCE_PERCENT, EGG_HATCH_LEVEL, IN_GAME_STAGES } from '../constants';
+import { DUPLICATE_HATCH_XP, EGG_DROP_CHANCE_PERCENT, EGG_HATCH_LEVEL, HATCH_DATA_COST, IN_GAME_STAGES } from '../constants';
 import { roster, addToRoster } from '../state/roster.svelte';
-import { removeIncubatingEgg } from '../state/hatchery.svelte';
+import { hatchery, removeIncubatingEgg, fillIncubatingSlots } from '../state/hatchery.svelte';
+import { spendData } from '../state/currency.svelte';
 
 function isInGameSpecies(species: DigimonSpecies): boolean {
   return IN_GAME_STAGES.has(species.stage);
@@ -70,18 +71,26 @@ export function rollEggDrop(killedSpeciesId: string): Egg | null {
   return createEgg(targetSpeciesId, targetSpecies.eggType, false);
 }
 
+/** Reached EGG_HATCH_LEVEL - waiting in its slot to be paid for. */
+export function isEggReady(egg: Egg): boolean {
+  return levelForXp(egg.xp) >= EGG_HATCH_LEVEL;
+}
+
 /**
- * Hatches an incubating egg once it reaches EGG_HATCH_LEVEL - removes it
- * from the hatchery and either adds its species to the roster (the reveal
- * moment - also what credits it in the Compendium) or, if that species is
- * already owned, converts it into a bonus for the existing entry instead
- * of a second copy. Called wherever xp is awarded (see awardKillXp in
- * combat/xp.ts) - not a separate sweep.
+ * Hatches a ready incubating egg for HATCH_DATA_COST Data - removes it
+ * from the hatchery (the next stored egg moves into the freed slot) and
+ * either adds its species to the roster (the reveal moment - also what
+ * credits it in the Compendium) or, if that species is already owned,
+ * gives the existing entry DUPLICATE_HATCH_XP instead of a second copy.
+ * False and no-op if the egg isn't incubating, isn't ready, or the Data
+ * isn't there.
  */
-export function tryHatch(egg: Egg): boolean {
-  if (levelForXp(egg.xp) < EGG_HATCH_LEVEL) return false;
+export function hatchEgg(eggId: string): boolean {
+  const egg = hatchery.incubating.find((e) => e.eggId === eggId);
+  if (!egg || !isEggReady(egg) || !spendData(HATCH_DATA_COST)) return false;
 
   removeIncubatingEgg(egg.eggId);
+  fillIncubatingSlots();
   if (addToRoster(createRosterEntry(egg.speciesId))) return true;
 
   // Already owned - the roster holds one entry per species, so the egg

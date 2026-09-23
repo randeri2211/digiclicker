@@ -1,0 +1,53 @@
+{
+  "misty-lake-shore": {
+    "id": "misty-lake-shore",
+    "name": "Misty Lake Shore",
+    "description": "A fog-covered shoreline at the forest's edge. Water- and plant-loving Digimon bring back more.",
+    "areaId": "forest-sector",
+    "unlockPathId": "forest-clearing",
+    "favoredElements": ["Water", "Plant"],
+    "durationMinutes": 10,
+    "loot": {
+      "data": [15, 30],
+      "eggChancePercent": 10,
+      "eggTypes": ["Aquatic", "Plant"],
+      "items": [{ "id": "attack-chip", "chancePercent": 15, "count": [1, 1] }]
+    }
+  },
+  "overgrown-server-ruins": {
+    "id": "overgrown-server-ruins",
+    "name": "Overgrown Server Ruins",
+    "description": "Ancient server racks swallowed by vines - scrap data and loose circuitry everywhere. Metal and Electric Digimon dig deeper.",
+    "areaId": "forest-sector",
+    "unlockPathId": "forest-depths",
+    "favoredElements": ["Metal", "Electric"],
+    "durationMinutes": 30,
+    "loot": {
+      "data": [50, 90],
+      "eggChancePercent": 12,
+      "eggTypes": ["Machine", "Mineral"],
+      "items": [
+        { "id": "speed-chip", "chancePercent": 25, "count": [1, 1] },
+        { "id": "hp-disk", "chancePercent": 25, "count": [1, 1] }
+      ]
+    }
+  },
+  "beast-tracks": {
+    "id": "beast-tracks",
+    "name": "Beast Tracks",
+    "description": "Deep claw marks lead past Leomon's territory into the wild heart of the forest. Earth and Fire Digimon follow them best.",
+    "areaId": "forest-sector",
+    "unlockPathId": "forest-heart",
+    "favoredElements": ["Earth", "Fire"],
+    "durationMinutes": 60,
+    "loot": {
+      "data": [120, 200],
+      "eggChancePercent": 15,
+      "eggTypes": ["Beast", "Dinosaur"],
+      "items": [
+        { "id": "attack-chip", "chancePercent": 30, "count": [1, 2] },
+        { "id": "hp-disk", "chancePercent": 20, "count": [1, 1] }
+      ]
+    }
+  }
+}

@@ -11,6 +11,9 @@
   import ShopScreen from './lib/components/ShopScreen.svelte';
   import CompendiumScreen from './lib/components/CompendiumScreen.svelte';
   import BossScreen from './lib/components/BossScreen.svelte';
+  import ExpeditionsScreen from './lib/components/ExpeditionsScreen.svelte';
+  import QuestLogScreen from './lib/components/QuestLogScreen.svelte';
+  import Toasts from './lib/components/shared/Toasts.svelte';
   import {
     startCombatTickLoop,
     stopCombatTickLoop,
@@ -26,7 +29,7 @@
     currency,
     findRootAncestors,
     rollEggDrop,
-    tryHatch,
+    hatchEgg,
     inventory,
     buyItem,
     areaProgress,
@@ -54,6 +57,8 @@
   let inventoryOpen = $state(false);
   let shopOpen = $state(false);
   let compendiumOpen = $state(false);
+  let expeditionsOpen = $state(false);
+  let questsOpen = $state(false);
   // Boss prep screen target, or null when closed.
   let bossPrep: { areaId: string; pathId: string } | null = $state(null);
 
@@ -100,7 +105,7 @@
       currency,
       findRootAncestors,
       rollEggDrop,
-      tryHatch,
+      hatchEgg,
       inventory,
       buyItem,
       areaProgress,
@@ -128,9 +133,11 @@
       onOpenInventory={() => (inventoryOpen = true)}
       onOpenShop={() => (shopOpen = true)}
       onOpenCompendium={() => (compendiumOpen = true)}
+      onOpenExpeditions={() => (expeditionsOpen = true)}
+      onOpenQuests={() => (questsOpen = true)}
     />
     <div class="main">
-      <CombatPanel onChallengeBoss={(areaId, pathId) => (bossPrep = { areaId, pathId })} />
+      <CombatPanel onChallengeBoss={(areaId, pathId) => (bossPrep = { areaId, pathId })} onOpenQuests={() => (questsOpen = true)} />
       <Sidebar onOpenEvolution={openEvolution} />
     </div>
   {/if}
@@ -155,12 +162,24 @@
     <ShopScreen onClose={() => (shopOpen = false)} />
   {/if}
 
+  {#if questsOpen}
+    <QuestLogScreen onClose={() => (questsOpen = false)} />
+  {/if}
+
+  {#if expeditionsOpen}
+    <ExpeditionsScreen onClose={() => (expeditionsOpen = false)} />
+  {/if}
+
   {#if bossPrep}
     <BossScreen areaId={bossPrep.areaId} pathId={bossPrep.pathId} onClose={() => (bossPrep = null)} />
   {/if}
 
   {#if compendiumOpen}
     <CompendiumScreen onClose={() => (compendiumOpen = false)} />
+  {/if}
+
+  {#if screen === 'game'}
+    <Toasts />
   {/if}
 </div>
 

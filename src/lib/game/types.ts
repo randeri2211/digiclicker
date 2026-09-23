@@ -46,13 +46,15 @@ export type EggType =
 
 /** A plain string union - adding a new item is a new member here plus a
  * matching ITEM_CATALOG entry (see src/lib/game/items/itemCatalog.ts). */
-export type ItemId = 'ability-reroll-crystal';
+export type ItemId = 'ability-reroll-crystal' | 'attack-chip' | 'speed-chip' | 'hp-disk';
 
 export interface ItemDefinition {
   id: ItemId;
   name: string;
   description: string;
-  costBits: number;
+  /** Shop price in bits, or null for items the Shop doesn't sell (found
+   * elsewhere, e.g. boss chips from expeditions). */
+  costBits: number | null;
 }
 
 /** Always has an entry for every ItemId (see inventory.svelte.ts's
@@ -252,6 +254,9 @@ export interface BossFightState {
   areaId: string;
   pathId: string;
   squad: SquadMember[];
+  /** Extra fraction per stat for the whole squad from boss chips spent on
+   * this fight (e.g. { attack: 0.25 } from an Attack Chip). */
+  statBonus: Partial<Record<keyof StatBlock, number>>;
 }
 
 /** Shown briefly in the arena after a boss fight ends. */
@@ -356,3 +361,107 @@ export interface DigivolveAutomationState {
   enabled: boolean;
   preferences: Record<string, DigivolvePreference>;
 }
+
+// ---- Expeditions ------------------------------------------------------
+
+export interface ExpeditionLootItem {
+  id: ItemId;
+  chancePercent: number;
+  count: [number, number];
+}
+
+/** A place a party can be sent to (src/lib/data/expeditions.json). */
+export interface ExpeditionDestination {
+  id: string;
+  name: string;
+  description: string;
+  areaId: string;
+  /** Becomes available once this path is unlocked. */
+  unlockPathId: string;
+  /** Party members of these elements raise the haul. */
+  favoredElements: Element[];
+  durationMinutes: number;
+  loot: {
+    data: [number, number];
+    eggChancePercent: number;
+    /** Found eggs are of one of these families. */
+    eggTypes: EggType[];
+    items: ExpeditionLootItem[];
+  };
+}
+
+export interface ActiveExpedition {
+  id: string;
+  destinationId: string;
+  memberSpeciesIds: string[];
+  startedAt: number;
+  endsAt: number;
+  /** Set once endsAt has passed - the party is back (fighting again) and
+   * the haul waits to be claimed. */
+  returned: boolean;
+}
+
+/** What a claimed expedition brought back. */
+export interface ExpeditionHaul {
+  destinationId: string;
+  data: number;
+  eggs: number;
+  items: { id: ItemId; count: number }[];
+}
+
+export interface ExpeditionState {
+  active: ActiveExpedition[];
+  /** The most recent claim, shown until dismissed. */
+  lastHaul: ExpeditionHaul | null;
+}
+
+// ---- Quests & progress flags -------------------------------------------
+
+/** One condition a quest checks against the live game state (see
+ * game/quests/quests.ts - each kind is one case there). */
+export type QuestRequirement =
+  | { kind: 'own-species'; speciesId: string }
+  | { kind: 'own-stage'; stage: Stage; count: number }
+  | { kind: 'own-element'; element: Element; count: number }
+  /** Any owned Digimon (or one species, if given) at this level or above. */
+  | { kind: 'reach-level'; level: number; speciesId?: string }
+  | { kind: 'path-kills'; areaId: string; pathId: string; kills: number }
+  | { kind: 'defeat-boss'; areaId: string; pathId: string }
+  /** Consumed when the quest is turned in. */
+  | { kind: 'deliver-item'; itemId: ItemId; count: number }
+  | { kind: 'has-flag'; flag: string };
+
+export interface QuestReward {
+  bits?: number;
+  data?: number;
+  items?: { id: ItemId; count: number }[];
+  /** Progress flags set on completion - how quests unlock other systems
+   * (e.g. a future Crest or Armor digivolution) without those systems
+   * knowing about quests. */
+  flags?: string[];
+}
+
+/** A quest (src/lib/data/quests.json). */
+export interface QuestDefinition {
+  id: string;
+  title: string;
+  /** Who gives it - shown on the quest card and the area's NPC strip. */
+  giver?: { name: string; speciesId?: string };
+  /** The area whose NPC strip shows it; omitted = only in the quest log. */
+  areaId?: string;
+  text: string;
+  /** Shown once it's completed. */
+  completeText?: string;
+  /** All must hold before the quest appears - the story's ordering. */
+  prerequisites?: { quests?: string[]; flags?: string[] };
+  requirements: QuestRequirement[];
+  rewards: QuestReward;
+}
+
+/** Permanent story/progress state: named flags other systems check, and
+ * which quests are done. */
+export interface ProgressState {
+  flags: Record<string, true>;
+  completedQuests: string[];
+}
+
