@@ -1,25 +1,29 @@
 import type { DigimonInstance, StatBlock } from '../types';
 import { levelForXp } from './levelCurve';
-import { damageRelevantSum } from './stats';
+import { getAbilityBonusFraction } from '../abilities/abilities';
 import { CLICK_DAMAGE, BASE_ATTACKS_PER_SECOND, SPEED_TO_APS_SCALE } from '../constants';
 
 export function computeClickDamage(): number {
   return CLICK_DAMAGE;
 }
 
-// One member's contribution to a stat (baseStats + level*growthPerLevel +
-// digivolutionStats) - the same three-block accumulation used everywhere
-// else, generalized so it can total up Speed as well as damage.
-function statContribution(member: DigimonInstance, pick: (block: StatBlock) => number): number {
+// One member's current effective value for a single stat - baseStats +
+// level*growthPerLevel + digivolutionStats, then a special ability's %
+// bonus applied on top if it targets this exact stat (see
+// getAbilityBonusFraction). The one place this formula lives - every
+// combat computation AND the Stat window's display both call this, so
+// they can never drift apart.
+export function computeInstanceStatValue(member: DigimonInstance, statKey: keyof StatBlock): number {
   const level = levelForXp(member.xp);
-  return pick(member.baseStats) + level * pick(member.growthPerLevel) + pick(member.digivolutionStats);
+  const raw = member.baseStats[statKey] + level * member.growthPerLevel[statKey] + member.digivolutionStats[statKey];
+  return raw * (1 + getAbilityBonusFraction(member, statKey));
 }
 
 // This member's flat damage on a single attack tick - not an average, a
 // member's Attack+SpecialAttack total is deterministic per instant (no
 // per-hit roll), so every tick at a given moment hits for exactly this.
 export function computeMemberDamagePerHit(member: DigimonInstance): number {
-  return statContribution(member, damageRelevantSum);
+  return computeInstanceStatValue(member, 'attack') + computeInstanceStatValue(member, 'specialAttack');
 }
 
 export function computeTeamDamagePerHit(members: DigimonInstance[]): number {
@@ -30,8 +34,14 @@ export function computeTeamDamagePerHit(members: DigimonInstance[]): number {
 // Speed), not per-member - there's one shared tick clock, not one per
 // Digimon.
 export function computeAttacksPerSecond(members: DigimonInstance[]): number {
-  const teamSpeed = members.reduce((total, member) => total + statContribution(member, (block) => block.speed), 0);
+  const teamSpeed = members.reduce((total, member) => total + computeInstanceStatValue(member, 'speed'), 0);
   return BASE_ATTACKS_PER_SECOND + teamSpeed * SPEED_TO_APS_SCALE;
+}
+
+// Team's summed HP stat - funds the per-encounter fight timer (see
+// computeFightTimeLimitMs in combat/spawn.ts).
+export function computeTeamHp(members: DigimonInstance[]): number {
+  return members.reduce((total, member) => total + computeInstanceStatValue(member, 'hp'), 0);
 }
 
 // Aggregate rate (attacks/sec * damage/hit) - not used by the tick loop

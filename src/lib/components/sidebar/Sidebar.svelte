@@ -4,7 +4,7 @@
   import TeamStatsPanel from './TeamStatsPanel.svelte';
   import ContextMenu from '../shared/ContextMenu.svelte';
   import StatWindow from '../shared/StatWindow.svelte';
-  import { team, getTeamSlotMenuItems } from '../../game/state/game.svelte';
+  import { team, getTeamSlotMenuItems, useAbilityReroll } from '../../game/state/game.svelte';
   import type { TeamBucket } from '../../game/state/game.svelte';
   import type { DigimonInstance } from '../../game/types';
 
@@ -48,6 +48,7 @@
     y={menuState.y}
     items={getTeamSlotMenuItems(menuState.instance, menuState.bucket, {
       onOpenStats: () => (statsFor = menuState?.instance ?? null),
+      onUseAbilityReroll: () => menuState && useAbilityReroll(menuState.instance),
     })}
     onClose={() => (menuState = null)}
   />

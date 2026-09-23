@@ -1,0 +1,220 @@
+{
+  "Aquatic": [
+    {
+      "id": "chibomon",
+      "weight": 1
+    },
+    {
+      "id": "leafmon",
+      "weight": 1
+    },
+    {
+      "id": "pupumon",
+      "weight": 1
+    },
+    {
+      "id": "puyomon",
+      "weight": 1
+    },
+    {
+      "id": "relemon",
+      "weight": 1
+    }
+  ],
+  "Beast": [
+    {
+      "id": "argomon-fresh",
+      "weight": 1
+    },
+    {
+      "id": "fusamon",
+      "weight": 1
+    },
+    {
+      "id": "ketomon",
+      "weight": 1
+    },
+    {
+      "id": "pabumon",
+      "weight": 1
+    },
+    {
+      "id": "puttimon",
+      "weight": 1
+    }
+  ],
+  "Bird": [
+    {
+      "id": "punimon",
+      "weight": 1
+    },
+    {
+      "id": "puwamon",
+      "weight": 1
+    }
+  ],
+  "Dinosaur": [
+    {
+      "id": "conomon",
+      "weight": 1
+    },
+    {
+      "id": "sandmon",
+      "weight": 1
+    }
+  ],
+  "Dragon": [
+    {
+      "id": "dokimon",
+      "weight": 1
+    },
+    {
+      "id": "kekomon",
+      "weight": 1
+    },
+    {
+      "id": "nyokimon",
+      "weight": 1
+    },
+    {
+      "id": "pururumon",
+      "weight": 1
+    }
+  ],
+  "Evil": [
+    {
+      "id": "bommon",
+      "weight": 1
+    },
+    {
+      "id": "botamon",
+      "weight": 1
+    },
+    {
+      "id": "fufumon",
+      "weight": 1
+    },
+    {
+      "id": "fukamon",
+      "weight": 1
+    },
+    {
+      "id": "mokumon",
+      "weight": 1
+    },
+    {
+      "id": "pafumon",
+      "weight": 1
+    },
+    {
+      "id": "tomorimon",
+      "weight": 1
+    }
+  ],
+  "Holy": [
+    {
+      "id": "pusumon",
+      "weight": 1
+    },
+    {
+      "id": "pyonmon",
+      "weight": 1
+    },
+    {
+      "id": "yukimibotamon",
+      "weight": 1
+    }
+  ],
+  "Insect": [
+    {
+      "id": "bombmon",
+      "weight": 1
+    },
+    {
+      "id": "pichimon",
+      "weight": 1
+    },
+    {
+      "id": "zurumon",
+      "weight": 1
+    }
+  ],
+  "Machine": [
+    {
+      "id": "cotsucomon",
+      "weight": 1
+    },
+    {
+      "id": "keemon",
+      "weight": 1
+    },
+    {
+      "id": "kuramon",
+      "weight": 1
+    },
+    {
+      "id": "metalkoromon",
+      "weight": 1
+    },
+    {
+      "id": "petitmon",
+      "weight": 1
+    },
+    {
+      "id": "sakumon",
+      "weight": 1
+    },
+    {
+      "id": "tsubumon",
+      "weight": 1
+    }
+  ],
+  "Mineral": [
+    {
+      "id": "datirimon",
+      "weight": 1
+    },
+    {
+      "id": "dodomon",
+      "weight": 1
+    },
+    {
+      "id": "jyarimon",
+      "weight": 1
+    },
+    {
+      "id": "paomon",
+      "weight": 1
+    },
+    {
+      "id": "yolkmon",
+      "weight": 1
+    },
+    {
+      "id": "yuramon",
+      "weight": 1
+    },
+    {
+      "id": "zerimon",
+      "weight": 1
+    }
+  ],
+  "Plant": [
+    {
+      "id": "chibickmon",
+      "weight": 1
+    },
+    {
+      "id": "curimon",
+      "weight": 1
+    },
+    {
+      "id": "popomon",
+      "weight": 1
+    },
+    {
+      "id": "poyomon",
+      "weight": 1
+    }
+  ]
+}

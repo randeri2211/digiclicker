@@ -8,6 +8,7 @@
   import EvolutionScreen from './lib/components/evolution/EvolutionScreen.svelte';
   import DigimonHubScreen from './lib/components/DigimonHubScreen.svelte';
   import InventoryScreen from './lib/components/InventoryScreen.svelte';
+  import ShopScreen from './lib/components/ShopScreen.svelte';
   import CompendiumScreen from './lib/components/CompendiumScreen.svelte';
   import {
     startCombatTickLoop,
@@ -29,6 +30,11 @@
     setActivePath,
     compendium,
     isDiscovered,
+    automation,
+    buyMysteryEgg,
+    useAbilityReroll,
+    ABILITY_CATALOG,
+    computeInstanceStatValue,
   } from './lib/game/state/game.svelte';
   import { preloadImages } from './lib/game/preload';
   import { getSpriteUrl } from './lib/game/images';
@@ -41,6 +47,7 @@
   let evolutionOpen = $state(false);
   let hubOpen = $state(false);
   let inventoryOpen = $state(false);
+  let shopOpen = $state(false);
   let compendiumOpen = $state(false);
 
   $effect(() => {
@@ -85,6 +92,11 @@
       setActivePath,
       compendium,
       isDiscovered,
+      automation,
+      buyMysteryEgg,
+      useAbilityReroll,
+      ABILITY_CATALOG,
+      computeInstanceStatValue,
     };
   }
 </script>
@@ -100,6 +112,7 @@
       onOpenEvolution={() => (evolutionOpen = true)}
       onOpenHub={() => (hubOpen = true)}
       onOpenInventory={() => (inventoryOpen = true)}
+      onOpenShop={() => (shopOpen = true)}
       onOpenCompendium={() => (compendiumOpen = true)}
     />
     <div class="main">
@@ -122,6 +135,10 @@
 
   {#if inventoryOpen}
     <InventoryScreen onClose={() => (inventoryOpen = false)} />
+  {/if}
+
+  {#if shopOpen}
+    <ShopScreen onClose={() => (shopOpen = false)} />
   {/if}
 
   {#if compendiumOpen}

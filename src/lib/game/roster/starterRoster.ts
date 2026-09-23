@@ -41,6 +41,7 @@ export function createDigimonInstance(speciesId: string, xp: number): DigimonIns
     growthPerLevel: rollGrowthPerLevel(stage, statAffinity),
     digivolutionStats: zeroStatBlock(),
     eggState: null,
+    abilityId: null,
   };
 }
 

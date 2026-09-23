@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { saveGame, exportSlotToFile, activeSlot } from '../game/state/game.svelte';
+  import { saveGame, exportSlotToFile, activeSlot, automation, setAutomationEnabled } from '../game/state/game.svelte';
 
   interface Props {
     onClose: () => void;
@@ -57,6 +57,15 @@
       <button class="panel-btn" onclick={handleExport}>Export Save</button>
       <button class="panel-btn danger" onclick={onBackToMenu}>Load (Back to Menu)</button>
     </div>
+
+    <label class="toggle-row">
+      <input
+        type="checkbox"
+        checked={automation.enabled}
+        onchange={(e) => setAutomationEnabled((e.target as HTMLInputElement).checked)}
+      />
+      Auto-Digivolve
+    </label>
 
     <button class="close-btn" onclick={onClose}>Close</button>
   </div>
@@ -117,6 +126,14 @@
     margin-left: 10px;
     font-size: 11px;
     color: var(--pos);
+  }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
   }
   .close-btn {
     appearance: none;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { DigimonInstance } from '../../game/types';
-  import { getSpecies, getSpriteUrl, getEggSpriteUrl } from '../../game/images';
+  import { getSpecies, getSpriteUrl, getEggSpriteUrl, getInstanceDisplayName, isMysteryEgg } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import { isReadyToDigivolve } from '../../game/state/game.svelte';
 
@@ -20,10 +20,6 @@
   // hatches - show the per-type egg art/name instead of spoiling it.
   function spriteFor(member: DigimonInstance): string | null {
     return member.eggState ? getEggSpriteUrl(member.eggState.eggType) : getSpriteUrl(member.speciesId);
-  }
-  function nameFor(member: DigimonInstance): string {
-    if (member.eggState) return `Digi-Egg (${member.eggState.eggType})`;
-    return getSpecies(member.speciesId)?.name ?? member.speciesId;
   }
   function stageFor(member: DigimonInstance): string {
     if (member.eggState) return 'Egg';
@@ -50,9 +46,12 @@
         {#if ready}
           <span class="ready-dot"></span>
         {/if}
+        {#if isMysteryEgg(member)}
+          <span class="mystery-badge">?</span>
+        {/if}
       </div>
       <div class="info">
-        <div class="name">{nameFor(member)}</div>
+        <div class="name">{getInstanceDisplayName(member)}</div>
         <div class="meta">Lv {levelForXp(member.xp)} · {stageFor(member)}</div>
       </div>
     </div>
@@ -108,6 +107,23 @@
     background: var(--warn);
     box-shadow: 0 0 6px var(--warn);
     border-radius: 50%;
+  }
+  .mystery-badge {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    font-family: var(--head);
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-h);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    width: 13px;
+    height: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
   .info {
     min-width: 0;

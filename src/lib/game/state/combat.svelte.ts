@@ -1,7 +1,7 @@
 import type { CombatState, Stage } from '../types';
 import { team } from './team.svelte';
 import { currency } from './currency.svelte';
-import { computeClickDamage, computeAttacksPerSecond, computeTeamDamagePerHit } from '../combat/damage';
+import { computeClickDamage, computeAttacksPerSecond, computeTeamDamagePerHit, computeTeamHp } from '../combat/damage';
 import { pickNextWildSpawn, spawnDebugWild, computeKillXp, computeKillBits } from '../combat/spawn';
 import { awardKillXp } from '../combat/xp';
 import { rollEggDrop } from '../eggs/eggs';
@@ -62,17 +62,18 @@ export function handleClick() {
 // changes, and by tick() below whenever a new spawn is due.
 export function applyDebugSpawn(now: number = Date.now()): void {
   if (!debugSpawn.enabled) return;
-  const wild = spawnDebugWild(now, debugSpawn.stage, debugSpawn.level);
+  const wild = spawnDebugWild(now, debugSpawn.stage, debugSpawn.level, computeTeamHp(team.activeMembers));
   if (wild) combat.wild = wild;
 }
 
 export function tick(now: number) {
   const wild = combat.wild;
   if (!wild) {
-    combat.wild = debugSpawn.enabled ? spawnDebugWild(now, debugSpawn.stage, debugSpawn.level) : null;
+    const teamHp = computeTeamHp(team.activeMembers);
+    combat.wild = debugSpawn.enabled ? spawnDebugWild(now, debugSpawn.stage, debugSpawn.level, teamHp) : null;
     if (!combat.wild) {
       const activePath = getActivePath(areaProgress);
-      if (activePath) combat.wild = pickNextWildSpawn(now, activePath);
+      if (activePath) combat.wild = pickNextWildSpawn(now, activePath, teamHp);
     }
     return;
   }
@@ -97,5 +98,13 @@ export function tick(now: number) {
 
   if (wild.currentHp <= 0) {
     resolveKill(wild);
+    return;
+  }
+
+  // Timed out before being defeated - no reward, mirrors how resolveKill
+  // clears combat.wild before granting rewards. The next tick()'s !wild
+  // branch spawns a fresh wild, same respawn gap as after a normal kill.
+  if (now >= wild.spawnedAt + wild.timeLimitMs) {
+    combat.wild = null;
   }
 }

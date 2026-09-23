@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { DigimonInstance, StatBlock } from '../../game/types';
-  import { getSpecies } from '../../game/images';
+  import { getInstanceDisplayName } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
+  import { computeInstanceStatValue, ABILITY_CATALOG } from '../../game/state/game.svelte';
 
   interface Props {
     instance: DigimonInstance;
@@ -10,23 +11,19 @@
 
   const { instance, onClose }: Props = $props();
 
-  const species = $derived(getSpecies(instance.speciesId));
   const level = $derived(levelForXp(instance.xp));
   // The instance's real speciesId is already resolved even while it's an
   // unhatched egg - hide the name (the whole point of an egg) but the
   // stat numbers below still reflect the real, hidden species.
-  const displayName = $derived(instance.eggState ? `Digi-Egg (${instance.eggState.eggType})` : (species?.name ?? instance.speciesId));
+  const displayName = $derived(getInstanceDisplayName(instance));
+  const ability = $derived(instance.abilityId ? ABILITY_CATALOG[instance.abilityId] : null);
 
   const ROWS: { label: string; key: keyof StatBlock }[] = [
     { label: 'Attack', key: 'attack' },
-    { label: 'Defense', key: 'defense' },
+    { label: 'HP', key: 'hp' },
     { label: 'Speed', key: 'speed' },
     { label: 'Special Attack', key: 'specialAttack' },
   ];
-
-  function currentValue(key: keyof StatBlock): number {
-    return instance.baseStats[key] + level * instance.growthPerLevel[key] + instance.digivolutionStats[key];
-  }
 
   $effect(() => {
     function handleKeydown(e: KeyboardEvent) {
@@ -76,11 +73,21 @@
             <td>{instance.baseStats[row.key]}</td>
             <td>{instance.growthPerLevel[row.key]}</td>
             <td>{instance.digivolutionStats[row.key]}</td>
-            <td class="current">{currentValue(row.key)}</td>
+            <td class="current">{Math.round(computeInstanceStatValue(instance, row.key))}</td>
           </tr>
         {/each}
       </tbody>
     </table>
+
+    <div class="ability-row">
+      <span class="ability-label">Special Ability</span>
+      {#if ability}
+        <span class="ability-name">{ability.name}</span>
+        <span class="ability-desc">{ability.description}</span>
+      {:else}
+        <span class="ability-desc">No special ability</span>
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -169,5 +176,24 @@
   .stat-table td.current {
     color: var(--pos);
     font-weight: 600;
+  }
+  .ability-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+  }
+  .ability-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .ability-name {
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .ability-desc {
+    color: var(--text-dim);
   }
 </style>

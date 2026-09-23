@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { ItemId } from '../game/types';
-  import { currency, inventory, buyItem, canAffordItem, ITEM_CATALOG } from '../game/state/game.svelte';
+  import { inventory, ITEM_CATALOG } from '../game/state/game.svelte';
 
   interface Props {
     onClose: () => void;
@@ -10,10 +9,6 @@
 
   const catalogEntries = Object.values(ITEM_CATALOG);
   const ownedEntries = $derived(catalogEntries.filter((item) => inventory[item.id] > 0));
-
-  function handleBuy(id: ItemId) {
-    buyItem(id);
-  }
 
   $effect(() => {
     function handleKeydown(e: KeyboardEvent) {
@@ -58,29 +53,6 @@
           {/each}
         {/if}
       </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Shop</div>
-      <div class="grid">
-        {#each catalogEntries as item (item.id)}
-          {@const affordable = canAffordItem(item.id)}
-          <div class="card shop-card">
-            <div class="card-name">{item.name}</div>
-            <div class="card-desc">{item.description}</div>
-            <div class="card-cost">{item.costBits} bits</div>
-            <button
-              class="buy-btn"
-              class:blocked={!affordable}
-              disabled={!affordable}
-              onclick={() => handleBuy(item.id)}
-            >
-              Buy
-            </button>
-          </div>
-        {/each}
-      </div>
-      <div class="bits-note">You have {currency.bits} bits.</div>
     </div>
   </div>
 </div>
@@ -174,33 +146,6 @@
     color: var(--pos);
   }
   .card-desc {
-    font-size: 11px;
-    color: var(--text-dim);
-  }
-  .card-cost {
-    font-size: 12px;
-    color: var(--accent);
-  }
-  .buy-btn {
-    appearance: none;
-    font: inherit;
-    font-family: var(--mono);
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    color: var(--text-h);
-    font-size: 12px;
-    padding: 8px 12px;
-    cursor: pointer;
-    margin-top: auto;
-  }
-  .buy-btn:hover:not(.blocked) {
-    border-color: var(--accent);
-  }
-  .buy-btn.blocked {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .bits-note {
     font-size: 11px;
     color: var(--text-dim);
   }

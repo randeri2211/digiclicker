@@ -1,6 +1,7 @@
 import type { DigimonInstance } from '../types';
 import type { ContextMenuItem } from '../../components/shared/ContextMenu.svelte';
 import { type TeamBucket, hasRoomIn, moveMember } from './teamActions';
+import { getItemCount } from '../state/inventory.svelte';
 
 const BUCKET_LABEL: Record<TeamBucket, string> = {
   active: 'Send To Active Team',
@@ -22,9 +23,16 @@ function sendToItem(instanceId: string, toBucket: TeamBucket): ContextMenuItem {
 export function getTeamSlotMenuItems(
   instance: DigimonInstance,
   bucket: TeamBucket,
-  callbacks: { onOpenStats: () => void }
+  callbacks: { onOpenStats: () => void; onUseAbilityReroll: () => void }
 ): ContextMenuItem[] {
-  const items: ContextMenuItem[] = [{ label: 'Open Stats', onSelect: callbacks.onOpenStats }];
+  const items: ContextMenuItem[] = [
+    { label: 'Open Stats', onSelect: callbacks.onOpenStats },
+    {
+      label: 'Use Ability Reroll',
+      onSelect: callbacks.onUseAbilityReroll,
+      disabled: getItemCount('ability-reroll-crystal') === 0,
+    },
+  ];
 
   switch (bucket) {
     case 'active':

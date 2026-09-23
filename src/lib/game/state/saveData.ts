@@ -1,4 +1,4 @@
-import type { AreaProgressState, CompendiumState, CurrencyState, InventoryState, TeamState, WildSpawnState } from '../types';
+import type { AreaProgressState, CompendiumState, CurrencyState, DigivolveAutomationState, InventoryState, TeamState, WildSpawnState } from '../types';
 
 export const CURRENT_SAVE_VERSION = 1;
 export const SAVE_KEY = 'digiclicker-saves-v1';
@@ -20,6 +20,10 @@ export interface SaveSlotData {
    * existed - normalizeCompendium in persistence.svelte.ts backfills it
    * from the loaded team's formHistory on first load if missing. */
   compendium?: CompendiumState;
+  /** Optional for backward compat with saves made before auto-digivolve
+   * existed - normalizeAutomation in persistence.svelte.ts defaults to
+   * disabled/no-preferences if missing. */
+  automation?: DigivolveAutomationState;
 }
 
 export interface SaveSlot {

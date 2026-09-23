@@ -1,5 +1,6 @@
 import type { DigimonInstance, TeamState } from '../types';
 import { tryHatch } from '../eggs/eggs';
+import { tryAutoDigivolve } from '../evolution/digivolve';
 import { levelForXp } from './levelCurve';
 import { MAX_LEVEL } from '../constants';
 
@@ -22,5 +23,6 @@ export function awardKillXp(xpValue: number, team: TeamState): void {
     // progresses toward hatching while placed in one of those slots -
     // reserveMembers is naturally "not progressing" with no special-casing.
     tryHatch(member);
+    tryAutoDigivolve(member);
   }
 }

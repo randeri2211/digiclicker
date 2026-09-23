@@ -12,11 +12,11 @@ import {
 
 // Formulas here are placeholders - tune the actual numbers in constants.ts.
 
-const STAT_KEYS = ['attack', 'defense', 'speed', 'specialAttack'] as const;
+const STAT_KEYS = ['attack', 'hp', 'speed', 'specialAttack'] as const;
 
 const STAT_TO_AFFINITY: Record<(typeof STAT_KEYS)[number], StatAffinity> = {
   attack: 'Attack',
-  defense: 'Defense',
+  hp: 'HP',
   speed: 'Speed',
   specialAttack: 'SpecialAttack',
 };
@@ -55,7 +55,7 @@ function computeStatBlockRange(
 ): StatRangeBlock {
   return {
     attack: computeStatRange(stage, statAffinity, 'attack', scale, preTransitionLevel),
-    defense: computeStatRange(stage, statAffinity, 'defense', scale, preTransitionLevel),
+    hp: computeStatRange(stage, statAffinity, 'hp', scale, preTransitionLevel),
     speed: computeStatRange(stage, statAffinity, 'speed', scale, preTransitionLevel),
     specialAttack: computeStatRange(stage, statAffinity, 'specialAttack', scale, preTransitionLevel),
   };
@@ -64,7 +64,7 @@ function computeStatBlockRange(
 function rollStatBlock(stage: Stage, statAffinity: StatAffinity, scale: number, preTransitionLevel = 0): StatBlock {
   return {
     attack: rollInRange(computeStatRange(stage, statAffinity, 'attack', scale, preTransitionLevel)),
-    defense: rollInRange(computeStatRange(stage, statAffinity, 'defense', scale, preTransitionLevel)),
+    hp: rollInRange(computeStatRange(stage, statAffinity, 'hp', scale, preTransitionLevel)),
     speed: rollInRange(computeStatRange(stage, statAffinity, 'speed', scale, preTransitionLevel)),
     specialAttack: rollInRange(computeStatRange(stage, statAffinity, 'specialAttack', scale, preTransitionLevel)),
   };
@@ -99,21 +99,14 @@ export function computeDigivolutionBonusRange(
 }
 
 export function zeroStatBlock(): StatBlock {
-  return { attack: 0, defense: 0, speed: 0, specialAttack: 0 };
+  return { attack: 0, hp: 0, speed: 0, specialAttack: 0 };
 }
 
 export function addStatBlocks(a: StatBlock, b: StatBlock): StatBlock {
   return {
     attack: a.attack + b.attack,
-    defense: a.defense + b.defense,
+    hp: a.hp + b.hp,
     speed: a.speed + b.speed,
     specialAttack: a.specialAttack + b.specialAttack,
   };
-}
-
-/** Only Attack and SpecialAttack currently feed combat damage - both are
- * damage-dealing stats (matching the games' ATK/INT split). Defense/Speed
- * are tracked but inert - no mitigation or tick-rate mechanic exists yet. */
-export function damageRelevantSum(block: StatBlock): number {
-  return block.attack + block.specialAttack;
 }

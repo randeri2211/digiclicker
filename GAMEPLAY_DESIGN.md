@@ -32,8 +32,8 @@ Running log of gameplay decisions. Split into **Confirmed** (locked in) and
 
 ### Core click loop
 - Player is in a Digital World area; clicking attacks a wild Digimon spawn.
-- Defeating a wild Digimon grants Bits (currency) and a chance to scan/tame
-  it into the player's roster.
+- Defeating a wild Digimon grants Bits (currency) and a rare chance to
+  drop a Digi-Egg (see "Digi-Eggs" below).
 
 ### Team structure
 Two independently expandable sets of team slots:
@@ -41,8 +41,8 @@ Two independently expandable sets of team slots:
   Base (starting) active capacity is **6** slots
   (`STARTER_ACTIVE_CAPACITY` in `src/lib/game/constants.ts`), all
   unlocked from the start of a new game - only 1 is filled by the
-  starter Digimon, the rest are empty until roster growth (taming) is
-  implemented.
+  starter Digimon, the rest are empty until roster growth (hatching
+  Digi-Eggs, or later mechanics) fills them.
 - **Training slots** — Digimon that don't fight, but passively receive a
   share of combat XP.
 
@@ -57,7 +57,7 @@ non-wash upgrade — more slots = strictly more total training throughput.
 ### Team slot menu & Digimon Hub
 - Clicking a filled Active or Training team slot opens a context menu
   (positioned next to the cursor, closes on outside click/Escape) with
-  per-slot actions: **Open Stats** (a small table of Attack/Defense/
+  per-slot actions: **Open Stats** (a small table of Attack/HP/
   Speed/SpecialAttack, Base vs. Digivolution columns), and moving the
   Digimon between buckets - **Send To Training Team** / **Send To
   Active Team** (greyed out when the destination is full), and
@@ -87,17 +87,34 @@ non-wash upgrade — more slots = strictly more total training throughput.
 - Clicking that button opens an **Evolution screen** listing all Digimon
   ready to evolve. Clicking one shows its available next-stage options
   (branching digivolutions) for the player to pick from manually.
-- **Settings: automatic digivolution mode**, one of three:
-  1. **Off** — fully manual; every evolution is chosen in the Evolution
-     screen.
-  2. **Repeat last path** — for a given Digimon line, if it was previously
-     digivolved into a specific next form, automatically repeat that same
-     choice the next time a Digimon on that line becomes eligible (no
-     screen visit needed).
-  3. **Digivolve by selection (pin)** — in the Evolution screen, the player
-     can pin a specific target evolution for a line ahead of time; once a
-     Digimon on that line becomes eligible, it auto-evolves into the pinned
-     target as soon as it's available.
+- **Auto-Digivolve (confirmed, built):** the original design called for
+  three separate modes (Off / Repeat last path / Digivolve by pin) - built
+  instead as **one unified preference system**, since "repeat last" and
+  "pin ahead of time" are really just two ways of setting the same thing.
+  `DigivolveAutomationState` (`types.ts`) holds a global `enabled` toggle
+  (Settings screen checkbox) plus `preferences: Record<sourceSpeciesId,
+  {targetSpeciesId, minLevel}>` - keyed by the Digimon's *current* species,
+  not an abstract "line" (the evolution graph is a multi-parent DAG, so
+  "current form" is the only well-defined key). Every manual digivolve
+  (`digivolve()` in `evolution/digivolve.ts`) records/overwrites that
+  source species' preference automatically, regardless of whether
+  automation is enabled - turning it on later immediately benefits from
+  however you already played. The Evolution screen also lets you pin a
+  target ahead of time with a custom **minLevel** - an extra floor on top
+  of (never replacing) the target's normal level requirement, letting a
+  Digimon "cook" longer before auto-firing (relevant since pre-transition
+  level feeds the digivolution-stat bonus). Pinning is explicit two-step
+  (Pin -> edit the level -> **Confirm**) rather than live-as-you-type -
+  nothing is written until Confirm, and the entered level is capped to
+  `MAX_LEVEL`. Confirm also checks eligibility immediately: if the
+  Digimon already meets both the normal requirement and the level just
+  confirmed, it digivolves right then instead of silently waiting for the
+  next kill to notice. Checked on every xp award (`tryAutoDigivolve` in
+  `awardKillXp`, alongside egg-hatch checking) - otherwise fires
+  silently, no screen visit needed. Scoped to digivolve-**up** only;
+  de-digivolve stays manual, since it now costs a purchased item and
+  auto-spending currency without an explicit per-instance action wasn't
+  part of the ask.
 
 ### Stat system: base stats vs. digivolution stats
 - Each Digimon has two categories of stats:
@@ -116,7 +133,7 @@ non-wash upgrade — more slots = strictly more total training throughput.
   transition's Digivolution stat bonus, on top of the usual stage/type
   amount - a small `LEVEL_IMPACT_SCALE` (0.1, placeholder) added per
   level, scaled by the same dominant/off factor as everything else so
-  attack-type Digimon still gain more Attack than Defense/Speed/
+  attack-type Digimon still gain more Attack than HP/Speed/
   SpecialAttack from the level they're cashing in
   (`src/lib/game/combat/stats.ts`).
 - Because digivolution stats are form-independent and only accumulate, they
@@ -130,26 +147,23 @@ non-wash upgrade — more slots = strictly more total training throughput.
   natural cost that bounds the digivolve/de-digivolve/re-digivolve loop, no
   separate currency needed. The reset happens as a result of the
   transition, not as a precondition for starting one.
-- **Level-gate baseline (confirmed):** every digivolve-up/de-digivolve
-  transition requires a minimum level first, keyed off the *target's*
-  stage (see `DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE` /
-  `DEDIGIVOLVE_MIN_LEVEL` in `src/lib/game/constants.ts`):
-  - De-digivolve (any lower stage): **Lv 4**
+- **Level-gate baseline (confirmed):** digivolving up requires a minimum
+  level first, keyed off the *target's* stage (see
+  `DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE` in `src/lib/game/constants.ts`):
   - Digivolve to Champion: **Lv 16**
   - Digivolve to Ultimate: **Lv 36**
   - Digivolve to Mega: **Lv 56**
   - Digivolve to In-Training/Rookie: no requirement yet (not specified,
     defaults to open).
-  This supersedes the earlier "de-digivolving has no level requirement"
-  decision - de-digivolving now needs Lv 4, which also softens (but
-  doesn't fully close) the farm-by-cycling concern below.
-- **Open question:** because de-digivolving only needs Lv 4 (much lower
-  than any digivolve-up threshold), a player could still digivolve up the
-  moment they hit a threshold and de-digivolve back down almost
-  immediately, re-grinding a cheap low-level range repeatedly to farm
-  digivolution-stat bonuses fast. A proposed mitigation is a cooldown
-  between digivolving and being allowed to de-digivolve again - not yet
-  decided.
+- **De-digivolve requirement (confirmed, superseded the old level gate):**
+  de-digivolving no longer uses a level gate at all - it costs a
+  consumable **De-Digivolution Crystal** (bought with Bits, see the
+  Inventory/Shop screen; `DEDIGIVOLVE_ITEM_ID`/`DEDIGIVOLVE_ITEM_COUNT` in
+  `constants.ts`), consumed on commit. This directly closes the
+  farm-by-cycling concern that used to be an open question here (a flat
+  Lv 4 gate made digivolve-up-then-immediately-de-digivolve-down a nearly
+  free repeatable loop) - de-digivolving now costs a real, earned
+  resource every time, not just a trivial level checkpoint.
 - **Playable stage scope (confirmed, temporary):** only In-Training,
   Rookie, Champion, Ultimate, and Mega stage Digimon are searched/offered
   as digivolve or de-digivolve options right now
@@ -161,6 +175,34 @@ non-wash upgrade — more slots = strictly more total training throughput.
   Hybrid's separate mechanic, DNA/Jogress multi-source fusion, etc.) is
   actually built. Re-enabling a stage later is a one-line change to
   `IN_GAME_STAGES`, no data regeneration needed.
+
+### Special Abilities (confirmed, built - stat-boost tier)
+- Each Digimon **instance** can hold one special ability
+  (`DigimonInstance.abilityId`) - null until an **Ability Reroll
+  Crystal** (bought in the Shop, same pattern as the De-Digivolution
+  Crystal) is used on it via a new "Use Ability Reroll" action in the
+  Hub/team context menu (`getTeamSlotMenuItems`). The item is the *only*
+  source - nothing rolls an ability automatically at creation.
+- `ABILITY_CATALOG` (`src/lib/game/abilities/abilityCatalog.ts`) has 12
+  entries: 4 stats (Attack/HP/Speed/SpecialAttack) x 3 rarity tiers
+  (Minor +5%, Major +10%, Superior +20%, placeholders) - a weighted pool
+  (Minor common, Superior rare), same convention as area spawn weights
+  and Mystery Egg pools. Using the item re-rolls a fresh weighted pick,
+  can reroll into the same ability again (no dedup).
+- **Persists across digivolve/de-digivolve** - a property of this
+  specific Digimon, not its current form, unlike `baseStats`/
+  `growthPerLevel` which reroll every transition (same permanence as
+  `digivolutionStats`).
+- The bonus applies via one shared `computeInstanceStatValue(instance,
+  statKey)` (`combat/damage.ts`) - `base + level*growth +
+  digivolutionStats`, then `* (1 + ability%)` if the ability targets
+  that exact stat. Every combat formula (damage/hit, attack rate, the
+  fight timer's team HP sum) *and* the Stat window's "Current" column
+  now call this one function, replacing what used to be two separately-
+  maintained copies of the same formula.
+- Planned but explicitly deferred: farming/resource-gathering
+  specialization abilities, once a farming system exists to specialize
+  in (see "Idle production" above - still not built).
 
 ### Combat: attack ticks and damage
 - Combat runs on **discrete attack ticks**, not a smooth per-second HP
@@ -183,10 +225,21 @@ non-wash upgrade — more slots = strictly more total training throughput.
   growthPerLevel + digivolutionStats) to the team's flat per-hit
   damage total; the whole team hits as one combined blow each tick,
   not member-by-member.
-- **Defense is still inert** - no damage-mitigation mechanic exists
-  yet on the wild-Digimon side. Speed graduated from inert to
-  attack-rate-relevant this session; Defense is the one remaining
-  stat with no live mechanical effect.
+- **Fights are timed - HP funds the timer (confirmed, built):** every
+  wild encounter has a time limit, `FIGHT_TIMER_BASE_SECONDS` (5,
+  placeholder) plus a flat `FIGHT_TIMER_SECONDS_PER_HP` bonus per point
+  of the active team's summed **HP** stat (`computeFightTimeLimitMs` in
+  `combat/spawn.ts`, `computeTeamHp` in `combat/damage.ts`) - fixed once
+  at spawn, doesn't change if team HP changes mid-fight. If the timer
+  runs out before the wild is defeated, the encounter ends with **no
+  reward** (no XP/Bits/egg roll) - same as never having fought it - and
+  a fresh wild spawns right after, same gap as a normal kill. This is
+  what finally gives the renamed **HP** stat (formerly Defense) a live
+  mechanical effect - it was the last of the four stats with no formula
+  behind it; Speed (attack rate), Attack/SpecialAttack (damage), and now
+  HP (fight duration) all matter. A `TimerBar` next to the HP bar shows
+  the countdown, reading the wild's already-ticking `lastTickAt` as its
+  clock rather than polling a separate timer.
 - The sidebar shows a live **Team DPS** panel (total + each active
   member's individual DPS share at the shared team attack rate) above
   the Active Team section.
@@ -240,13 +293,13 @@ non-wash upgrade — more slots = strictly more total training throughput.
   far; area bosses as an alternate mastery gate (proposed below) aren't
   built - `mastery` is kill-count-only for now.
 
-### Taming mechanic
-- Defeating a wild Digimon gives a chance to tame it: a flat **base
-  chance**, scaled by the level difference between the wild Digimon and
-  the player (presumably favoring the player at higher relative level),
-  up to a cap — not a straight line to 100%.
-- Items that manipulate the base taming chance are a later addition, not
-  needed for the first pass.
+### Taming mechanic — superseded
+- Originally: defeating a wild Digimon would have a chance to tame it
+  directly into the roster. Superseded by Digi-Eggs as the roster-growth
+  mechanic instead (see "Digi-Eggs" below) - taming was never built
+  (`computeTameChancePercent` existed only as a display-only stub feeding
+  a "Tame chance on defeat" readout, with nothing behind it) and has been
+  removed rather than left as dead code.
 
 ### Currency: Bits and Data
 - **Bits** (combat currency) buy **items**, including **Data**.
@@ -307,9 +360,24 @@ non-wash upgrade — more slots = strictly more total training throughput.
   Fresh-stage line that provably evolves into it. If no Fresh ancestor is
   traceable (a data gap), that roll is simply skipped rather than
   substituting a wrong-stage fallback.
-- **Acquisition - shop (proposed, not yet built):** some egg types
-  purchasable directly with Data, per the "Currency: Bits and Data"
-  section above. A separate, self-contained feature for later.
+- **Acquisition - Mystery Digi-Eggs (confirmed, built):** buyable
+  directly in the **Shop** with Bits (not Data - Data still has no
+  source anywhere in the game, so building a shop mechanic around it
+  would've meant deciding a Data-earning mechanism too; Bits already
+  flow and are already spent elsewhere). One buy card per `EggType`
+  (`MYSTERY_EGG_COST_BITS`, flat across all 11 types), labeled "Mystery
+  {Type} Digi-Egg" - buying immediately rolls a weighted-random
+  Fresh-stage species from that type's pool
+  (`src/lib/data/mysteryEggWeights.json`, seeded from the same eggType
+  taxonomy every species already has, hand-tunable afterward like area
+  spawn weights; validated in CI by `validate_mystery_eggs.py`) and
+  drops it straight into `reserveMembers`, same landing spot as a
+  kill-drop egg. Same hatching mechanics either way - only display
+  differs: a Mystery egg shows "Mystery {Type} Digi-Egg" (vs. a
+  kill-drop's plain "Digi-Egg ({Type})") and a "?" badge overlaid on the
+  sprite (`DigimonInstance.eggState.isMystery`, `isMysteryEgg`/
+  `getInstanceDisplayName` in `images.ts`), so a mystery egg is never
+  mistaken for a real wild-caught one.
 
 ## Technical notes
 

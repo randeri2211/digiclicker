@@ -1,5 +1,6 @@
 import type { AreaPath, Stage, WildSpawnState } from '../types';
 import { getSpecies, getSpeciesIdsByStage } from '../images';
+import { weightedPick } from '../util/random';
 import {
   WILD_HP_BASE,
   WILD_HP_STAGE_MULTIPLIER,
@@ -8,10 +9,8 @@ import {
   KILL_XP_PER_LEVEL,
   KILL_BITS_BASE,
   KILL_BITS_PER_LEVEL,
-  TAME_CHANCE_BASE_PERCENT,
-  TAME_CHANCE_PER_LEVEL_DIFF_PERCENT,
-  TAME_CHANCE_MIN_PERCENT,
-  TAME_CHANCE_MAX_PERCENT,
+  FIGHT_TIMER_BASE_SECONDS,
+  FIGHT_TIMER_SECONDS_PER_HP,
 } from '../constants';
 
 export function computeWildMaxHp(speciesId: string, level: number): number {
@@ -21,7 +20,14 @@ export function computeWildMaxHp(speciesId: string, level: number): number {
   return Math.round(WILD_HP_BASE * stageMultiplier * levelMultiplier);
 }
 
-function makeWildSpawn(now: number, speciesId: string, level: number): WildSpawnState {
+// The active team's summed HP stat (see computeTeamHp in combat/damage.ts)
+// funds how long a fight lasts - a flat per-point bonus on top of a base
+// duration, fixed once at spawn time.
+export function computeFightTimeLimitMs(teamHp: number): number {
+  return (FIGHT_TIMER_BASE_SECONDS + teamHp * FIGHT_TIMER_SECONDS_PER_HP) * 1000;
+}
+
+function makeWildSpawn(now: number, speciesId: string, level: number, teamHp: number): WildSpawnState {
   const maxHp = computeWildMaxHp(speciesId, level);
   return {
     speciesId,
@@ -30,6 +36,8 @@ function makeWildSpawn(now: number, speciesId: string, level: number): WildSpawn
     currentHp: maxHp,
     lastTickAt: now,
     attackProgress: 0,
+    spawnedAt: now,
+    timeLimitMs: computeFightTimeLimitMs(teamHp),
   };
 }
 
@@ -37,32 +45,22 @@ function makeWildSpawn(now: number, speciesId: string, level: number): WildSpawn
 // uniform level roll in whichever range applies - the entry's own
 // levelRange if it set one (e.g. a weaker regional variant capped lower
 // than the rest of the path), else the path's overall levelRange.
-export function pickNextWildSpawn(now: number, path: AreaPath): WildSpawnState {
-  const totalWeight = path.digimonPool.reduce((sum, entry) => sum + entry.weight, 0);
-  let roll = Math.random() * totalWeight;
-  let chosen = path.digimonPool[path.digimonPool.length - 1];
-  for (const entry of path.digimonPool) {
-    roll -= entry.weight;
-    if (roll <= 0) {
-      chosen = entry;
-      break;
-    }
-  }
-
+export function pickNextWildSpawn(now: number, path: AreaPath, teamHp: number): WildSpawnState {
+  const chosen = weightedPick(path.digimonPool, (entry) => entry.weight);
   const [min, max] = chosen.levelRange ?? path.levelRange;
   const level = min + Math.floor(Math.random() * (max - min + 1));
 
-  return makeWildSpawn(now, chosen.id, level);
+  return makeWildSpawn(now, chosen.id, level, teamHp);
 }
 
 // DEBUG: spawns a specific stage+level wild on demand, bypassing the
-// normal WILD_SPAWN_POOL/nextLevel progression - for checking HP/damage
-// scaling against any stage without grinding to it. See DebugSpawnPanel.
-export function spawnDebugWild(now: number, stage: Stage, level: number): WildSpawnState | null {
+// normal area/path spawn pool - for checking HP/damage scaling against
+// any stage without grinding to it. See DebugSpawnPanel.
+export function spawnDebugWild(now: number, stage: Stage, level: number, teamHp: number): WildSpawnState | null {
   const candidates = getSpeciesIdsByStage(stage);
   if (candidates.length === 0) return null;
   const speciesId = candidates[Math.floor(Math.random() * candidates.length)];
-  return makeWildSpawn(now, speciesId, level);
+  return makeWildSpawn(now, speciesId, level, teamHp);
 }
 
 export function computeKillXp(wildLevel: number): number {
@@ -71,9 +69,4 @@ export function computeKillXp(wildLevel: number): number {
 
 export function computeKillBits(wildLevel: number): number {
   return KILL_BITS_BASE + wildLevel * KILL_BITS_PER_LEVEL;
-}
-
-export function computeTameChancePercent(avgTeamLevel: number, wildLevel: number): number {
-  const raw = TAME_CHANCE_BASE_PERCENT + (avgTeamLevel - wildLevel) * TAME_CHANCE_PER_LEVEL_DIFF_PERCENT;
-  return Math.min(TAME_CHANCE_MAX_PERCENT, Math.max(TAME_CHANCE_MIN_PERCENT, Math.round(raw)));
 }

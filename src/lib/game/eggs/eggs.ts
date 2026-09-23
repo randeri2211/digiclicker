@@ -63,7 +63,7 @@ export function rollEggDrop(killedSpeciesId: string): DigimonInstance | null {
   if (!targetSpecies) return null;
 
   const instance = createDigimonInstance(targetSpeciesId, 0);
-  instance.eggState = { eggType: targetSpecies.eggType, hatchAtLevel: EGG_HATCH_LEVEL };
+  instance.eggState = { eggType: targetSpecies.eggType, hatchAtLevel: EGG_HATCH_LEVEL, isMystery: false };
   return instance;
 }
 

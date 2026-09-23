@@ -11,7 +11,7 @@ export type Stage =
   | 'Burst Mode'
   | 'Unknown';
 
-export type StatAffinity = 'Attack' | 'Defense' | 'Speed' | 'SpecialAttack';
+export type StatAffinity = 'Attack' | 'HP' | 'Speed' | 'SpecialAttack';
 
 /** The 11 Digi-Egg flavor types (see egg_type_mapping.py) - a species'
  * eggType is independent of its statAffinity, resolved from the same raw
@@ -29,10 +29,9 @@ export type EggType =
   | 'Evil'
   | 'Holy';
 
-/** One member for now (the de-digivolve item) - a plain string union so
- * adding a new item later is just adding a new member here plus a matching
- * ITEM_CATALOG entry (see src/lib/game/items/itemCatalog.ts). */
-export type ItemId = 'dedigivolve-crystal';
+/** A plain string union - adding a new item is a new member here plus a
+ * matching ITEM_CATALOG entry (see src/lib/game/items/itemCatalog.ts). */
+export type ItemId = 'dedigivolve-crystal' | 'ability-reroll-crystal';
 
 export interface ItemDefinition {
   id: ItemId;
@@ -45,9 +44,41 @@ export interface ItemDefinition {
  * initialization) - lookups never need a `?? 0` fallback. */
 export type InventoryState = Record<ItemId, number>;
 
+/** 4 stats x 3 rarity tiers - a plain string union so adding a new
+ * ability is a new member here plus a matching ABILITY_CATALOG entry
+ * (see src/lib/game/abilities/abilityCatalog.ts). */
+export type AbilityId =
+  | 'attack-minor'
+  | 'attack-major'
+  | 'attack-superior'
+  | 'hp-minor'
+  | 'hp-major'
+  | 'hp-superior'
+  | 'speed-minor'
+  | 'speed-major'
+  | 'speed-superior'
+  | 'special-attack-minor'
+  | 'special-attack-major'
+  | 'special-attack-superior';
+
+export interface AbilityDefinition {
+  id: AbilityId;
+  name: string;
+  description: string;
+  statKey: keyof StatBlock;
+  /** e.g. 10 = +10% to statKey. */
+  percent: number;
+  /** Rarity weight for rerollAbility's weighted pick - higher rolls more
+   * often, same convention as AreaSpawnEntry/mystery-egg pool weights. */
+  weight: number;
+}
+
 export interface StatBlock {
   attack: number;
-  defense: number;
+  /** Funds the per-encounter fight timer (see combat/spawn.ts's
+   * computeFightTimeLimitMs) - the last stat to gain a live mechanical
+   * effect, formerly called Defense. */
+  hp: number;
   speed: number;
   specialAttack: number;
 }
@@ -127,8 +158,19 @@ export interface DigimonInstance {
    * display/digivolve-eligibility are gated on this. Cleared (hatches,
    * resetting xp to 0 - same as digivolve/de-digivolve) the moment xp
    * crosses hatchAtLevel; checked wherever xp is awarded (see
-   * tryHatch in game/eggs/eggs.ts). */
-  eggState: { eggType: EggType; hatchAtLevel: number } | null;
+   * tryHatch in game/eggs/eggs.ts). isMystery distinguishes a
+   * player-bought Mystery Digi-Egg (game/eggs/mysteryEggs.ts) from a
+   * real wild kill-drop (game/eggs/eggs.ts's rollEggDrop) - same
+   * hatching mechanics either way, only display (name + a "?" overlay
+   * on the sprite, see images.ts's isMysteryEgg) differs. */
+  eggState: { eggType: EggType; hatchAtLevel: number; isMystery: boolean } | null;
+  /** Null until an Ability Reroll Crystal is used on this instance (see
+   * abilities/abilities.ts's useAbilityReroll) - that item is the only
+   * source, nothing rolls one automatically. Persists across digivolve/
+   * de-digivolve (a property of this specific Digimon, not its current
+   * form) - unlike baseStats/growthPerLevel, which reroll every
+   * transition. */
+  abilityId: AbilityId | null;
 }
 
 export interface TeamState {
@@ -159,6 +201,16 @@ export interface WildSpawnState {
    * (team attacksPerSecond * elapsedSeconds, carried over so partial
    * progress isn't lost between polls of the tick loop). */
   attackProgress: number;
+  /** When this encounter started - immutable for its lifetime, unlike
+   * lastTickAt (which updates every tick). Paired with timeLimitMs to
+   * know when the fight times out (see combat/spawn.ts,
+   * state/combat.svelte.ts's tick()). */
+  spawnedAt: number;
+  /** This encounter's total duration, fixed at spawn time from the
+   * active team's HP stat at that moment (see
+   * computeFightTimeLimitMs in combat/spawn.ts) - doesn't change if
+   * team HP changes mid-fight. */
+  timeLimitMs: number;
 }
 
 export interface DamagePopupState {
@@ -221,3 +273,22 @@ export interface AreaProgressState {
  * keyed by speciesId, never entries removed even if the player later loses
  * every instance of that form. See state/compendium.svelte.ts. */
 export type CompendiumState = Record<string, true>;
+
+/** A player's chosen (or auto-learned) next digivolve target for a given
+ * source species - minLevel is an optional extra floor ON TOP OF the
+ * target's normal DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE requirement (never
+ * below it), letting a Digimon "cook" longer before auto-firing. */
+export interface DigivolvePreference {
+  targetSpeciesId: string;
+  minLevel: number;
+}
+
+/** Keyed by source speciesId (the Digimon's CURRENT form), not an
+ * abstract "line" - the evolution graph is a messy multi-parent DAG, so
+ * "current species" is the only well-defined key. Populated either by
+ * pinning ahead of time or automatically from the most recent manual
+ * digivolve choice - see evolution/digivolve.ts. */
+export interface DigivolveAutomationState {
+  enabled: boolean;
+  preferences: Record<string, DigivolvePreference>;
+}

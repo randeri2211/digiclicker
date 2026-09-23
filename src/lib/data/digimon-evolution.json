@@ -1,7 +1,7 @@
 {
   "meta": {
     "droppedNodeCount": 38,
-    "generatedAt": "2026-08-28T21:56:49.046596+00:00",
+    "generatedAt": "2026-08-30T08:35:44.179258+00:00",
     "keptNodeCount": 1660,
     "sourceNodeCount": 1698
   },
@@ -200,7 +200,7 @@
       "spriteUrl": "digimon/images/Aegisdramon/Aegisdramon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -216,7 +216,7 @@
       "spriteUrl": "digimon/images/Aequcedramon/Aequcedramon b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -472,7 +472,7 @@
       "spriteUrl": "digimon/images/Ajatarmon/Ajatarmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -679,7 +679,7 @@
       "spriteUrl": "digimon/images/Amphimon/Amphimon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -781,7 +781,7 @@
       "spriteUrl": "digimon/images/AncientMermaidmon/AncientMermaidmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Ancient Aquabeast"
     },
@@ -882,7 +882,7 @@
       "spriteUrl": "digimon/images/Andromon/Andromon da.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -1210,7 +1210,7 @@
       "spriteUrl": "digimon/images/Apollomon/Apollomon Darkness Mode t.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -1284,7 +1284,7 @@
       "spriteUrl": "digimon/images/Arbormon/Arbormon b.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -1646,7 +1646,7 @@
       "spriteUrl": "digimon/images/Armageddemon/Armageddemon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unidentified"
     },
@@ -1697,7 +1697,7 @@
       "spriteUrl": "digimon/images/Armamon/Armamon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Weapon"
     },
@@ -1717,7 +1717,7 @@
       "spriteUrl": "digimon/images/Armamon/Armamon Burst Mode b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Weapon"
     },
@@ -1735,7 +1735,7 @@
       "spriteUrl": "digimon/images/Armormon/Armormon dw3.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -1852,7 +1852,7 @@
       "spriteUrl": "digimon/images/Aruraumon/Aruraumon dw2.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -1957,7 +1957,7 @@
       "spriteUrl": "digimon/images/AtlurBallistamon/AtlurBallistamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -2044,7 +2044,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -2163,7 +2163,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -2184,7 +2184,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -2247,7 +2247,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -2310,7 +2310,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -2556,7 +2556,7 @@
       "spriteUrl": "digimon/images/BalliBeastmon/BalliBeastmon t.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -2612,7 +2612,7 @@
       "spriteUrl": "digimon/images/Ballistamon/Ballistamon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -2686,7 +2686,7 @@
       "spriteUrl": "digimon/images/BanchoGolemon/BanchoGolemon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mineral"
     },
@@ -2946,7 +2946,7 @@
       "spriteUrl": "digimon/images/Battle/N-12 10 1.jpg",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -3216,7 +3216,7 @@
       "spriteUrl": "digimon/images/Beetlemon/Beetlemon sc.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -3381,7 +3381,7 @@
       "spriteUrl": "digimon/images/Betsumon/Betsumon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -3401,7 +3401,7 @@
       "spriteUrl": "digimon/images/Bibimon/Bibimon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -3457,7 +3457,7 @@
       "spriteUrl": "digimon/images/BioDarkdramon/BioDarkdramon t.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -3584,7 +3584,7 @@
       "spriteUrl": "digimon/images/BishopChessmon/BishopChessmon (Black) t.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -3605,7 +3605,7 @@
       "spriteUrl": "digimon/images/BishopChessmon/BishopChessmon (White) b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -3815,7 +3815,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -3854,7 +3854,7 @@
       "spriteUrl": "digimon/images/BlackGuilmon/BlackGuilmon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -3876,7 +3876,7 @@
       "spriteUrl": "digimon/images/BlackKingNumemon/BlackKingNumemon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -3892,7 +3892,7 @@
       "spriteUrl": "digimon/images/BlackMachGaogamon/BlackMachGaogamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -3910,7 +3910,7 @@
       "spriteUrl": "digimon/images/BlackMegaGargomon/BlackMegaGargomon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -3936,7 +3936,7 @@
       "spriteUrl": "digimon/images/BlackMetalGarurumon/BlackMetalGarurumon sc.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -3956,7 +3956,7 @@
       "spriteUrl": "digimon/images/BlackRapidmon/BlackRapidmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -3993,7 +3993,7 @@
       "spriteUrl": "digimon/images/BlackShoutmon/MegaBlackShoutmon X7 vg.jpg",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -4058,7 +4058,7 @@
       "spriteUrl": "digimon/images/BlackWarGrowlmon/BlackWarGrowlmon dw3.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -4074,7 +4074,7 @@
       "spriteUrl": "digimon/images/BladeKuwagamon/BladeKuwagamon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -4103,7 +4103,7 @@
       "spriteUrl": "digimon/images/Blastmon/Blastmon dff.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mineral"
     },
@@ -4125,7 +4125,7 @@
       "spriteUrl": "digimon/images/Blimpmon/Blimpmon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -4161,7 +4161,7 @@
       "spriteUrl": "digimon/images/BlitzGreymon/BlitzGreymon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -4206,7 +4206,7 @@
       "spriteUrl": "digimon/images/Blossomon/Blossomon da.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -4324,7 +4324,7 @@
       "spriteUrl": "digimon/images/Boltmon/Boltmon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -4386,7 +4386,7 @@
       "spriteUrl": "digimon/images/Bombmon/Bombmon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -4412,7 +4412,7 @@
       "spriteUrl": "digimon/images/Bommon/Bommon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -4498,7 +4498,7 @@
       "spriteUrl": "digimon/images/Botamon/Botamon dl.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -4588,7 +4588,7 @@
       "spriteUrl": "digimon/images/Breakdramon/Breakdramon ts.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine Dragon"
     },
@@ -4604,7 +4604,7 @@
       "spriteUrl": "digimon/images/Brigadramon/Brigadramon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -4634,7 +4634,7 @@
       "spriteUrl": "digimon/images/BryweLudramon/BryweLudramon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Armor"
     },
@@ -4696,7 +4696,7 @@
       "spriteUrl": "digimon/images/Budmon/Budmon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -4718,7 +4718,7 @@
       "spriteUrl": "digimon/images/Bukamon/Bukamon dl.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -4736,7 +4736,7 @@
       "spriteUrl": "digimon/images/Bulbmon/Bulbmon dw3.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -5066,7 +5066,7 @@
       "spriteUrl": "digimon/images/CannonBeemon/CannonBeemon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -5082,7 +5082,7 @@
       "spriteUrl": "digimon/images/CannonBeemon/CannonBeemon (Source Code).png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -5098,7 +5098,7 @@
       "spriteUrl": "digimon/images/Cannondramon/Cannondramon dw3.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -5136,7 +5136,7 @@
       "spriteUrl": "digimon/images/CaptainHookmon/CaptainHookmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Marine Man"
     },
@@ -5168,7 +5168,7 @@
       "spriteUrl": "digimon/images/Cargodramon/Cargodramon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -5222,7 +5222,7 @@
       "spriteUrl": "digimon/images/Cendrillmon/Cendrillmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -5404,7 +5404,7 @@
       "spriteUrl": "digimon/images/Chamblemon/Chamblemon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -5507,7 +5507,7 @@
       "spriteUrl": "digimon/images/Chaosdramon/Chaosdramon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -5523,7 +5523,7 @@
       "spriteUrl": "digimon/images/Chaosdramon/Chaosdramon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -5567,7 +5567,7 @@
       "spriteUrl": "digimon/images/ChaosGallantmon/ChaosGallantmon C vg.gif",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -5590,7 +5590,7 @@
       "spriteUrl": "digimon/images/ChaosGrimmon/ChaosGrimmon vg.gif",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -5623,7 +5623,7 @@
       "spriteUrl": "digimon/images/ChaosMetalSeadramon/ChaosMetalSeadramon dw2.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -5683,7 +5683,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -5736,7 +5736,7 @@
       "spriteUrl": "digimon/images/Chaperomon/Chaperomon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -5784,7 +5784,7 @@
       "spriteUrl": "digimon/images/Cherrymon/Cherrymon de.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -5802,7 +5802,7 @@
       "spriteUrl": "digimon/images/Cherrymon/Cherrymon (Red) dw3.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -5897,7 +5897,7 @@
       "spriteUrl": "digimon/images/Chibick/XW-05 22 01.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -5921,7 +5921,7 @@
       "spriteUrl": "digimon/images/Chibickmon/Chibickmon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -5955,7 +5955,7 @@
       "spriteUrl": "digimon/images/Chibomon/Chibomon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -6073,7 +6073,7 @@
       "spriteUrl": "digimon/images/Cho-Hakkaimon/Cho-Hakkaimon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -6218,7 +6218,7 @@
       "spriteUrl": "digimon/images/Citramon/DigiAnalyserDS-Citramon.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -6236,7 +6236,7 @@
       "spriteUrl": "digimon/images/ClavisAngemon/ClavisAngemon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Virtue"
     },
@@ -6252,7 +6252,7 @@
       "spriteUrl": "digimon/images/ClearAgumon/ClearAgumon dw2.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -6287,7 +6287,7 @@
       "spriteUrl": "digimon/images/Clockmon/Clockmon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -6347,7 +6347,7 @@
       "spriteUrl": "digimon/images/Commandramon/Commandramon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -6365,7 +6365,7 @@
       "spriteUrl": "digimon/images/Conomon/Conomon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -6381,7 +6381,7 @@
       "spriteUrl": "digimon/images/Copymon/Copymon b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -6486,7 +6486,7 @@
       "spriteUrl": "digimon/images/Cotsucomon/Cotsucomon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Armor"
     },
@@ -6776,7 +6776,7 @@
       "spriteUrl": "digimon/images/Curimon/Curimon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -6819,7 +6819,7 @@
       "spriteUrl": "digimon/images/CuteShoutmon/CuteShoutmon t.gif",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -6860,7 +6860,7 @@
       "spriteUrl": "digimon/images/Cyberdramon/Cyberdramon de.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -6901,7 +6901,7 @@
       "spriteUrl": "digimon/images/Cyberdramon/Cyberdramon (2010 anime) dff.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -7023,7 +7023,7 @@
       "spriteUrl": "digimon/images/Daipenmon/Daipenmon b.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -7137,7 +7137,7 @@
       "spriteUrl": "digimon/images/Dark/4-21 Dark Trailmon.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -7172,7 +7172,7 @@
       "spriteUrl": "digimon/images/Darkdramon/Darkdramon dwds.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -7253,7 +7253,7 @@
       "spriteUrl": "digimon/images/DarkKnightmon/DarkKnightmon b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -7301,7 +7301,7 @@
       "spriteUrl": "digimon/images/DarkKnightmon/DarkKnightmon b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -7378,7 +7378,7 @@
       "spriteUrl": "digimon/images/DarkMaildramon/DarkMaildramon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -7402,7 +7402,7 @@
       "spriteUrl": "digimon/images/DarknessBagramon/DarknessBagramon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -7491,7 +7491,7 @@
       "spriteUrl": "digimon/images/DarkVolumon/DarkVolumon t.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -7528,7 +7528,7 @@
       "spriteUrl": "digimon/images/Datamon/Datamon da.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -7549,7 +7549,7 @@
       "spriteUrl": "digimon/images/Datirimon/Datirimon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -7570,7 +7570,7 @@
       "spriteUrl": "digimon/images/Daxiongmaoshou/Daxiongmaoshou b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -7674,7 +7674,7 @@
       "spriteUrl": "digimon/images/Death/CD 30 01.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -7690,7 +7690,7 @@
       "spriteUrl": "digimon/images/Deathmon/CD 17 01.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -7708,7 +7708,7 @@
       "spriteUrl": "digimon/images/Deckerdramon/Deckerdramon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -7753,7 +7753,7 @@
       "spriteUrl": "digimon/images/DeckerGreymon/DeckerGreymon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -7777,7 +7777,7 @@
       "spriteUrl": "digimon/images/Deltamon/Deltamon dw3.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -8104,7 +8104,7 @@
       "spriteUrl": "digimon/images/Dexmon/Dexmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unanalyzable"
     },
@@ -8328,7 +8328,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -8368,7 +8368,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -8393,7 +8393,7 @@
       "spriteUrl": "digimon/images/Digitamamon/Digitamamon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Perfect"
     },
@@ -8678,7 +8678,7 @@
       "spriteUrl": "digimon/images/Dodomon/Dodomon rd.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -8696,7 +8696,7 @@
       "spriteUrl": "digimon/images/Doggymon/Doggymon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -8714,7 +8714,7 @@
       "spriteUrl": "digimon/images/Dokimon/Dokimon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -8833,7 +8833,7 @@
       "spriteUrl": "digimon/images/DonShoutmon/DonShoutmon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -9140,7 +9140,7 @@
       "spriteUrl": "digimon/images/Dot-Kamemon/Dot-Kamemon toy.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -9172,7 +9172,7 @@
       "spriteUrl": "digimon/images/Dot-Lalamon/Dot-Lalamon toy.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -9188,7 +9188,7 @@
       "spriteUrl": "digimon/images/DotAgumon/DotAgumon vg.gif",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -9220,7 +9220,7 @@
       "spriteUrl": "digimon/images/DotMirageGaogamon/DotMirageGaogamon vg.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -9424,7 +9424,7 @@
       "spriteUrl": "digimon/images/Duramon/Duramon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Weapon"
     },
@@ -9537,7 +9537,7 @@
       "spriteUrl": "digimon/images/Eaglemon/Eaglemon ts.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -9573,7 +9573,7 @@
       "spriteUrl": "digimon/images/Ebemon/Ebemon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -9589,7 +9589,7 @@
       "spriteUrl": "digimon/images/Ebemon/Ebemon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -9605,7 +9605,7 @@
       "spriteUrl": "digimon/images/EbiBurgamon/EbiBurgamon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Food"
     },
@@ -9739,7 +9739,7 @@
       "spriteUrl": "digimon/images/Elephantmon/Elephantmon b.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -9788,7 +9788,7 @@
       "spriteUrl": "digimon/images/EmperorGreymon/EmperorGreymon b.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Dragon Warrior"
     },
@@ -9841,7 +9841,7 @@
       "spriteUrl": "digimon/images/Entmon/Entmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -9861,7 +9861,7 @@
       "spriteUrl": "digimon/images/Eosmon/Eosmon (Champion) b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -9978,7 +9978,7 @@
       "spriteUrl": "digimon/images/Espimon/Espimon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -10005,7 +10005,7 @@
       "spriteUrl": "digimon/images/Etemon/Etemon Chaos da.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -10064,7 +10064,7 @@
       "spriteUrl": "digimon/images/Evilbeast/Evilbeast Laylamon t.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -10170,7 +10170,7 @@
       "spriteUrl": "digimon/images/ExTyrannomon/ExTyrannomon dw2.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -10615,7 +10615,7 @@
       "spriteUrl": "digimon/images/Flickmon/Flickmon (Tool) b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -10639,7 +10639,7 @@
       "spriteUrl": "digimon/images/Floramon/Floramon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -10736,7 +10736,7 @@
       "spriteUrl": "digimon/images/Footmon/Footmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -10760,7 +10760,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -10780,7 +10780,7 @@
       "spriteUrl": "digimon/images/ForgeBeemon/ForgeBeemon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -10877,7 +10877,7 @@
       "spriteUrl": "digimon/images/Frozomon/Frozomon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -10895,7 +10895,7 @@
       "spriteUrl": "digimon/images/Fufumon/Fufumon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -10946,7 +10946,7 @@
       "spriteUrl": "digimon/images/Fujinmon/Fujinmon nc.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -10962,7 +10962,7 @@
       "spriteUrl": "digimon/images/Fujitsumon/Octomon b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Shellfish"
     },
@@ -10998,7 +10998,7 @@
       "spriteUrl": "digimon/images/Fumamon/Fumamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -11016,7 +11016,7 @@
       "spriteUrl": "digimon/images/Fusamon/Fusamon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -11051,7 +11051,7 @@
       "spriteUrl": "digimon/images/Fuxishou/Fuxishou b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -11132,7 +11132,7 @@
       "spriteUrl": "digimon/images/Gagaahmon/Gagaahmon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -11634,7 +11634,7 @@
       "spriteUrl": "digimon/images/Gasamon/Gasamon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -11852,7 +11852,7 @@
       "spriteUrl": "digimon/images/Geremon/Geremon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -11873,7 +11873,7 @@
       "spriteUrl": "digimon/images/Gesomon/Gesomon da.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -11889,7 +11889,7 @@
       "spriteUrl": "digimon/images/Gesomon/Gesomon da.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -12007,7 +12007,7 @@
       "spriteUrl": "digimon/images/GigaBreakdramon/6-57 Analyzer-04 JP.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine Dragon"
     },
@@ -12031,7 +12031,7 @@
       "spriteUrl": "digimon/images/Gigadramon/Gigadramon da.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -12049,7 +12049,7 @@
       "spriteUrl": "digimon/images/GigaSeadramon/GigaSeadramon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -12068,7 +12068,7 @@
       "spriteUrl": "digimon/images/Gigasmon/Gigasmon b.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mineral"
     },
@@ -12182,7 +12182,7 @@
       "spriteUrl": "digimon/images/Giromon/Giromon dw3.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -12347,7 +12347,7 @@
       "spriteUrl": "digimon/images/Gogmamon/Gogmamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock"
     },
@@ -12521,7 +12521,7 @@
       "spriteUrl": "digimon/images/Golemon/Golemon sc.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mineral"
     },
@@ -12605,7 +12605,7 @@
       "spriteUrl": "digimon/images/Gotsumon/Gotsumon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock"
     },
@@ -12621,7 +12621,7 @@
       "spriteUrl": "digimon/images/Gotsumon/Gotsumon (Source Code).png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock"
     },
@@ -12687,7 +12687,7 @@
       "spriteUrl": "digimon/images/Grand/Grand Generamon (Heroes) b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unique"
     },
@@ -12709,7 +12709,7 @@
       "spriteUrl": "digimon/images/Grand/6-51 Analyzer-02 JP.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -12855,7 +12855,7 @@
       "spriteUrl": "digimon/images/GranLocomon/GranLocomon vg.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -12911,7 +12911,7 @@
       "spriteUrl": "digimon/images/Gravimon/Gravimon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unidentified"
     },
@@ -13346,7 +13346,7 @@
       "spriteUrl": "digimon/images/Guardromon/Guardromon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -13367,7 +13367,7 @@
       "spriteUrl": "digimon/images/Guardromon/Guardromon (Blue) dw3.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -13543,7 +13543,7 @@
       "spriteUrl": "digimon/images/Gundramon/Gundramon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -13586,7 +13586,7 @@
       "spriteUrl": "digimon/images/Gurimon/Gurimon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -13640,7 +13640,7 @@
       "spriteUrl": "digimon/images/Gwappamon/Gwappamon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -13677,7 +13677,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -13719,7 +13719,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -13782,7 +13782,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -13803,7 +13803,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -13928,7 +13928,7 @@
       "spriteUrl": "digimon/images/Hagurumon/Hagurumon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -13944,7 +13944,7 @@
       "spriteUrl": "digimon/images/Hagurumon/Hagurumon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -13999,7 +13999,7 @@
       "spriteUrl": "digimon/images/Hanimon/Hanimon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -14089,7 +14089,7 @@
       "spriteUrl": "digimon/images/HeavyLeomon/HeavyLeomon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -14271,7 +14271,7 @@
       "spriteUrl": "digimon/images/Hi-Commandramon/Hi-Commandramon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -14313,7 +14313,7 @@
       "spriteUrl": "digimon/images/HiAndromon/HiAndromon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -14534,7 +14534,7 @@
       "spriteUrl": "digimon/images/Housemon/Housemon dm.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -14552,7 +14552,7 @@
       "spriteUrl": "digimon/images/HoverEspimon/HoverEspimon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -14645,7 +14645,7 @@
       "spriteUrl": "digimon/images/Hydramon/Hydramon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -14778,7 +14778,7 @@
       "spriteUrl": "digimon/images/IceDevimon/IceDevimon dl.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -15076,7 +15076,7 @@
       "spriteUrl": "digimon/images/Invisimon/Invisimon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15114,7 +15114,7 @@
       "spriteUrl": "digimon/images/Jagamon/Jagamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -15140,7 +15140,7 @@
       "spriteUrl": "digimon/images/JagerLoweemon/JagerLoweemon b.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15178,7 +15178,7 @@
       "spriteUrl": "digimon/images/Jazardmon/Jazardmon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine Dragon"
     },
@@ -15198,7 +15198,7 @@
       "spriteUrl": "digimon/images/Jazarichmon/Jazarichmon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine Dragon"
     },
@@ -15218,7 +15218,7 @@
       "spriteUrl": "digimon/images/Jellymon/Jellymon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -15300,7 +15300,7 @@
       "spriteUrl": "digimon/images/JetMervamon/JetMervamon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -15321,7 +15321,7 @@
       "spriteUrl": "digimon/images/JetSilphymon/JetSilphymon b.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15462,7 +15462,7 @@
       "spriteUrl": "digimon/images/JumboGamemon/JumboGamemon dwds.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15478,7 +15478,7 @@
       "spriteUrl": "digimon/images/JungleMojyamon/JungleMojyamon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Rare Animal"
     },
@@ -15496,7 +15496,7 @@
       "spriteUrl": "digimon/images/Junkmon/Junkmon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -15587,7 +15587,7 @@
       "spriteUrl": "digimon/images/Justimon/Justimon (Accel Arm) b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15606,7 +15606,7 @@
       "spriteUrl": "digimon/images/Justimon/Justimon (Blitz Arm) b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15622,7 +15622,7 @@
       "spriteUrl": "digimon/images/Justimon/Justimon (Critical Arm) b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15638,7 +15638,7 @@
       "spriteUrl": "digimon/images/Justimon/Justimon X b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15660,7 +15660,7 @@
       "spriteUrl": "digimon/images/Jyarimon/Jyarimon rd.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -15749,7 +15749,7 @@
       "spriteUrl": "digimon/images/Kaguyamon/Kaguyamon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -15785,7 +15785,7 @@
       "spriteUrl": "digimon/images/Kakkinmon/Kakkinmon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Armor"
     },
@@ -15816,7 +15816,7 @@
       "spriteUrl": "digimon/images/Kamemon/Kamemon dwds.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -15862,7 +15862,7 @@
       "spriteUrl": "digimon/images/Kapurimon/Kapurimon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -15878,7 +15878,7 @@
       "spriteUrl": "digimon/images/Karakurumon/Karakurumon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -16001,7 +16001,7 @@
       "spriteUrl": "digimon/images/Keemon/Keemon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -16039,7 +16039,7 @@
       "spriteUrl": "digimon/images/Kekomon/Kekomon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -16066,7 +16066,7 @@
       "spriteUrl": "digimon/images/KendoGarurumon/KendoGarurumon dl.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -16087,7 +16087,7 @@
       "spriteUrl": "digimon/images/Kenkimon/Kenkimon b.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -16213,7 +16213,7 @@
       "spriteUrl": "digimon/images/Ketomon/Ketomon vg.gif",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -16248,7 +16248,7 @@
       "spriteUrl": "digimon/images/Kimeramon/Kimeramon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -16266,7 +16266,7 @@
       "spriteUrl": "digimon/images/KingChessmon/KingChessmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -16284,7 +16284,7 @@
       "spriteUrl": "digimon/images/KingEtemon/KingEtemon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -16381,7 +16381,7 @@
       "spriteUrl": "digimon/images/KnightChessmon/KnightChessmon (Black) b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -16403,7 +16403,7 @@
       "spriteUrl": "digimon/images/KnightChessmon/KnightChessmon (White) b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -16607,7 +16607,7 @@
       "spriteUrl": "digimon/images/Kokeshimon/Kokeshimon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -16651,7 +16651,7 @@
       "spriteUrl": "digimon/images/Kokuwamon/Kokuwamon dwds.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -16667,7 +16667,7 @@
       "spriteUrl": "digimon/images/Kokuwamon/Kokuwamon dwds.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -16827,7 +16827,7 @@
       "spriteUrl": "digimon/images/Kouki/Kouki Tsubasa t.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -17091,7 +17091,7 @@
       "spriteUrl": "digimon/images/Kyaromon/Kyaromon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -17347,7 +17347,7 @@
       "spriteUrl": "digimon/images/Lalamon/Lalamon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -17419,7 +17419,7 @@
       "spriteUrl": "digimon/images/Landramon/Landramon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mineral"
     },
@@ -17439,7 +17439,7 @@
       "spriteUrl": "digimon/images/Lavogaritamon/Lavogaritamon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock Dragon"
     },
@@ -17459,7 +17459,7 @@
       "spriteUrl": "digimon/images/Lavorvomon/Lavorvomon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock Dragon"
     },
@@ -17497,7 +17497,7 @@
       "spriteUrl": "digimon/images/Leafmon/Leafmon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -17876,7 +17876,7 @@
       "spriteUrl": "digimon/images/LoaderLiomon/LoaderLiomon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -17924,7 +17924,7 @@
       "spriteUrl": "digimon/images/Locomon/Locomon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -18044,7 +18044,7 @@
       "spriteUrl": "digimon/images/Loudmon/Loudmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -18205,7 +18205,7 @@
       "spriteUrl": "digimon/images/Ludomon/Ludomon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Armor"
     },
@@ -18248,7 +18248,7 @@
       "spriteUrl": "digimon/images/Luminamon/Luminamon (Nene Version) m.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -18341,7 +18341,7 @@
       "spriteUrl": "digimon/images/MachGaogamon/MachGaogamon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -18380,7 +18380,7 @@
       "spriteUrl": "digimon/images/Machinedramon/Machinedramon de.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -18407,7 +18407,7 @@
       "spriteUrl": "digimon/images/Machinedramon/Machinedramon (Source Code).png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -18423,7 +18423,7 @@
       "spriteUrl": "digimon/images/Machinedramon/Machinedramon (Source Code).png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -18470,7 +18470,7 @@
       "spriteUrl": "digimon/images/Machmon/Machmon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -18739,7 +18739,7 @@
       "spriteUrl": "digimon/images/MagnaGarurumon/MagnaGarurumon dl.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -18776,7 +18776,7 @@
       "spriteUrl": "digimon/images/MagnaGarurumon/MagnaGarurumon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -18847,7 +18847,7 @@
       "spriteUrl": "digimon/images/Magneticdramon/Magneticdramon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock Dragon"
     },
@@ -18872,7 +18872,7 @@
       "spriteUrl": "digimon/images/MailBirdramon/MailBirdramon dff.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -18893,7 +18893,7 @@
       "spriteUrl": "digimon/images/Maildramon/Maildramon dw3.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -19092,7 +19092,7 @@
       "spriteUrl": "digimon/images/Manekimon/Manekimon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -19179,7 +19179,7 @@
       "spriteUrl": "digimon/images/Maquinamon/Maquinamon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -19218,7 +19218,7 @@
       "spriteUrl": "digimon/images/MarineBullmon/MarineBullmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -19236,7 +19236,7 @@
       "spriteUrl": "digimon/images/MarineChimairamon/MarineChimairamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -19353,7 +19353,7 @@
       "spriteUrl": "digimon/images/MasterBlimpmon/MasterBlimpmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -19584,7 +19584,7 @@
       "spriteUrl": "digimon/images/MegaGargomon/MegaGargomon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -19846,7 +19846,7 @@
       "spriteUrl": "digimon/images/Mekanorimon/Mekanorimon da.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -20039,7 +20039,7 @@
       "spriteUrl": "digimon/images/Mervamon/Mervamon ts.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -20061,7 +20061,7 @@
       "spriteUrl": "digimon/images/MetalEtemon/MetalEtemon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20098,7 +20098,7 @@
       "spriteUrl": "digimon/images/MetalGarurumon/Metalgarurumon asr.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20116,7 +20116,7 @@
       "spriteUrl": "digimon/images/MetalGarurumon/MetalGarurumon X dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20152,7 +20152,7 @@
       "spriteUrl": "digimon/images/MetalGreymon/MetalGreymon (2010 anime) dff.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20172,7 +20172,7 @@
       "spriteUrl": "digimon/images/MetalGreymon/MetalGreymon (2010 anime) dff.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20193,7 +20193,7 @@
       "spriteUrl": "digimon/images/MetalGreymon/MetalGreymon Cyberdramon dff.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -20245,7 +20245,7 @@
       "spriteUrl": "digimon/images/MetalGreymon/MetalGreymon (2010 anime) dff.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20273,7 +20273,7 @@
       "spriteUrl": "digimon/images/MetalGreymon/MetalGreymon (2010 anime) dff.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20289,7 +20289,7 @@
       "spriteUrl": "digimon/images/MetalGreymon/MetalGreymon (2010 anime) dff.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20307,7 +20307,7 @@
       "spriteUrl": "digimon/images/MetalGreymon/MetalGreymon X dm.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20337,7 +20337,7 @@
       "spriteUrl": "digimon/images/MetalKabuterimon/MetalKabuterimon b.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20366,7 +20366,7 @@
       "spriteUrl": "digimon/images/MetalKoromon/MetalKoromon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -20422,7 +20422,7 @@
       "spriteUrl": "digimon/images/MetalMamemon/MetalMamemon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20438,7 +20438,7 @@
       "spriteUrl": "digimon/images/MetalMamemon/MetalMamemon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20458,7 +20458,7 @@
       "spriteUrl": "digimon/images/MetalPhantomon/MetalPhantomon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20494,7 +20494,7 @@
       "spriteUrl": "digimon/images/MetalSeadramon/MetalSeadramon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20522,7 +20522,7 @@
       "spriteUrl": "digimon/images/MetalTyrannomon/MetalTyrannomon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20538,7 +20538,7 @@
       "spriteUrl": "digimon/images/MetalTyrannomon/MetalTyrannomon (Source Code).png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -20580,7 +20580,7 @@
       "spriteUrl": "digimon/images/Metatromon/Metatromon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -20601,7 +20601,7 @@
       "spriteUrl": "digimon/images/Meteormon/Meteormon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock"
     },
@@ -20665,7 +20665,7 @@
       "spriteUrl": "digimon/images/Millenniummon/Millenniummon ws.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -20836,7 +20836,7 @@
       "spriteUrl": "digimon/images/Missimon/Missimon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -20895,7 +20895,7 @@
       "spriteUrl": "digimon/images/MockingBirdmon/MockingBirdmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -21014,7 +21014,7 @@
       "spriteUrl": "digimon/images/Monarchlizamon/Monarchlizamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -21175,7 +21175,7 @@
       "spriteUrl": "digimon/images/Monzaemon/Monzaemon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -21191,7 +21191,7 @@
       "spriteUrl": "digimon/images/Monzaemon/Monzaemon (Source Code).png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -21221,7 +21221,7 @@
       "spriteUrl": "digimon/images/Moon=Millenniummon/Moon=Millenniummon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Wicked God"
     },
@@ -21239,7 +21239,7 @@
       "spriteUrl": "digimon/images/Moonmon/Moonmon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -21274,7 +21274,7 @@
       "spriteUrl": "digimon/images/MoriShellmon/MoriShellmon dw2.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -21403,7 +21403,7 @@
       "spriteUrl": "digimon/images/Mulemon/Mulemon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -21517,7 +21517,7 @@
       "spriteUrl": "digimon/images/Mushroomon/Mushroomon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -21543,7 +21543,7 @@
       "spriteUrl": "digimon/images/MusoKnightmon/MusoKnightmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -21644,7 +21644,7 @@
       "spriteUrl": "digimon/images/Namakemon/Namakemon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -21689,7 +21689,7 @@
       "spriteUrl": "digimon/images/Nanimon/Nanimon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Invader"
     },
@@ -21797,7 +21797,7 @@
       "spriteUrl": "digimon/images/Negamon/Negamon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -21818,7 +21818,7 @@
       "spriteUrl": "digimon/images/Negamon/9-66 Negamon Evolved.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -22043,7 +22043,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -22061,7 +22061,7 @@
       "spriteUrl": "digimon/images/Nezhamon/Nezhamon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -22077,7 +22077,7 @@
       "spriteUrl": "digimon/images/Nezhamon/Nezhamon Crimson Mode b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -22175,7 +22175,7 @@
       "spriteUrl": "digimon/images/NoblePumpkinmon/NoblePumpkinmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -22193,7 +22193,7 @@
       "spriteUrl": "digimon/images/Nohemon/Nohemon b.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -22220,7 +22220,7 @@
       "spriteUrl": "digimon/images/Numemon/Numemon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -22236,7 +22236,7 @@
       "spriteUrl": "digimon/images/Numemon/Numemon (Aqua) dw3.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -22268,7 +22268,7 @@
       "spriteUrl": "digimon/images/Nyabootmon/Nyabootmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -22332,7 +22332,7 @@
       "spriteUrl": "digimon/images/Oblivimon/Oblivimon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -22385,7 +22385,7 @@
       "spriteUrl": "digimon/images/Octomon/Octomon dw3.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -22453,7 +22453,7 @@
       "spriteUrl": "digimon/images/Ogudomon/Ogudomon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Avatar"
     },
@@ -22559,7 +22559,7 @@
       "spriteUrl": "digimon/images/Oleamon/Oleamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Carnivorous Plant"
     },
@@ -22646,7 +22646,7 @@
       "spriteUrl": "digimon/images/Omegamon/Omegamon Alter-B dl.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -22727,7 +22727,7 @@
       "spriteUrl": "digimon/images/Omekamon/Omekamon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -23303,7 +23303,7 @@
       "spriteUrl": "digimon/images/Pabumon/Pabumon dl.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -23325,7 +23325,7 @@
       "spriteUrl": "digimon/images/Pafumon/Pafumon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Spirit"
     },
@@ -23352,7 +23352,7 @@
       "spriteUrl": "digimon/images/Pagumon/Pagumon dl.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -23457,7 +23457,7 @@
       "spriteUrl": "digimon/images/Palmon/Palmon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -23473,7 +23473,7 @@
       "spriteUrl": "digimon/images/Palmon/Palmon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -23518,7 +23518,7 @@
       "spriteUrl": "digimon/images/Pandamon/Pandamon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -23568,7 +23568,7 @@
       "spriteUrl": "digimon/images/Paomon/Paomon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -23691,7 +23691,7 @@
       "spriteUrl": "digimon/images/PaunGaossmon/PaunGaossmon t.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -23709,7 +23709,7 @@
       "spriteUrl": "digimon/images/PawnChessmon/PawnChessmon (Black) dwds.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -23739,7 +23739,7 @@
       "spriteUrl": "digimon/images/PawnChessmon/PawnChessmon (White) dwds.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -23776,7 +23776,7 @@
       "spriteUrl": "digimon/images/Peacockmon/Peacockmon b.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -23871,7 +23871,7 @@
       "spriteUrl": "digimon/images/Petaldramon/Petaldramon b.png",
       "stage": "Hybrid",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -23921,7 +23921,7 @@
       "spriteUrl": "digimon/images/Petitmon/Petitmon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -24084,7 +24084,7 @@
       "spriteUrl": "digimon/images/Pichimon/Pichimon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -24208,7 +24208,7 @@
       "spriteUrl": "digimon/images/PileVolcamon/PileVolcamon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -24294,7 +24294,7 @@
       "spriteUrl": "digimon/images/Pistmon/Pistmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -24457,7 +24457,7 @@
       "spriteUrl": "digimon/images/Plutomon/Plutomon nc.png",
       "stage": "Ultra",
       "stageOrder": 6,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -24514,7 +24514,7 @@
       "spriteUrl": "digimon/images/Pomumon/Pomumon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -24552,7 +24552,7 @@
       "spriteUrl": "digimon/images/Popomon/Popomon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -24572,7 +24572,7 @@
       "spriteUrl": "digimon/images/Porcupamon/Porcupamon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -24649,7 +24649,7 @@
       "spriteUrl": "digimon/images/Poyomon/Poyomon dl.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -24724,7 +24724,7 @@
       "spriteUrl": "digimon/images/Pristimon/Pristimon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -24744,7 +24744,7 @@
       "spriteUrl": "digimon/images/Proganomon/Proganomon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mineral"
     },
@@ -24916,7 +24916,7 @@
       "spriteUrl": "digimon/images/Pumpkinmon/Pumpkinmon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -24932,7 +24932,7 @@
       "spriteUrl": "digimon/images/Pumpkinmon/Pumpkinmon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -24974,7 +24974,7 @@
       "spriteUrl": "digimon/images/Punimon/Punimon dl.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -25026,7 +25026,7 @@
       "spriteUrl": "digimon/images/Puppetmon/Puppetmon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -25048,7 +25048,7 @@
       "spriteUrl": "digimon/images/Pupumon/Pupumon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -25084,7 +25084,7 @@
       "spriteUrl": "digimon/images/Pururumon/Pururumon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -25102,7 +25102,7 @@
       "spriteUrl": "digimon/images/Pusumon/Pusumon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -25148,7 +25148,7 @@
       "spriteUrl": "digimon/images/Puttimon/Puttimon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Mini Angel"
     },
@@ -25192,7 +25192,7 @@
       "spriteUrl": "digimon/images/Puyomon/Puyomon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -25230,7 +25230,7 @@
       "spriteUrl": "digimon/images/Pyonmon/Pyonmon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -25264,7 +25264,7 @@
       "spriteUrl": "digimon/images/Pyramidimon/Pyramidimon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mineral"
     },
@@ -25296,7 +25296,7 @@
       "spriteUrl": "digimon/images/Quartzmon/Quartzmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unidentified"
     },
@@ -25314,7 +25314,7 @@
       "spriteUrl": "digimon/images/QueenBeemon/QueenBeemon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -25332,7 +25332,7 @@
       "spriteUrl": "digimon/images/QueenChessmon/QueenChessmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -25446,7 +25446,7 @@
       "spriteUrl": "digimon/images/Raidenmon/Raidenmon dw3.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -25484,7 +25484,7 @@
       "spriteUrl": "digimon/images/RaijiLudomon/RaijiLudomon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Armor"
     },
@@ -25502,7 +25502,7 @@
       "spriteUrl": "digimon/images/Raijinmon/Raijinmon dw3.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -25564,7 +25564,7 @@
       "spriteUrl": "digimon/images/Rapidmon/Rapidmon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -25622,7 +25622,7 @@
       "spriteUrl": "digimon/images/RaptorSparrowmon/RaptorSparrowmon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -25738,7 +25738,7 @@
       "spriteUrl": "digimon/images/Ravemon/Ravemon BM dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -25754,7 +25754,7 @@
       "spriteUrl": "digimon/images/Ravemon/Ravemon BM dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -25772,7 +25772,7 @@
       "spriteUrl": "digimon/images/Reapermon/Reapermon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -25811,7 +25811,7 @@
       "spriteUrl": "digimon/images/Rebellimon/Rebellimon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -25845,7 +25845,7 @@
       "spriteUrl": "digimon/images/RedVegiemon/RedVegiemon dw2.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Carnivorous Plant"
     },
@@ -25917,7 +25917,7 @@
       "spriteUrl": "digimon/images/Relemon/Relemon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -26013,7 +26013,7 @@
       "spriteUrl": "digimon/images/Reptiledramon/Reptiledramon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -26162,7 +26162,7 @@
       "spriteUrl": "digimon/images/Rinkmon/Rinkmon b.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -26185,7 +26185,7 @@
       "spriteUrl": "digimon/images/RizeGreymon/RizeGreymon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -26201,7 +26201,7 @@
       "spriteUrl": "digimon/images/RizeGreymon/RizeGreymon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -26254,7 +26254,7 @@
       "spriteUrl": "digimon/images/RookChessmon/RookChessmon (Black) b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -26382,7 +26382,7 @@
       "spriteUrl": "digimon/images/RustTyranomon/RustTyranomon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -26401,7 +26401,7 @@
       "spriteUrl": "digimon/images/Ruthless/Ruthless Tuwarmon Beast Mode t.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -26470,7 +26470,7 @@
       "spriteUrl": "digimon/images/Ryugumon/Ryugumon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -26590,7 +26590,7 @@
       "spriteUrl": "digimon/images/Sakumon/Sakumon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Weapon"
     },
@@ -26606,7 +26606,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -26642,7 +26642,7 @@
       "spriteUrl": "digimon/images/Sakuttomon/Sakuttomon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Weapon"
     },
@@ -26793,7 +26793,7 @@
       "spriteUrl": "digimon/images/Sandmon/Sandmon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -26851,7 +26851,7 @@
       "spriteUrl": "digimon/images/Sangomon/Sangomon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -26899,7 +26899,7 @@
       "spriteUrl": "digimon/images/Sanzomon/Sanzomon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Monk"
     },
@@ -26975,7 +26975,7 @@
       "spriteUrl": "digimon/images/ScourgeChiropmon/ScourgeChiropmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -27071,7 +27071,7 @@
       "spriteUrl": "digimon/images/Sealsdramon/Sealsdramon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -27272,7 +27272,7 @@
       "spriteUrl": "digimon/images/Sethmon/6-45 Analyzer-05 JP.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -27293,7 +27293,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -27364,7 +27364,7 @@
       "spriteUrl": "digimon/images/Shademon/Shademon b.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -27402,7 +27402,7 @@
       "spriteUrl": "digimon/images/ShadowToyAgumon/ShadowToyAgumon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -27546,7 +27546,7 @@
       "spriteUrl": "digimon/images/Sharkmon/Sharkmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -27733,7 +27733,7 @@
       "spriteUrl": "digimon/images/ShinMonzaemon/ShinMonzaemon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -27783,7 +27783,7 @@
       "spriteUrl": "digimon/images/Shoemon/Shoemon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -27803,7 +27803,7 @@
       "spriteUrl": "digimon/images/ShoeShoemon/ShoeShoemon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -27858,7 +27858,7 @@
       "spriteUrl": "digimon/images/Shootmon/Shootmon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -27904,7 +27904,7 @@
       "spriteUrl": "digimon/images/Shounitamon/Shounitamon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -28001,7 +28001,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28023,7 +28023,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28130,7 +28130,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -28202,7 +28202,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon X3 dff.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28286,7 +28286,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon X4 asr.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28314,7 +28314,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28339,7 +28339,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28366,7 +28366,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28395,7 +28395,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28423,7 +28423,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28445,7 +28445,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28497,7 +28497,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28515,7 +28515,7 @@
       "spriteUrl": "digimon/images/Shoutmon/Shoutmon (Yellow) vg.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Composite"
     },
@@ -28663,7 +28663,7 @@
       "spriteUrl": "digimon/images/Sistermon/Sistermon Blanc (Awakened) b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -28679,7 +28679,7 @@
       "spriteUrl": "digimon/images/Sistermon/Sistermon Blanc (Awakened) b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -28697,7 +28697,7 @@
       "spriteUrl": "digimon/images/Sistermon/Sistermon Ciel (Awakened) b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -28713,7 +28713,7 @@
       "spriteUrl": "digimon/images/Sistermon/Sistermon Ciel (Awakened) b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -28731,7 +28731,7 @@
       "spriteUrl": "digimon/images/Sistermon/Sistermon Noir (Awakened) b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -28747,7 +28747,7 @@
       "spriteUrl": "digimon/images/Sistermon/Sistermon Noir (Awakened) b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -28837,7 +28837,7 @@
       "spriteUrl": "digimon/images/SkullGreymon/SkullGreymon B vg.gif",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -28899,7 +28899,7 @@
       "spriteUrl": "digimon/images/SkullKnightmon/SkullKnightmon (Red) vp.gif",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -28940,7 +28940,7 @@
       "spriteUrl": "digimon/images/SkullKnightmon/SkullKnightmon (Red) vp.gif",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -28960,7 +28960,7 @@
       "spriteUrl": "digimon/images/SkullKnightmon/SkullKnightmon (Red) vp.gif",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Enhancement"
     },
@@ -29362,7 +29362,7 @@
       "spriteUrl": "digimon/images/Solarmon/Solarmon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -29466,7 +29466,7 @@
       "spriteUrl": "digimon/images/Spadamon/Spadamon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Weapon"
     },
@@ -29658,7 +29658,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -29704,7 +29704,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -29729,7 +29729,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -29777,7 +29777,7 @@
       "spriteUrl": null,
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -29933,7 +29933,7 @@
       "spriteUrl": "digimon/images/Star/Star Sword t.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -29952,7 +29952,7 @@
       "spriteUrl": "digimon/images/Star/6-03 Rare Star Sword.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -30106,7 +30106,7 @@
       "spriteUrl": "digimon/images/Stegomon/Stegomon b.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Stegosaur"
     },
@@ -30251,7 +30251,7 @@
       "spriteUrl": "digimon/images/Suijinmon/Suijinmon dw3.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -30319,7 +30319,7 @@
       "spriteUrl": "digimon/images/Sunflowmon/Sunflowmon de.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -30399,7 +30399,7 @@
       "spriteUrl": "digimon/images/Surfimon/Surfimon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -30455,7 +30455,7 @@
       "spriteUrl": "digimon/images/Swimmon/Swimmon b.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Tropical Fish"
     },
@@ -30656,7 +30656,7 @@
       "spriteUrl": "digimon/images/Tanemon/Tanemon dl.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -30677,7 +30677,7 @@
       "spriteUrl": "digimon/images/Tankdramon/Tankdramon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -30699,7 +30699,7 @@
       "spriteUrl": "digimon/images/Tankmon/Tankmon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -30809,7 +30809,7 @@
       "spriteUrl": "digimon/images/Targetmon/Targetmon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -30841,7 +30841,7 @@
       "spriteUrl": "digimon/images/Tekkamon/Tekkamon dw2.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31019,7 +31019,7 @@
       "spriteUrl": "digimon/images/TeslaJellymon/TeslaJellymon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mollusk"
     },
@@ -31117,7 +31117,7 @@
       "spriteUrl": "digimon/images/TiaLudomon/TiaLudomon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Armor"
     },
@@ -31137,7 +31137,7 @@
       "spriteUrl": "digimon/images/TigerVespamon/TigerVespamon dl.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -31174,7 +31174,7 @@
       "spriteUrl": "digimon/images/Tinmon/Tinmon dw.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31233,7 +31233,7 @@
       "spriteUrl": "digimon/images/Tlalocmon/Tlalocmon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Mineral"
     },
@@ -31267,7 +31267,7 @@
       "spriteUrl": "digimon/images/TobuCatmon/TobuCatmon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -31306,7 +31306,7 @@
       "spriteUrl": "digimon/images/Togemon/Togemon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -31322,7 +31322,7 @@
       "spriteUrl": "digimon/images/Togemon/Togemon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -31442,7 +31442,7 @@
       "spriteUrl": "digimon/images/Toropiamon/Toropiamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -31498,7 +31498,7 @@
       "spriteUrl": "digimon/images/ToyAgumon/ToyAgumon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -31551,7 +31551,7 @@
       "spriteUrl": "digimon/images/Trailmon/Trailmon (Angler) t.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31567,7 +31567,7 @@
       "spriteUrl": "digimon/images/Trailmon/4-18 Trailmon (Buffalo).png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31583,7 +31583,7 @@
       "spriteUrl": "digimon/images/Trailmon/4-18 Trailmon (Buffalo).png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31599,7 +31599,7 @@
       "spriteUrl": "digimon/images/Trailmon/Trailmon (C-89 Model) n.jpg",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31615,7 +31615,7 @@
       "spriteUrl": "digimon/images/Trailmon/4-18 Trailmon (Franken) and Koji.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31631,7 +31631,7 @@
       "spriteUrl": "digimon/images/Trailmon/Trailmon (Kettle) t.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31647,7 +31647,7 @@
       "spriteUrl": "digimon/images/Trailmon/4-18 Trailmon (Mole) and Zoe.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31663,7 +31663,7 @@
       "spriteUrl": "digimon/images/Trailmon/4-18 Trailmon (Raccoon Dog).png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31679,7 +31679,7 @@
       "spriteUrl": "digimon/images/Trailmon/Trailmon (Worm) b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Machine"
     },
@@ -31775,7 +31775,7 @@
       "spriteUrl": "digimon/images/Tsubumon/Tsubumon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -31864,7 +31864,7 @@
       "spriteUrl": "digimon/images/Tumblemon/Tumblemon b.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock"
     },
@@ -31974,7 +31974,7 @@
       "spriteUrl": "digimon/images/Tylomon/Tylomon dw3.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Ocean Dragon"
     },
@@ -31990,7 +31990,7 @@
       "spriteUrl": "digimon/images/Tylomon/Tylomon dw3.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Ocean Dragon"
     },
@@ -32144,7 +32144,7 @@
       "spriteUrl": "digimon/images/UltimateBrachiomon/UltimateBrachiomon ts.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -32290,7 +32290,7 @@
       "spriteUrl": "digimon/images/Vademon/Vademon (Red) dw3.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Alien"
     },
@@ -32497,7 +32497,7 @@
       "spriteUrl": "digimon/images/Vegiemon/Vegiemon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Carnivorous Plant"
     },
@@ -32563,7 +32563,7 @@
       "spriteUrl": "digimon/images/VenomMyotismon/VenomMyotismon da.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Devil"
     },
@@ -32636,7 +32636,7 @@
       "spriteUrl": "digimon/images/Vespamon/Vespamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -32763,7 +32763,7 @@
       "spriteUrl": "digimon/images/Vipemon/Vipemon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -32803,7 +32803,7 @@
       "spriteUrl": "digimon/images/Volcamon/Volcamon b.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -32873,7 +32873,7 @@
       "spriteUrl": "digimon/images/Vorvomon/Vorvomon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Rock Dragon"
     },
@@ -32964,7 +32964,7 @@
       "spriteUrl": "digimon/images/Wanyamon/Wanyamon dl.png",
       "stage": "In-Training",
       "stageOrder": 1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Lesser"
     },
@@ -33066,7 +33066,7 @@
       "spriteUrl": "digimon/images/WarGrowlmon/WarGrowlmon dl.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -33102,7 +33102,7 @@
       "spriteUrl": "digimon/images/WarGrowlmon/WarGrowlmon (Yellow) dwds.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -33120,7 +33120,7 @@
       "spriteUrl": "digimon/images/WarGrowlmon/WarGrowlmon (Yellow) dwds.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -33147,7 +33147,7 @@
       "spriteUrl": "digimon/images/WaruMonzaemon/WaruMonzaemon dw3.png",
       "stage": "Ultimate",
       "stageOrder": 4,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -33185,7 +33185,7 @@
       "spriteUrl": "digimon/images/Waspmon/Waspmon de.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -33233,7 +33233,7 @@
       "spriteUrl": "digimon/images/Weedmon/Weedmon dw2.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -33556,7 +33556,7 @@
       "spriteUrl": "digimon/images/Wolvermon/Wolvermon b.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -33579,7 +33579,7 @@
       "spriteUrl": "digimon/images/Woodmon/Woodmon de.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -33707,7 +33707,7 @@
       "spriteUrl": "digimon/images/XrosUpArresterdramon/6-77 XrosUpArresterdramon (Astamon).png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -33745,7 +33745,7 @@
       "spriteUrl": "digimon/images/XrosUpArresterdramon/6-62 XrosUpArresterdramon (Dobermon).png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -33764,7 +33764,7 @@
       "spriteUrl": "digimon/images/XrosUpArresterdramon/6-73 XrosUpArresterdramon (GigaBreakdramon).png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -33802,7 +33802,7 @@
       "spriteUrl": "digimon/images/XrosUpArresterdramon/6-77 XrosUpArresterdramon (Ogremon).png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -33898,7 +33898,7 @@
       "spriteUrl": "digimon/images/XrosUpDorulumon/6-78 XrosUpDorulumon.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -33917,7 +33917,7 @@
       "spriteUrl": "digimon/images/XrosUpGumdramon/6-60 XrosUpGumdramon.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -33955,7 +33955,7 @@
       "spriteUrl": "digimon/images/XrosUpOmegaShoutmon/6-56 XrosUpOmegaShoutmon.png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -34012,7 +34012,7 @@
       "spriteUrl": "digimon/images/XrosUpShoutmon/6-73 XrosUpShoutmon (Kamemon).png",
       "stage": "Unknown",
       "stageOrder": -1,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -34086,7 +34086,7 @@
       "spriteUrl": "digimon/images/Yakiimon/Yakiimon submission.jpg",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Vegetation"
     },
@@ -34121,7 +34121,7 @@
       "spriteUrl": "digimon/images/Yasyamon/Yasyamon b.png",
       "stage": "Armor",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Wizard<!--Source?"
     },
@@ -34180,7 +34180,7 @@
       "spriteUrl": "digimon/images/Yolkmon/Yolkmon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -34216,7 +34216,7 @@
       "spriteUrl": "digimon/images/Yoxtu!Yoxtu!mon/Yoxtu!Yoxtu!mon vg.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Puppet"
     },
@@ -34239,7 +34239,7 @@
       "spriteUrl": "digimon/images/YukimiBotamon/YukimiBotamon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -34255,7 +34255,7 @@
       "spriteUrl": "digimon/images/Yukinamon/Yukinamon dpc.gif",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Unknown"
     },
@@ -34353,7 +34353,7 @@
       "spriteUrl": "digimon/images/ZeedGarurumon/ZeedGarurumon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -34379,7 +34379,7 @@
       "spriteUrl": "digimon/images/ZeedMillenniummon/ZeedMillenniummon ws.jpg",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "fallback",
       "type": "Wicked God"
     },
@@ -34410,7 +34410,7 @@
       "spriteUrl": "digimon/images/ZekeGreymon/ZekeGreymon b.png",
       "stage": "Mega",
       "stageOrder": 5,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Cyborg"
     },
@@ -34492,7 +34492,7 @@
       "spriteUrl": "digimon/images/Zerimon/Zerimon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     },
@@ -34598,7 +34598,7 @@
       "spriteUrl": "digimon/images/ZubaEagermon/ZubaEagermon dl.png",
       "stage": "Champion",
       "stageOrder": 3,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Weapon"
     },
@@ -34619,7 +34619,7 @@
       "spriteUrl": "digimon/images/Zubamon/Zubamon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Weapon"
     },
@@ -34658,7 +34658,7 @@
       "spriteUrl": "digimon/images/Zurumon/Zurumon b.png",
       "stage": "Fresh",
       "stageOrder": 0,
-      "statAffinity": "Defense",
+      "statAffinity": "HP",
       "statAffinitySource": "mapped",
       "type": "Slime"
     }

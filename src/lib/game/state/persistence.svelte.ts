@@ -4,11 +4,14 @@ import { combat } from './combat.svelte';
 import { inventory } from './inventory.svelte';
 import { areaProgress } from './areaProgress.svelte';
 import { compendium } from './compendium.svelte';
+import { automation } from './digivolveAutomation.svelte';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
-import type { AreaProgressState, CompendiumState, DigimonInstance, InventoryState, TeamState } from '../types';
+import type { AreaProgressState, CompendiumState, DigimonInstance, DigivolveAutomationState, InventoryState, StatBlock, TeamState } from '../types';
 import { getSpecies } from '../images';
 import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
+import { computeTeamHp } from '../combat/damage';
+import { computeFightTimeLimitMs } from '../combat/spawn';
 import { AUTOSAVE_INTERVAL_MS } from '../constants';
 import { ITEM_CATALOG } from '../items/itemCatalog';
 import { initialAreaProgress } from '../areas/areaProgress';
@@ -23,6 +26,15 @@ export const activeSlot: { id: string | null } = $state({ id: null });
 // baseStats/growthPerLevel are rolled fresh from the instance's CURRENT
 // species (the only information available at load time - the original
 // birth-form/most-recent-transition context is gone).
+// Old saves' StatBlocks have a `defense` key, not `hp` (Defense was
+// renamed to HP once it gained a live effect - see combat/stats.ts).
+// Prefers hp if present (already-migrated or freshly-rolled blocks),
+// else falls back to the old defense value, else 0 - a no-op on a block
+// already in the new shape.
+function migrateStatBlock(block: StatBlock & { defense?: number }): StatBlock {
+  return { ...block, hp: block.hp ?? block.defense ?? 0 };
+}
+
 function normalizeInstance(instance: DigimonInstance): DigimonInstance {
   const species = getSpecies(instance.speciesId);
   const stage = species?.stage ?? 'Unknown';
@@ -33,10 +45,11 @@ function normalizeInstance(instance: DigimonInstance): DigimonInstance {
   return {
     ...instance,
     formHistory: instance.formHistory ?? [instance.speciesId],
-    baseStats: instance.baseStats ?? rollBaseStats(stage, statAffinity),
-    growthPerLevel: instance.growthPerLevel ?? rollGrowthPerLevel(stage, statAffinity),
-    digivolutionStats: hasStatBlockDigivolutionStats ? instance.digivolutionStats : zeroStatBlock(),
-    eggState: instance.eggState ?? null,
+    baseStats: migrateStatBlock(instance.baseStats ?? rollBaseStats(stage, statAffinity)),
+    growthPerLevel: migrateStatBlock(instance.growthPerLevel ?? rollGrowthPerLevel(stage, statAffinity)),
+    digivolutionStats: migrateStatBlock(hasStatBlockDigivolutionStats ? instance.digivolutionStats : zeroStatBlock()),
+    eggState: instance.eggState ? { ...instance.eggState, isMystery: instance.eggState.isMystery ?? false } : null,
+    abilityId: instance.abilityId ?? null,
   };
 }
 
@@ -79,6 +92,12 @@ function normalizeCompendium(loaded: CompendiumState | undefined, normalizedTeam
   return backfilled;
 }
 
+// Defaults to disabled/no-preferences if missing (saves made before
+// auto-digivolve existed).
+function normalizeAutomation(loaded: DigivolveAutomationState | undefined): DigivolveAutomationState {
+  return loaded ?? { enabled: false, preferences: {} };
+}
+
 function normalizeTeam(loadedTeam: TeamState): TeamState {
   return {
     ...loadedTeam,
@@ -104,6 +123,7 @@ function snapshotLiveState(): SaveSlotData {
       inventory,
       areaProgress,
       compendium,
+      automation,
     })
   );
 }
@@ -113,7 +133,16 @@ function applySlotToLiveState(data: SaveSlotData): void {
   const normalizedTeam = normalizeTeam(data.team);
   Object.assign(team, normalizedTeam);
   combat.wild = data.wild
-    ? { ...data.wild, lastTickAt: Date.now(), attackProgress: data.wild.attackProgress ?? 0 }
+    ? {
+        ...data.wild,
+        lastTickAt: Date.now(),
+        attackProgress: data.wild.attackProgress ?? 0,
+        // Saves made before the fight timer existed have neither field -
+        // resume as if the encounter just started, with a real timer
+        // computed from the current (already-normalized) team's HP.
+        spawnedAt: data.wild.spawnedAt ?? Date.now(),
+        timeLimitMs: data.wild.timeLimitMs ?? computeFightTimeLimitMs(computeTeamHp(normalizedTeam.activeMembers)),
+      }
     : null;
   combat.damagePopup = null;
   Object.assign(inventory, normalizeInventory(data.inventory));
@@ -122,6 +151,14 @@ function applySlotToLiveState(data: SaveSlotData): void {
   // loaded record as-is or a full backfill, never a partial one.
   for (const key of Object.keys(compendium)) delete compendium[key];
   Object.assign(compendium, normalizeCompendium(data.compendium, normalizedTeam));
+
+  // preferences has the same dynamic/unbounded key set as compendium -
+  // clear stale entries from whichever slot was previously live before
+  // assigning the newly loaded ones.
+  const normalizedAutomation = normalizeAutomation(data.automation);
+  for (const key of Object.keys(automation.preferences)) delete automation.preferences[key];
+  Object.assign(automation.preferences, normalizedAutomation.preferences);
+  automation.enabled = normalizedAutomation.enabled;
 }
 
 export function loadSlotIntoLiveState(slotId: string): void {
@@ -175,7 +212,8 @@ function isValidSlotData(value: unknown): value is SaveSlotData {
     // normalizeAreaProgress) - only reject one if present but malformed.
     (data.inventory === undefined || (typeof data.inventory === 'object' && data.inventory !== null)) &&
     (data.areaProgress === undefined || (typeof data.areaProgress === 'object' && data.areaProgress !== null)) &&
-    (data.compendium === undefined || (typeof data.compendium === 'object' && data.compendium !== null))
+    (data.compendium === undefined || (typeof data.compendium === 'object' && data.compendium !== null)) &&
+    (data.automation === undefined || (typeof data.automation === 'object' && data.automation !== null))
   );
 }
 

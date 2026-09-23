@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { DigimonInstance, StatBlock, StatRangeBlock } from '../../game/types';
-  import { getSpecies, getSpriteUrl, getEggSpriteUrl } from '../../game/images';
+  import { getSpecies, getSpriteUrl, getEggSpriteUrl, getInstanceDisplayName, isMysteryEgg } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import {
     getDigivolveOptions,
@@ -8,13 +8,17 @@
     digivolve,
     dedigivolve,
     ITEM_CATALOG,
+    automation,
+    setPreference,
+    clearPreference,
   } from '../../game/state/game.svelte';
   import type { DigivolutionOption } from '../../game/state/game.svelte';
   import { getItemCount } from '../../game/state/inventory.svelte';
+  import { MAX_LEVEL } from '../../game/constants';
 
   function formatStatBlock(block: StatBlock, signed: boolean): string {
     const fmt = (n: number) => (signed ? `${n >= 0 ? '+' : ''}${n}` : `${n}`);
-    return `ATK ${fmt(block.attack)} · DEF ${fmt(block.defense)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
+    return `ATK ${fmt(block.attack)} · HP ${fmt(block.hp)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
   }
 
   // Ranges are shown instead of a rolled number - the actual roll only
@@ -27,7 +31,7 @@
       const sign = signed && lo >= 0 ? '+' : '';
       return lo === hi ? `${sign}${lo}` : `${sign}${lo}–${hi}`;
     };
-    return `ATK ${fmt(block.attack)} · DEF ${fmt(block.defense)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
+    return `ATK ${fmt(block.attack)} · HP ${fmt(block.hp)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
   }
 
   interface Props {
@@ -53,7 +57,7 @@
   // An unhatched egg's speciesId is already resolved but hidden until it
   // hatches - show the per-type egg art/name instead of spoiling it.
   const currentSprite = $derived(instance.eggState ? getEggSpriteUrl(instance.eggState.eggType) : getSpriteUrl(instance.speciesId));
-  const currentName = $derived(instance.eggState ? `Digi-Egg (${instance.eggState.eggType})` : (currentSpecies?.name ?? instance.speciesId));
+  const currentName = $derived(getInstanceDisplayName(instance));
   const currentStage = $derived(instance.eggState ? 'Egg' : (currentSpecies?.stage ?? 'Unknown'));
 
   function commitDigivolve(option: DigivolutionOption) {
@@ -63,10 +67,53 @@
   function commitDedigivolve(option: DigivolutionOption) {
     dedigivolve(instance, option.species.id);
   }
+
+  // Only one option can be mid-edit at a time (one preference per source
+  // species anyway) - nothing is written to the real preference until
+  // Confirm, so adjusting the level or backing out costs nothing.
+  let pendingPinTargetId: string | null = $state(null);
+  let pendingMinLevel: number = $state(0);
+
+  function startPinEdit(option: DigivolutionOption, event: Event) {
+    event.stopPropagation();
+    const existing = automation.preferences[instance.speciesId];
+    pendingPinTargetId = option.species.id;
+    pendingMinLevel = existing?.targetSpeciesId === option.species.id ? existing.minLevel : (option.requirement?.minLevel ?? 0);
+  }
+
+  function cancelPinEdit(event: Event) {
+    event.stopPropagation();
+    pendingPinTargetId = null;
+  }
+
+  function unpin(event: Event) {
+    event.stopPropagation();
+    clearPreference(instance.speciesId);
+    pendingPinTargetId = null;
+  }
+
+  // Confirm is the only moment a preference actually gets written - caps
+  // the entered level to MAX_LEVEL, then checks eligibility right away
+  // rather than silently waiting for the next kill: if this instance
+  // already meets both the option's normal requirement and the level just
+  // confirmed, digivolve immediately. digivolve() leaves a same-target
+  // preference untouched, so the custom level just set survives it.
+  function confirmPin(option: DigivolutionOption, event: Event) {
+    event.stopPropagation();
+    const clampedLevel = Math.min(Math.max(0, Math.round(pendingMinLevel) || 0), MAX_LEVEL);
+    setPreference(instance.speciesId, option.species.id, clampedLevel);
+    pendingPinTargetId = null;
+
+    if (option.requirementMet && levelForXp(instance.xp) >= clampedLevel) {
+      digivolve(instance, option.species.id);
+    }
+  }
 </script>
 
-{#snippet optionCard(option: DigivolutionOption, onCommit: (o: DigivolutionOption) => void)}
+{#snippet optionCard(option: DigivolutionOption, onCommit: (o: DigivolutionOption) => void, showPin: boolean)}
   {@const sprite = getSpriteUrl(option.species.id)}
+  {@const pinnedPreference = showPin ? automation.preferences[instance.speciesId] : undefined}
+  {@const isPinned = pinnedPreference?.targetSpeciesId === option.species.id}
   <div
     class="option-card"
     class:blocked={!option.requirementMet}
@@ -97,6 +144,31 @@
         No requirements
       {/if}
     </div>
+    {#if showPin}
+      {@const isEditing = pendingPinTargetId === option.species.id}
+      <div class="pin-row">
+        {#if isEditing}
+          <label class="pin-level">
+            Min Lv
+            <input
+              type="number"
+              min="0"
+              max={MAX_LEVEL}
+              bind:value={pendingMinLevel}
+              onclick={(e) => e.stopPropagation()}
+            />
+          </label>
+          <button class="pin-btn confirm" onclick={(e) => confirmPin(option, e)}>Confirm</button>
+          <button class="pin-btn" onclick={cancelPinEdit}>Cancel</button>
+        {:else if isPinned}
+          <span class="pin-btn pinned">Pinned (Lv {pinnedPreference?.minLevel})</span>
+          <button class="pin-btn" onclick={(e) => startPinEdit(option, e)}>Edit</button>
+          <button class="pin-btn" onclick={unpin}>Unpin</button>
+        {:else}
+          <button class="pin-btn" onclick={(e) => startPinEdit(option, e)}>Pin</button>
+        {/if}
+      </div>
+    {/if}
   </div>
 {/snippet}
 
@@ -107,7 +179,7 @@
       <div class="empty-note">No further digivolutions available.</div>
     {:else}
       {#each digivolveOptions as option (option.species.id)}
-        {@render optionCard(option, commitDigivolve)}
+        {@render optionCard(option, commitDigivolve, true)}
       {/each}
     {/if}
   </div>
@@ -120,6 +192,9 @@
         <img src={currentSprite} alt="" />
       {:else}
         <span class="no-sprite">{currentName}</span>
+      {/if}
+      {#if isMysteryEgg(instance)}
+        <span class="mystery-badge">?</span>
       {/if}
     </div>
     <div class="current-name">{currentName}</div>
@@ -136,7 +211,7 @@
       <div class="empty-note">No prior forms in the evolution graph.</div>
     {:else}
       {#each dedigivolveOptions as option (option.species.id)}
-        {@render optionCard(option, commitDedigivolve)}
+        {@render optionCard(option, commitDedigivolve, false)}
       {/each}
     {/if}
   </div>
@@ -242,6 +317,50 @@
     font-size: 9px;
     color: var(--text-dim);
   }
+  .pin-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .pin-btn {
+    appearance: none;
+    font: inherit;
+    font-family: var(--mono);
+    background: var(--panel-2);
+    border: 1px solid var(--panel-border);
+    color: var(--text-dim);
+    font-size: 9px;
+    padding: 3px 8px;
+    cursor: pointer;
+  }
+  .pin-btn.pinned {
+    color: var(--text-h);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    cursor: default;
+  }
+  .pin-btn.confirm {
+    color: var(--pos);
+    border-color: var(--pos);
+  }
+  .pin-level {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+  .pin-level input {
+    width: 42px;
+    font: inherit;
+    font-family: var(--mono);
+    background: var(--panel-2);
+    border: 1px solid var(--panel-border);
+    color: var(--text-h);
+    padding: 2px 4px;
+  }
 
   .current-card {
     display: flex;
@@ -253,6 +372,7 @@
     border: 1px solid var(--panel-border-strong);
   }
   .current-sprite {
+    position: relative;
     width: 96px;
     height: 96px;
     display: flex;
@@ -260,6 +380,23 @@
     justify-content: center;
     background: var(--panel-2);
     border: 1px solid var(--panel-border);
+  }
+  .mystery-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-family: var(--head);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-h);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
   .current-sprite img {
     width: 82%;

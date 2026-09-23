@@ -6,11 +6,14 @@
     /** Digivolution-eligibility indicator. */
     ready?: boolean;
     isActive?: boolean;
+    /** True only for a still-unhatched Mystery Digi-Egg - see
+     * game/images.ts's isMysteryEgg. */
+    isMystery?: boolean;
     /** Only fired for filled slots - empty/locked slots have nothing to act on. */
     onClick?: (event: MouseEvent) => void;
   }
 
-  const { variant, spriteUrl = null, level, ready = false, isActive = false, onClick }: Props = $props();
+  const { variant, spriteUrl = null, level, ready = false, isActive = false, isMystery = false, onClick }: Props = $props();
 </script>
 
 {#snippet slotContent()}
@@ -23,6 +26,9 @@
     {/if}
     {#if ready}
       <span class="slot-ready"></span>
+    {/if}
+    {#if isMystery}
+      <span class="slot-mystery">?</span>
     {/if}
   {:else if variant === 'empty'}
     +
@@ -104,6 +110,23 @@
     background: var(--warn);
     box-shadow: 0 0 6px var(--warn);
     border-radius: 50%;
+  }
+  .slot-mystery {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    font-family: var(--head);
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-h);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    width: 13px;
+    height: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
   .slot.empty {
     color: var(--text-dim);

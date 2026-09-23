@@ -51,6 +51,15 @@ export const SPEED_TO_APS_SCALE = 0.02;
  * checked/applied at. */
 export const COMBAT_TICK_INTERVAL_MS = 250;
 
+// ---- Combat: fight timer ---------------------------------------------
+/** Every wild encounter has a time limit - timeLimitMs = (
+ * FIGHT_TIMER_BASE_SECONDS + teamHpSum * FIGHT_TIMER_SECONDS_PER_HP) *
+ * 1000 (see computeFightTimeLimitMs in combat/spawn.ts). If it runs out
+ * before the wild is defeated, the encounter ends with no reward and a
+ * fresh wild spawns - HP's one live mechanical effect. */
+export const FIGHT_TIMER_BASE_SECONDS = 5;
+export const FIGHT_TIMER_SECONDS_PER_HP = 0.05;
+
 // ---- Combat: per-instance stat rolls --------------------------------
 /** Relative power multiplier per stage, used when rolling baseStats/
  * growthPerLevel/digivolutionStats. */
@@ -80,7 +89,7 @@ export const DIGIVOLUTION_BONUS_SCALE = 4;
 /** How much the Digimon's level right before a digivolve/de-digivolve
  * feeds into that transition's digivolutionStats bonus, on top of the
  * usual stage/type amount - scaled by the same dominant/off factor, so
- * an attack-type Digimon still gains more Attack than Defense/Speed from
+ * an attack-type Digimon still gains more Attack than HP/Speed from
  * the level it's cashing in. */
 export const LEVEL_IMPACT_SCALE = 0.1;
 
@@ -117,10 +126,6 @@ export const KILL_XP_BASE = 20;
 export const KILL_XP_PER_LEVEL = 5;
 export const KILL_BITS_BASE = 10;
 export const KILL_BITS_PER_LEVEL = 3;
-export const TAME_CHANCE_BASE_PERCENT = 15;
-export const TAME_CHANCE_PER_LEVEL_DIFF_PERCENT = 3;
-export const TAME_CHANCE_MIN_PERCENT = 5;
-export const TAME_CHANCE_MAX_PERCENT = 90;
 
 // ---- Digi-Eggs -------------------------------------------------------
 /** Chance per wild kill that it drops a Digi-Egg (see rollEggDrop in
@@ -129,10 +134,12 @@ export const TAME_CHANCE_MAX_PERCENT = 90;
 export const EGG_DROP_CHANCE_PERCENT = 0.1;
 /** Level an egg must reach (gained the same way any team member gains
  * xp - it has to actually sit in an active/training slot) before it
- * hatches. Same placeholder tier as DEDIGIVOLVE_MIN_LEVEL (4) - low
- * enough to reach in a couple of kills so hatching isn't a second full
+ * hatches. Placeholder - low enough that hatching isn't a second full
  * grind on top of the rare drop itself. */
 export const EGG_HATCH_LEVEL = 10;
+/** Bits price for a Mystery Digi-Egg of any type, in the Shop (see
+ * game/eggs/mysteryEggs.ts) - flat across all 11 EggTypes for now. */
+export const MYSTERY_EGG_COST_BITS = 500;
 
 // ---- Items -----------------------------------------------------------
 /** De-digivolving requires spending this many of DEDIGIVOLVE_ITEM_ID
@@ -141,9 +148,12 @@ export const EGG_HATCH_LEVEL = 10;
  * de-digivolving a deliberate spend instead of a free repeatable action. */
 export const DEDIGIVOLVE_ITEM_ID: ItemId = 'dedigivolve-crystal';
 export const DEDIGIVOLVE_ITEM_COUNT = 1;
-/** Bits price for one De-Digivolution Crystal in the Inventory shop (see
+/** Bits price for one De-Digivolution Crystal in the Shop (see
  * items/itemCatalog.ts). */
 export const DEDIGIVOLVE_CRYSTAL_COST_BITS = 250;
+/** Bits price for one Ability Reroll Crystal in the Shop (see
+ * items/itemCatalog.ts, abilities/abilities.ts's useAbilityReroll). */
+export const ABILITY_REROLL_COST_BITS = 400;
 
 // ---- Persistence -------------------------------------------------------
 export const AUTOSAVE_INTERVAL_MS = 15000;

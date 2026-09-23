@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { DigimonInstance } from '../game/types';
-  import { getSpecies, getSpriteUrl, getEggSpriteUrl } from '../game/images';
+  import { getSpecies, getSpriteUrl, getEggSpriteUrl, getInstanceDisplayName, isMysteryEgg } from '../game/images';
   import { levelForXp } from '../game/combat/levelCurve';
-  import { team, getTeamSlotMenuItems } from '../game/state/game.svelte';
+  import { team, getTeamSlotMenuItems, useAbilityReroll } from '../game/state/game.svelte';
   import type { TeamBucket } from '../game/state/game.svelte';
   import ContextMenu from './shared/ContextMenu.svelte';
   import StatWindow from './shared/StatWindow.svelte';
@@ -11,10 +11,6 @@
   // hatches - show the per-type egg art/name instead of spoiling it.
   function spriteFor(instance: DigimonInstance): string | null {
     return instance.eggState ? getEggSpriteUrl(instance.eggState.eggType) : getSpriteUrl(instance.speciesId);
-  }
-  function nameFor(instance: DigimonInstance): string {
-    if (instance.eggState) return `Digi-Egg (${instance.eggState.eggType})`;
-    return getSpecies(instance.speciesId)?.name ?? instance.speciesId;
   }
   function stageFor(instance: DigimonInstance): string {
     if (instance.eggState) return 'Egg';
@@ -89,8 +85,11 @@
               {#if sprite}
                 <img src={sprite} alt="" />
               {/if}
+              {#if isMysteryEgg(entry.instance)}
+                <span class="mystery-badge">?</span>
+              {/if}
             </div>
-            <div class="card-name">{nameFor(entry.instance)}</div>
+            <div class="card-name">{getInstanceDisplayName(entry.instance)}</div>
             <div class="card-meta">Lv {levelForXp(entry.instance.xp)} · {stageFor(entry.instance)}</div>
           </button>
         {/each}
@@ -105,6 +104,7 @@
     y={menuState.y}
     items={getTeamSlotMenuItems(menuState.instance, menuState.bucket, {
       onOpenStats: () => (statsFor = menuState?.instance ?? null),
+      onUseAbilityReroll: () => menuState && useAbilityReroll(menuState.instance),
     })}
     onClose={() => (menuState = null)}
   />
@@ -202,6 +202,7 @@
     border-color: var(--accent);
   }
   .card-sprite {
+    position: relative;
     width: 64px;
     height: 64px;
     display: flex;
@@ -214,6 +215,23 @@
     width: 82%;
     height: 82%;
     object-fit: contain;
+  }
+  .mystery-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-family: var(--head);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-h);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
   .card-name {
     font-size: 12px;

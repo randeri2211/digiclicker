@@ -13,6 +13,7 @@ import { levelForXp } from '../combat/levelCurve';
 import { IN_GAME_STAGES, DEDIGIVOLVE_ITEM_ID, DEDIGIVOLVE_ITEM_COUNT } from '../constants';
 import { removeItem } from '../state/inventory.svelte';
 import { recordDiscovery } from '../state/compendium.svelte';
+import { automation, setPreference } from '../state/digivolveAutomation.svelte';
 
 // Species whose stage isn't in IN_GAME_STAGES stay fully present in the
 // scraped data (so nothing is lost, and re-enabling a stage later is a
@@ -147,15 +148,48 @@ function applyTransition(instance: DigimonInstance, targetSpeciesId: string): vo
   instance.growthPerLevel = growthPerLevel;
 }
 
+// Every digivolve (auto-fired ones included, see tryAutoDigivolve below)
+// records the "last choice" for this source species, regardless of
+// whether automation is currently enabled - so turning automation on
+// later already benefits from whatever was played manually before that
+// point. An existing preference for the same target is left untouched, so
+// a pinned custom minLevel survives every digivolve it triggers; only
+// picking a DIFFERENT target replaces it (at that target's base
+// requirement - adjusting it up is a separate pin action in the UI).
 export function digivolve(instance: DigimonInstance, targetSpeciesId: string): void {
+  const sourceSpeciesId = instance.speciesId;
   applyTransition(instance, targetSpeciesId);
+  if (automation.preferences[sourceSpeciesId]?.targetSpeciesId === targetSpeciesId) return;
+  const defaultMinLevel = getRequirement(sourceSpeciesId, targetSpeciesId)?.minLevel ?? 0;
+  setPreference(sourceSpeciesId, targetSpeciesId, defaultMinLevel);
 }
 
-// Trusts the caller to have already checked requirementMet (same
-// convention digivolve() follows for its level requirement) - the UI only
-// ever commits a blocked option if it bypasses the requirementMet guard
-// itself, so this doesn't re-check before consuming the item.
-export function dedigivolve(instance: DigimonInstance, targetSpeciesId: string): void {
-  removeItem(DEDIGIVOLVE_ITEM_ID, DEDIGIVOLVE_ITEM_COUNT);
+// Called after every xp award (see awardKillXp in combat/xp.ts) - fires a
+// digivolve with no player interaction when: automation is on, this
+// instance's current species has a saved preference, that preference's
+// target is still a real, in-game-reachable option, the option's normal
+// requirement is met, AND the instance's level has crossed the
+// preference's own minLevel (an optional extra floor on top of - never a
+// replacement for - the real requirement).
+export function tryAutoDigivolve(instance: DigimonInstance): void {
+  if (!automation.enabled || instance.eggState) return;
+
+  const preference = automation.preferences[instance.speciesId];
+  if (!preference) return;
+
+  const option = getDigivolveOptions(instance).find((o) => o.species.id === preference.targetSpeciesId);
+  if (!option || !option.requirementMet) return;
+  if (levelForXp(instance.xp) < preference.minLevel) return;
+
+  digivolve(instance, preference.targetSpeciesId);
+}
+
+// False and no-op if the player can't pay the item cost - removeItem
+// already guards against going negative, so the transition only ever
+// happens once the crystal has actually been consumed, even if a caller
+// skips its own requirementMet check.
+export function dedigivolve(instance: DigimonInstance, targetSpeciesId: string): boolean {
+  if (!removeItem(DEDIGIVOLVE_ITEM_ID, DEDIGIVOLVE_ITEM_COUNT)) return false;
   applyTransition(instance, targetSpeciesId);
+  return true;
 }

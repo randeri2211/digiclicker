@@ -10,7 +10,7 @@ falls back to a deterministic hash in EvolutionGraphConverter.py.
 """
 
 ATTACK = "Attack"
-DEFENSE = "Defense"
+HP = "HP"
 SPEED = "Speed"
 SPECIAL_ATTACK = "SpecialAttack"
 
@@ -54,22 +54,22 @@ TYPE_TO_STAT_AFFINITY = {
     "Crustacean": ATTACK,
     "Dark Dragon": ATTACK,
 
-    # Defense - mechanical/composite/mineral/plant/shelled/amorphous archetypes
-    "Cyborg": DEFENSE,
-    "Machine": DEFENSE,
-    "Puppet": DEFENSE,
-    "Composite": DEFENSE,
-    "Enhancement": DEFENSE,
-    "Mineral": DEFENSE,
-    "Weapon": DEFENSE,
-    "Armor": DEFENSE,
-    "Vegetation": DEFENSE,
-    "Rock": DEFENSE,
-    "Mollusk": DEFENSE,
-    "Carnivorous Plant": DEFENSE,
-    "Machine Dragon": DEFENSE,
-    "Rock Dragon": DEFENSE,
-    "Slime": DEFENSE,
+    # HP - mechanical/composite/mineral/plant/shelled/amorphous archetypes
+    "Cyborg": HP,
+    "Machine": HP,
+    "Puppet": HP,
+    "Composite": HP,
+    "Enhancement": HP,
+    "Mineral": HP,
+    "Weapon": HP,
+    "Armor": HP,
+    "Vegetation": HP,
+    "Rock": HP,
+    "Mollusk": HP,
+    "Carnivorous Plant": HP,
+    "Machine Dragon": HP,
+    "Rock Dragon": HP,
+    "Slime": HP,
 
     # Speed - flying/insect/agile archetypes
     "Insectoid": SPEED,

@@ -1,7 +1,7 @@
 <script lang="ts">
   import TeamSlot from './TeamSlot.svelte';
   import type { DigimonInstance } from '../../game/types';
-  import { getSpriteUrl, getEggSpriteUrl } from '../../game/images';
+  import { getSpriteUrl, getEggSpriteUrl, isMysteryEgg } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import { isReadyToDigivolve } from '../../game/state/game.svelte';
 
@@ -40,6 +40,7 @@
         spriteUrl={spriteFor(member)}
         level={levelForXp(member.xp)}
         ready={isReadyToDigivolve(member)}
+        isMystery={isMysteryEgg(member)}
         onClick={onSlotClick && ((event) => onSlotClick(member, event))}
       />
     {/each}
