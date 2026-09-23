@@ -18,9 +18,19 @@ export type { QuestStatus } from '../quests/quests';
 export { inventory } from './inventory.svelte';
 export { buyItem, canAffordItem } from '../items/items';
 export { ITEM_CATALOG } from '../items/itemCatalog';
-export { areaProgress, setActivePath } from './areaProgress.svelte';
+export { areaProgress, setActivePath, travelTo } from './areaProgress.svelte';
 export { AREAS, getArea, getPath } from '../areas/areaRegistry';
-export { isPathUnlocked, isBossAvailable, isBossDefeated, killsOnPath } from '../areas/areaProgress';
+export { isPathUnlocked, isBossAvailable, isBossDefeated, killsOnPath, pathNodeState } from '../areas/areaProgress';
+export type { PathNodeState } from '../areas/areaProgress';
+export {
+  REGIONS,
+  MAP_SIZE,
+  getRegion,
+  getRegionOfArea,
+  isAreaBuilt,
+  isAreaUnlocked,
+  isRegionUnlocked,
+} from '../areas/regionRegistry';
 export { automation, setAutomationEnabled, setPreference, clearPreference } from './digivolveAutomation.svelte';
 export { useAbilityReroll } from '../abilities/abilities';
 export { ABILITY_CATALOG } from '../abilities/abilityCatalog';

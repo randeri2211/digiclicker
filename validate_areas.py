@@ -8,6 +8,10 @@ that doesn't exist) are pure human error with nothing else to catch them -
 this script is that catch, run locally and in CI (see
 .github/workflows/validate-areas.yml).
 
+It also checks src/lib/data/regions.json, the travel maps: every built area
+sits on exactly one region's map, every path has a map position inside the
+map, and routes join areas of the same region.
+
 Stdlib only, no pip install needed.
 """
 import json
@@ -17,6 +21,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 AREAS_DIR = ROOT / "src" / "lib" / "data" / "areas"
 EVOLUTION_DATA_PATH = ROOT / "src" / "lib" / "data" / "digimon-evolution.json"
+REGIONS_PATH = ROOT / "src" / "lib" / "data" / "regions.json"
+
+# Mirrors MapTerrain in src/lib/game/types.ts.
+TERRAINS = {
+    "forest", "savanna", "mountain", "snow", "town", "lake",
+    "ruins", "desert", "dark", "volcano", "sky", "digital",
+}
 
 # Mirrors IN_GAME_STAGES in src/lib/game/constants.ts - duplicated here
 # since this script can't import the TS source. Keep in sync by hand if
@@ -85,7 +96,51 @@ def validate_boss(prefix, boss, paths, species):
     return errors
 
 
-def validate_area_file(path, species):
+def is_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def validate_regions(regions_data, built_area_ids):
+    errors = []
+    size = regions_data.get("mapSize")
+    if not (isinstance(size, list) and len(size) == 2 and all(is_positive_number(v) for v in size)):
+        return ["regions.json: mapSize must be [width, height]"]
+    width, height = size
+
+    region_ids = set()
+    placements = {}
+    for region in regions_data.get("regions", []):
+        rid = region.get("id")
+        if rid in region_ids:
+            errors.append(f"regions.json: duplicate region id {rid!r}")
+        region_ids.add(rid)
+        for field in ("name", "label", "areas", "routes"):
+            if field not in region:
+                errors.append(f"region {rid}: missing field '{field}'")
+        area_ids = set()
+        for area in region.get("areas", []):
+            aid = area.get("id")
+            area_ids.add(aid)
+            placements.setdefault(aid, []).append(rid)
+            if area.get("terrain") not in TERRAINS:
+                errors.append(f"region {rid}: area {aid!r} has unknown terrain {area.get('terrain')!r}")
+            if not (is_number(area.get("x")) and 0 <= area["x"] <= width and is_number(area.get("y")) and 0 <= area["y"] <= height):
+                errors.append(f"region {rid}: area {aid!r} is not inside the {width}x{height} map")
+            if not is_positive_number(area.get("r")):
+                errors.append(f"region {rid}: area {aid!r} needs a positive radius 'r'")
+        for route in region.get("routes", []):
+            if not (isinstance(route, list) and len(route) == 2 and all(end in area_ids for end in route)):
+                errors.append(f"region {rid}: route {route!r} must join two areas of this region")
+
+    for aid, rids in placements.items():
+        if len(rids) > 1:
+            errors.append(f"area {aid!r} is on more than one region map: {rids}")
+    for aid in sorted(built_area_ids - set(placements)):
+        errors.append(f"area {aid!r} has a data file but isn't on any region map in regions.json")
+    return errors
+
+
+def validate_area_file(path, species, map_size):
     errors = []
     area_id = path.stem
 
@@ -115,9 +170,13 @@ def validate_area_file(path, species):
     for path_id, p in paths.items():
         prefix = f"{area_id}:{path_id}"
 
-        for field in ("name", "levelRange", "digimonPool", "mastery", "unlocks"):
+        for field in ("name", "map", "levelRange", "digimonPool", "mastery", "unlocks"):
             if field not in p:
                 errors.append(f"{prefix}: missing field '{field}'")
+        pos = p.get("map")
+        if isinstance(pos, dict) and map_size:
+            if not (is_number(pos.get("x")) and 0 <= pos["x"] <= map_size[0] and is_number(pos.get("y")) and 0 <= pos["y"] <= map_size[1]):
+                errors.append(f"{prefix}: map position {pos!r} is not inside the {map_size[0]}x{map_size[1]} region map")
         if any(f not in p for f in ("levelRange", "digimonPool", "mastery", "unlocks")):
             continue
 
@@ -211,10 +270,13 @@ def main():
         return 0
 
     species = load_species()
+    with open(REGIONS_PATH, encoding="utf-8") as f:
+        regions_data = json.load(f)
+    map_size = regions_data.get("mapSize")
 
-    all_errors = []
+    all_errors = validate_regions(regions_data, {path.stem for path in area_files})
     for path in area_files:
-        all_errors.extend(validate_area_file(path, species))
+        all_errors.extend(validate_area_file(path, species, map_size))
 
     if all_errors:
         print(f"FAILED - {len(all_errors)} problem(s) found across {len(area_files)} area file(s):\n")
