@@ -50,6 +50,14 @@ export const CLICK_DAMAGE_DPS_FRACTION = balance.CLICK_DAMAGE_DPS_FRACTION;
 /** attacksPerSecond = BASE_ATTACKS_PER_SECOND + rosterSpeedSum * SPEED_TO_APS_SCALE */
 export const BASE_ATTACKS_PER_SECOND = balance.BASE_ATTACKS_PER_SECOND;
 export const SPEED_TO_APS_SCALE = balance.SPEED_TO_APS_SCALE;
+/** Boss-fight matchups (see combat/advantage.ts): each edge a squad member
+ * wins against the boss - attribute (Vaccine > Virus > Data > Vaccine) and
+ * element (data/elementChart.json) - adds ADVANTAGE_BONUS to its stat
+ * multiplier; each edge it loses subtracts DISADVANTAGE_PENALTY. Edges add
+ * up: with 0.5 / 0.25 that's 2.0x at best, 0.5x at worst. Boss fights
+ * only - normal wild fights ignore matchups. */
+export const ADVANTAGE_BONUS = balance.ADVANTAGE_BONUS;
+export const DISADVANTAGE_PENALTY = balance.DISADVANTAGE_PENALTY;
 /** How often the combat tick loop polls, in ms - not the attack rate
  * itself (that's attacksPerSecond above), just the granularity ticks get
  * checked/applied at. */

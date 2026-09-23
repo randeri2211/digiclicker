@@ -115,6 +115,16 @@
       ],
     },
     {
+      id: 'matchups',
+      title: 'Boss matchups',
+      note: 'Per edge won (attribute, element) / lost - they add up. Boss fights only.',
+      open: false,
+      fields: [
+        { path: ['ADVANTAGE_BONUS'], label: 'Advantage bonus', step: 0.05 },
+        { path: ['DISADVANTAGE_PENALTY'], label: 'Disadvantage penalty', step: 0.05 },
+      ],
+    },
+    {
       id: 'timer',
       title: 'Fight timer',
       open: true,

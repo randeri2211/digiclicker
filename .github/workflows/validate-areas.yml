@@ -8,6 +8,9 @@ on:
       - 'src/lib/data/mysteryEggWeights.json'
       - 'validate_mystery_eggs.py'
       - 'src/lib/data/digimon-evolution.json'
+      - 'src/lib/data/elementChart.json'
+      - 'element_mapping.py'
+      - 'validate_elements.py'
   pull_request:
     paths:
       - 'src/lib/data/areas/**'
@@ -15,6 +18,9 @@ on:
       - 'src/lib/data/mysteryEggWeights.json'
       - 'validate_mystery_eggs.py'
       - 'src/lib/data/digimon-evolution.json'
+      - 'src/lib/data/elementChart.json'
+      - 'element_mapping.py'
+      - 'validate_elements.py'
 
 jobs:
   validate:
@@ -26,3 +32,4 @@ jobs:
           python-version: '3.12'
       - run: python validate_areas.py
       - run: python validate_mystery_eggs.py
+      - run: python validate_elements.py

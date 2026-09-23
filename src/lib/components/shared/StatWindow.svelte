@@ -4,6 +4,7 @@
   import { levelForXp } from '../../game/combat/levelCurve';
   import { computeEntryStatValue, ABILITY_CATALOG } from '../../game/state/game.svelte';
   import XpBar from './XpBar.svelte';
+  import SpeciesTags from './SpeciesTags.svelte';
 
   interface Props {
     entry: RosterEntry;
@@ -53,6 +54,8 @@
       </div>
       <button class="close-btn" onclick={onClose}>Close</button>
     </div>
+
+    <div class="tags-row"><SpeciesTags speciesId={entry.speciesId} /></div>
 
     <XpBar xp={entry.xp} showNumbers />
 
@@ -151,6 +154,9 @@
   .close-btn:hover {
     border-color: var(--panel-border-strong);
     color: var(--text-h);
+  }
+  .tags-row {
+    display: flex;
   }
   .stat-table {
     width: 100%;

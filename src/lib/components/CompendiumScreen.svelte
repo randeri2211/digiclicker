@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SpeciesTags from './shared/SpeciesTags.svelte';
   import type { Stage } from '../game/types';
   import { IN_GAME_STAGES } from '../game/constants';
   import { getSpecies, getSpeciesIdsByStage, getSpriteUrl } from '../game/images';
@@ -86,6 +87,7 @@
               {/if}
             </div>
             <div class="card-name">{species?.name ?? speciesId}</div>
+            <SpeciesTags {speciesId} />
           </div>
         {:else}
           <div class="card locked">

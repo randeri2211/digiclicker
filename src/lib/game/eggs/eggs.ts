@@ -84,8 +84,9 @@ export function tryHatch(egg: Egg): boolean {
   removeIncubatingEgg(egg.eggId);
   if (addToRoster(createRosterEntry(egg.speciesId))) return true;
 
-  // TODO(human): this species is already owned - turn the egg into a bonus
-  // for `existing` instead of a second copy.
-  const existing = roster[egg.speciesId];
+  // Already owned - the roster holds one entry per species, so the egg
+  // becomes a flat XP bonus for the existing entry instead of a copy
+  // (levelForXp clamps at MAX_LEVEL, so a maxed entry just keeps it).
+  roster[egg.speciesId].xp += DUPLICATE_HATCH_XP;
   return true;
 }

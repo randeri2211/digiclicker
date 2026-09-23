@@ -1,0 +1,12 @@
+{
+  "Fire": ["Plant", "Metal"],
+  "Water": ["Fire", "Earth"],
+  "Plant": ["Water", "Earth"],
+  "Electric": ["Water", "Wind"],
+  "Earth": ["Electric", "Fire"],
+  "Wind": ["Plant"],
+  "Metal": ["Wind", "Electric"],
+  "Light": ["Dark"],
+  "Dark": ["Light"],
+  "Neutral": []
+}

@@ -13,6 +13,7 @@
   import ContextMenu from './shared/ContextMenu.svelte';
   import StatWindow from './shared/StatWindow.svelte';
   import XpBar from './shared/XpBar.svelte';
+  import SpeciesTags from './shared/SpeciesTags.svelte';
 
   interface Props {
     /** speciesId preselects that entry on the Evolution screen. */
@@ -120,6 +121,7 @@
               Lv {levelForXp(row.entry.xp)} · {getSpecies(row.entry.speciesId)?.stage ?? 'Unknown'}
             </div>
             <div class="card-xp"><XpBar xp={row.entry.xp} /></div>
+            <SpeciesTags speciesId={row.entry.speciesId} />
             <div class="card-meta">{row.dps.toFixed(1)} DPS</div>
           </button>
         {/each}
