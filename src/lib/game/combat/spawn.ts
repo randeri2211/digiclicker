@@ -1,4 +1,4 @@
-import type { AreaPath, Stage, WildSpawnState } from '../types';
+import type { AreaPath, BossDefinition, Stage, WildSpawnState } from '../types';
 import { getSpecies, getSpeciesIdsByStage } from '../images';
 import { weightedPick } from '../util/random';
 import {
@@ -26,11 +26,11 @@ export function computeWildMaxHp(speciesId: string, level: number): number {
   return Math.round(WILD_HP_BASE * stageMultiplier * levelMultiplier);
 }
 
-// The roster's summed HP stat (see computeRosterHp in combat/damage.ts)
-// funds how long a fight lasts, through whichever capped curve
-// FIGHT_TIMER_FORMULA picks (see combat/fightTimer.ts). Fixed once at
-// spawn time.
-export function computeFightTimeLimitMs(rosterHp: number): number {
+// Boss fights only (normal wild fights are untimed): the squad's summed
+// HP stat (see computeSquadStat in combat/damage.ts) funds how long the
+// fight lasts, through whichever capped curve FIGHT_TIMER_FORMULA picks
+// (see combat/fightTimer.ts). Fixed once when the fight starts.
+export function computeFightTimeLimitMs(squadHp: number): number {
   const seconds = fightTimerSeconds(
     {
       formula: FIGHT_TIMER_FORMULA,
@@ -40,13 +40,12 @@ export function computeFightTimeLimitMs(rosterHp: number): number {
       fullBonusHp: FIGHT_TIMER_FULL_BONUS_HP,
       powerExponent: FIGHT_TIMER_POWER_EXPONENT,
     },
-    rosterHp
+    squadHp
   );
   return seconds * 1000;
 }
 
-function makeWildSpawn(now: number, speciesId: string, level: number, rosterHp: number): WildSpawnState {
-  const maxHp = computeWildMaxHp(speciesId, level);
+function makeSpawn(now: number, speciesId: string, level: number, maxHp: number, timeLimitMs: number | null): WildSpawnState {
   return {
     speciesId,
     level,
@@ -55,30 +54,42 @@ function makeWildSpawn(now: number, speciesId: string, level: number, rosterHp: 
     lastTickAt: now,
     attackProgress: 0,
     spawnedAt: now,
-    timeLimitMs: computeFightTimeLimitMs(rosterHp),
+    timeLimitMs,
   };
+}
+
+// Normal wild fights are untimed - the wild stays until it falls.
+function makeWildSpawn(now: number, speciesId: string, level: number): WildSpawnState {
+  return makeSpawn(now, speciesId, level, computeWildMaxHp(speciesId, level), null);
+}
+
+// A boss: the species' normal wild HP at the boss level times its
+// hpMultiplier, on a timer funded by the squad's HP.
+export function makeBossSpawn(now: number, boss: BossDefinition, squadHp: number): WildSpawnState {
+  const maxHp = Math.round(computeWildMaxHp(boss.speciesId, boss.level) * boss.hpMultiplier);
+  return makeSpawn(now, boss.speciesId, boss.level, maxHp, computeFightTimeLimitMs(squadHp));
 }
 
 // Weighted-random species pick within the active path's pool, then a
 // uniform level roll in whichever range applies - the entry's own
 // levelRange if it set one (e.g. a weaker regional variant capped lower
 // than the rest of the path), else the path's overall levelRange.
-export function pickNextWildSpawn(now: number, path: AreaPath, rosterHp: number): WildSpawnState {
+export function pickNextWildSpawn(now: number, path: AreaPath): WildSpawnState {
   const chosen = weightedPick(path.digimonPool, (entry) => entry.weight);
   const [min, max] = chosen.levelRange ?? path.levelRange;
   const level = min + Math.floor(Math.random() * (max - min + 1));
 
-  return makeWildSpawn(now, chosen.id, level, rosterHp);
+  return makeWildSpawn(now, chosen.id, level);
 }
 
 // DEBUG: spawns a specific stage+level wild on demand, bypassing the
 // normal area/path spawn pool - for checking HP/damage scaling against
 // any stage without grinding to it. See DebugSpawnPanel.
-export function spawnDebugWild(now: number, stage: Stage, level: number, rosterHp: number): WildSpawnState | null {
+export function spawnDebugWild(now: number, stage: Stage, level: number): WildSpawnState | null {
   const candidates = getSpeciesIdsByStage(stage);
   if (candidates.length === 0) return null;
   const speciesId = candidates[Math.floor(Math.random() * candidates.length)];
-  return makeWildSpawn(now, speciesId, level, rosterHp);
+  return makeWildSpawn(now, speciesId, level);
 }
 
 // XP for defeating a wild of this level, from the kill XP curve in

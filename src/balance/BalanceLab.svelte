@@ -6,6 +6,7 @@
     DEFAULT_SCENARIO,
     summarizeRoster,
     checkPaths,
+    checkBosses,
     maxWinnableLevel,
     wildHp,
     fightTimerSeconds,
@@ -126,7 +127,7 @@
     },
     {
       id: 'timer',
-      title: 'Fight timer',
+      title: 'Boss fight timer',
       open: true,
       describe: (b) => FIGHT_TIMER_FORMULAS.find((f) => f.id === timerFormulaOf(b))?.description,
       fields: [
@@ -139,13 +140,13 @@
         { path: ['FIGHT_TIMER_MAX_BONUS_SECONDS'], label: 'Max bonus seconds', step: 1 },
         {
           path: ['FIGHT_TIMER_HALF_BONUS_HP'],
-          label: 'Roster HP for half bonus',
+          label: 'Squad HP for half bonus',
           step: 1000,
           showIf: (b) => timerFormulaOf(b) === 'halfLife',
         },
         {
           path: ['FIGHT_TIMER_FULL_BONUS_HP'],
-          label: 'Roster HP for full bonus',
+          label: 'Squad HP for full bonus',
           step: 1000,
           showIf: (b) => ['parabola', 'power'].includes(timerFormulaOf(b)),
         },
@@ -350,12 +351,15 @@
     level: Math.max(1, Number(scenario.level) || 1),
     inheritedFromLevel: Math.max(0, Number(scenario.inheritedFromLevel) || 0),
     clicksPerSecond: Math.max(0, Number(scenario.clicksPerSecond) || 0),
+    targetKillSeconds: Math.max(0.1, Number(scenario.targetKillSeconds) || DEFAULT_SCENARIO.targetKillSeconds),
+    bossMatchup: Math.max(0, Number(scenario.bossMatchup) || DEFAULT_SCENARIO.bossMatchup),
   });
 
   // ---- Derived numbers (only from a fully valid draft) ------------------
   const model = $derived(draft && invalidCount === 0 ? draft : saved);
   const summary = $derived(model ? summarizeRoster(model, safeScenario) : null);
   const paths = $derived(model && summary ? checkPaths(model, summary) : []);
+  const bosses = $derived(model ? checkBosses(model, safeScenario) : []);
   const reach = $derived(
     model && summary
       ? STAGES.map((stage) => ({
@@ -439,9 +443,9 @@
     if (!model || !summary) return null;
     const selected = timerFormulaOf(model);
     const ceiling = model.FIGHT_TIMER_BASE_SECONDS + model.FIGHT_TIMER_MAX_BONUS_SECONDS;
-    const rosterHp = Math.max(1, summary.totals.hp);
-    // Wide enough to see every formula flatten out, and the roster's dot.
-    const span = Math.max(100, model.FIGHT_TIMER_HALF_BONUS_HP * 6, model.FIGHT_TIMER_FULL_BONUS_HP * 1.25, rosterHp * 1.25);
+    // Wide enough to see every formula flatten out, and every boss squad's dot.
+    const squadHps = bosses.map((b) => b.squadHp);
+    const span = Math.max(100, model.FIGHT_TIMER_HALF_BONUS_HP * 6, model.FIGHT_TIMER_FULL_BONUS_HP * 1.25, ...squadHps.map((hp) => hp * 1.25));
     const isLog = timerScale.value === 'log';
     const xMax = isLog ? Math.pow(10, Math.ceil(Math.log10(span))) : span;
     const samples = Array.from({ length: 200 }, (_, i) =>
@@ -476,13 +480,11 @@
       series,
       xDomain: [isLog ? 1 : 0, xMax] as [number, number],
       yDomain: [0, Math.max(1, ceiling * 1.08)] as [number, number],
-      markers: [
-        {
-          x: rosterHp,
-          y: fightTimerSeconds(model, rosterHp),
-          label: `Your roster: ${formatCompact(rosterHp)} HP → ${summary.timerSeconds.toFixed(1)}s`,
-        },
-      ],
+      markers: bosses.map((b) => ({
+        x: Math.max(1, b.squadHp),
+        y: b.timerSeconds,
+        label: `${b.bossName} squad: ${formatCompact(b.squadHp)} HP → ${b.timerSeconds.toFixed(1)}s`,
+      })),
     };
   });
 
@@ -566,7 +568,11 @@
     };
   });
 
-  const VERDICT_TEXT = { idle: 'Wins idle', clicking: 'Needs clicking', 'too-hard': 'Too hard' } as const;
+  // Wild fights are untimed: the area check grades kill SPEED against the
+  // target kill time; boss fights are timed: the boss check grades wins.
+  const VERDICT_TEXT = { idle: 'Fast idle', clicking: 'Fast clicking', 'too-hard': 'Slow' } as const;
+  const BOSS_VERDICT_TEXT = { idle: 'Wins idle', clicking: 'Needs clicking', 'too-hard': 'Loses' } as const;
+  const fmtSeconds = (s: number) => (Number.isFinite(s) ? (s >= 100 ? `${Math.round(s)}s` : `${s.toFixed(1)}s`) : '∞');
 </script>
 
 {#snippet scaleToggle(axis: string, setting: { value: AxisScale }, hints: Record<AxisScale, string>)}
@@ -643,6 +649,14 @@
               <span class="field-label">Clicks per second</span>
               <input id="sc-cps" type="number" min="0" step="1" bind:value={scenario.clicksPerSecond} />
             </label>
+            <label class="field" for="sc-target">
+              <span class="field-label">Target seconds per kill</span>
+              <input id="sc-target" type="number" min="1" step="1" bind:value={scenario.targetKillSeconds} />
+            </label>
+            <label class="field" for="sc-matchup">
+              <span class="field-label">Boss squad matchup ×</span>
+              <input id="sc-matchup" type="number" min="0.5" max="2" step="0.25" bind:value={scenario.bossMatchup} />
+            </label>
           </div>
         </section>
 
@@ -713,12 +727,12 @@
             <span class="tile-sub">{safeScenario.clicksPerSecond}/s adds {summary.dps > 0 ? Math.round((safeScenario.clicksPerSecond * summary.clickDamage / summary.dps) * 100) : 0}%</span>
           </div>
           <div class="tile">
-            <span class="tile-label">Fight timer</span>
-            <span class="tile-value">{summary.timerSeconds.toFixed(1)}s</span>
-            <span class="tile-sub">from {formatCompact(summary.totals.hp)} roster HP</span>
+            <span class="tile-label">Target kill time</span>
+            <span class="tile-value">{safeScenario.targetKillSeconds}s</span>
+            <span class="tile-sub">wild fights are untimed</span>
           </div>
           <div class="tile">
-            <span class="tile-label">Damage per fight</span>
+            <span class="tile-label">Damage in {safeScenario.targetKillSeconds}s</span>
             <span class="tile-value">{formatCompact(summary.activeDamagePerFight)}</span>
             <span class="tile-sub">{formatCompact(summary.idleDamagePerFight)} idle</span>
           </div>
@@ -726,11 +740,11 @@
 
         <section class="checks">
           <div class="panel area-check">
-            <h2 class="panel-title">Area check</h2>
+            <h2 class="panel-title">Area check - kill speed</h2>
             <div class="table-scroll">
               <table>
                 <thead>
-                  <tr><th>Path</th><th>Levels</th><th>Toughest spawn</th><th class="num">HP</th><th>Verdict</th></tr>
+                  <tr><th>Path</th><th>Levels</th><th>Toughest spawn</th><th class="num">HP</th><th class="num">Kill time</th><th>Verdict</th></tr>
                 </thead>
                 <tbody>
                   {#each paths as p (p.areaName + p.pathName)}
@@ -739,6 +753,7 @@
                       <td class="num">{p.levelRange[0]}–{p.levelRange[1]}</td>
                       <td>{p.toughestName} <span class="dim">Lv {p.toughestLevel}</span></td>
                       <td class="num">{formatCompact(p.toughestHp)}</td>
+                      <td class="num">{fmtSeconds(p.idleKillSeconds)} <span class="dim">/ {fmtSeconds(p.activeKillSeconds)} clicking</span></td>
                       <td>
                         <span class="pill {p.verdict}">
                           <span class="pill-icon" aria-hidden="true">{p.verdict === 'idle' ? '✓' : p.verdict === 'clicking' ? '!' : '✕'}</span>
@@ -753,7 +768,7 @@
           </div>
 
           <div class="panel reach">
-            <h2 class="panel-title">Highest wild level beaten</h2>
+            <h2 class="panel-title">Killed within {safeScenario.targetKillSeconds}s</h2>
             <div class="reach-list">
               {#each reach as r (r.stage)}
                 <div class="reach-row">
@@ -766,6 +781,43 @@
           </div>
         </section>
 
+        {#if bosses.length}
+          <section class="panel">
+            <h2 class="panel-title">Boss check</h2>
+            <p class="chart-note boss-note">
+              Squad = the example roster's highest-stage members, each at ×{safeScenario.bossMatchup} matchup. Timer from
+              squad HP.
+            </p>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Boss</th><th>Path</th><th class="num">HP</th><th>Squad</th><th class="num">Timer</th><th class="num">Kill time</th><th>Verdict</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each bosses as b (b.areaName + b.pathName)}
+                    <tr>
+                      <td>{b.bossName} <span class="dim">Lv {b.level}</span></td>
+                      <td>{b.pathName}</td>
+                      <td class="num">{formatCompact(b.hp)}</td>
+                      <td>{b.squadText} <span class="dim">of {b.squadSize}</span></td>
+                      <td class="num">{fmtSeconds(b.timerSeconds)}</td>
+                      <td class="num">{fmtSeconds(b.idleKillSeconds)} <span class="dim">/ {fmtSeconds(b.activeKillSeconds)} clicking</span></td>
+                      <td>
+                        <span class="pill {b.verdict}">
+                          <span class="pill-icon" aria-hidden="true">{b.verdict === 'idle' ? '✓' : b.verdict === 'clicking' ? '!' : '✕'}</span>
+                          {BOSS_VERDICT_TEXT[b.verdict]}
+                        </span>
+                      </td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        {/if}
+
         {#if winChart}
           <section class="panel">
             {@render scaleToggle('Y axis', winScale, {
@@ -773,7 +825,7 @@
               linear: 'True shape of the curves - low stages flatten near zero.',
             })}
             <LineChart
-              title="Wild HP vs your damage per fight"
+              title="Wild HP vs your damage in {safeScenario.targetKillSeconds}s"
               series={winChart.series}
               yScale={winScale.value}
               xDomain={[1, levels[levels.length - 1]]}
@@ -785,7 +837,7 @@
               strips={winChart.strips}
               height={380}
             />
-            <p class="chart-note">A wild is beatable where its line sits below yours - your lines are damage dealt inside one fight timer.</p>
+            <p class="chart-note">Wild fights are untimed - a wild falls within the target kill time where its line sits below yours.</p>
           </section>
         {/if}
 
@@ -863,16 +915,16 @@
           {#if timerChart}
             <section class="panel">
               {@render scaleToggle('X axis', timerScale, {
-                log: 'Each gridline is ×10 roster HP.',
+                log: 'Each gridline is ×10 squad HP.',
                 linear: "The formula's true shape.",
               })}
               <LineChart
-                title="Fight timer"
+                title="Boss fight timer"
                 series={timerChart.series}
                 xScale={timerScale.value}
                 xDomain={timerChart.xDomain}
                 yDomain={timerChart.yDomain}
-                xLabel={timerScale.value === 'log' ? 'Roster HP (log)' : 'Roster HP'}
+                xLabel={timerScale.value === 'log' ? 'Squad HP (log)' : 'Squad HP'}
                 yLabel="Seconds"
                 formatX={formatCompact}
                 formatY={(y) => `${+y.toFixed(1)}`}
@@ -1309,6 +1361,9 @@
   .scale-hint {
     color: var(--text-dim-readable);
     margin-left: 4px;
+  }
+  .boss-note {
+    margin: -4px 0 10px;
   }
   .chart-note {
     margin: 8px 0 0;

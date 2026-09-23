@@ -6,44 +6,129 @@
   "paths": {
     "forest-clearing": {
       "name": "Forest Clearing",
-      "levelRange": [1, 10],
-      "digimonPool": [
-        { "id": "botamon", "weight": 2 },
-        { "id": "punimon", "weight": 2 },
-        { "id": "koromon", "weight": 3 },
-        { "id": "tsunomon", "weight": 3 },
-        { "id": "yokomon", "weight": 2 },
-        { "id": "tokomon", "weight": 2 }
+      "levelRange": [
+        1,
+        10
       ],
-      "mastery": { "kills": 25 },
-      "unlocks": ["forest-depths"]
+      "digimonPool": [
+        {
+          "id": "botamon",
+          "weight": 2
+        },
+        {
+          "id": "punimon",
+          "weight": 2
+        },
+        {
+          "id": "koromon",
+          "weight": 3
+        },
+        {
+          "id": "tsunomon",
+          "weight": 3
+        },
+        {
+          "id": "yokomon",
+          "weight": 2
+        },
+        {
+          "id": "tokomon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 25
+      },
+      "unlocks": [
+        "forest-depths"
+      ]
     },
     "forest-depths": {
       "name": "Forest Depths",
-      "levelRange": [8, 20],
-      "digimonPool": [
-        { "id": "agumon", "weight": 3 },
-        { "id": "gabumon", "weight": 3 },
-        { "id": "betamon", "weight": 2 },
-        { "id": "biyomon", "weight": 2 },
-        { "id": "palmon", "weight": 2 },
-        { "id": "gomamon", "weight": 2 },
-        { "id": "tentomon", "weight": 2 },
-        { "id": "patamon", "weight": 2 }
+      "levelRange": [
+        8,
+        20
       ],
-      "mastery": { "kills": 40 },
-      "unlocks": ["forest-heart"]
+      "digimonPool": [
+        {
+          "id": "agumon",
+          "weight": 3
+        },
+        {
+          "id": "gabumon",
+          "weight": 3
+        },
+        {
+          "id": "betamon",
+          "weight": 2
+        },
+        {
+          "id": "biyomon",
+          "weight": 2
+        },
+        {
+          "id": "palmon",
+          "weight": 2
+        },
+        {
+          "id": "gomamon",
+          "weight": 2
+        },
+        {
+          "id": "tentomon",
+          "weight": 2
+        },
+        {
+          "id": "patamon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 40
+      },
+      "unlocks": [
+        "forest-heart"
+      ]
     },
     "forest-heart": {
       "name": "Forest Heart",
-      "levelRange": [18, 30],
-      "digimonPool": [
-        { "id": "greymon", "weight": 2 },
-        { "id": "garurumon", "weight": 2 },
-        { "id": "agumon", "weight": 1, "levelRange": [18, 20] }
+      "levelRange": [
+        18,
+        30
       ],
-      "mastery": { "kills": 50 },
-      "unlocks": []
+      "digimonPool": [
+        {
+          "id": "greymon",
+          "weight": 2
+        },
+        {
+          "id": "garurumon",
+          "weight": 2
+        },
+        {
+          "id": "agumon",
+          "weight": 1,
+          "levelRange": [
+            18,
+            20
+          ]
+        }
+      ],
+      "mastery": {
+        "kills": 50
+      },
+      "unlocks": [],
+      "boss": {
+        "speciesId": "leomon",
+        "level": 32,
+        "squadSize": 3,
+        "hpMultiplier": 5,
+        "rewards": {
+          "bits": 500,
+          "data": 50
+        },
+        "unlocks": []
+      }
     }
   }
 }

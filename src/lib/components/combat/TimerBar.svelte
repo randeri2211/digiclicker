@@ -11,8 +11,10 @@
   // itself - the combat tick loop already updates it ~4x/second, so this
   // recomputes on the same cadence as the rest of combat with no extra
   // timer/interval needed.
-  const remainingMs = $derived(Math.max(0, wild.spawnedAt + wild.timeLimitMs - wild.lastTickAt));
-  const percent = $derived(wild.timeLimitMs > 0 ? Math.max(0, Math.min(100, (remainingMs / wild.timeLimitMs) * 100)) : 0);
+  // Only rendered for timed (boss) fights - see Arena.svelte.
+  const limitMs = $derived(wild.timeLimitMs ?? 0);
+  const remainingMs = $derived(Math.max(0, wild.spawnedAt + limitMs - wild.lastTickAt));
+  const percent = $derived(limitMs > 0 ? Math.max(0, Math.min(100, (remainingMs / limitMs) * 100)) : 0);
   const remainingSeconds = $derived((remainingMs / 1000).toFixed(1));
 </script>
 

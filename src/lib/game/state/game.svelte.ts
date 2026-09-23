@@ -8,11 +8,20 @@ export { buyItem, canAffordItem } from '../items/items';
 export { ITEM_CATALOG } from '../items/itemCatalog';
 export { areaProgress, setActivePath } from './areaProgress.svelte';
 export { AREAS, getArea, getPath } from '../areas/areaRegistry';
-export { isPathUnlocked } from '../areas/areaProgress';
+export { isPathUnlocked, isBossAvailable, isBossDefeated, killsOnPath } from '../areas/areaProgress';
 export { automation, setAutomationEnabled, setPreference, clearPreference } from './digivolveAutomation.svelte';
 export { useAbilityReroll } from '../abilities/abilities';
 export { ABILITY_CATALOG } from '../abilities/abilityCatalog';
-export { combat, handleClick, debugSpawn, applyDebugSpawn } from './combat.svelte';
+export {
+  combat,
+  handleClick,
+  debugSpawn,
+  applyDebugSpawn,
+  startBossFight,
+  retreatBossFight,
+  dismissBossResult,
+  squadMultiplier,
+} from './combat.svelte';
 export { startCombatTickLoop, stopCombatTickLoop } from '../combat/tickLoop';
 export {
   computeRosterDps,

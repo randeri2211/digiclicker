@@ -224,15 +224,13 @@ export interface WildSpawnState {
    * progress isn't lost between polls of the tick loop). */
   attackProgress: number;
   /** When this encounter started - immutable for its lifetime, unlike
-   * lastTickAt (which updates every tick). Paired with timeLimitMs to
-   * know when the fight times out (see combat/spawn.ts,
-   * state/combat.svelte.ts's tick()). */
+   * lastTickAt (which updates every tick). */
   spawnedAt: number;
-  /** This encounter's total duration, fixed at spawn time from the
-   * roster's summed HP stat at that moment (see
-   * computeFightTimeLimitMs in combat/spawn.ts) - doesn't change if
-   * roster HP changes mid-fight. */
-  timeLimitMs: number;
+  /** Total time limit in ms, or null for an untimed encounter. Normal
+   * wild fights are untimed (they last until the wild falls); only boss
+   * fights are timed, funded by the squad's HP (see
+   * computeFightTimeLimitMs in combat/spawn.ts). */
+  timeLimitMs: number | null;
 }
 
 export interface DamagePopupState {
@@ -240,9 +238,37 @@ export interface DamagePopupState {
   id: number;
 }
 
+/** A squad member in a boss fight: a roster species plus its matchup
+ * multiplier against the boss (see combat/advantage.ts), fixed when the
+ * fight starts. */
+export interface SquadMember {
+  speciesId: string;
+  multiplier: number;
+}
+
+/** Present while a boss fight is running - combat.wild then holds the
+ * boss, and only the squad fights it (the rest of the roster sits out). */
+export interface BossFightState {
+  areaId: string;
+  pathId: string;
+  squad: SquadMember[];
+}
+
+/** Shown briefly in the arena after a boss fight ends. */
+export interface BossFightResult {
+  speciesId: string;
+  won: boolean;
+  bits: number;
+  data: number;
+  firstClear: boolean;
+  id: number;
+}
+
 export interface CombatState {
   wild: WildSpawnState | null;
   damagePopup: DamagePopupState | null;
+  boss: BossFightState | null;
+  lastBossResult: BossFightResult | null;
 }
 
 /** One entry in a path's spawn pool. `weight` drives weighted-random
@@ -259,11 +285,28 @@ export interface AreaSpawnEntry {
 /** A single explorable location within an area (see data/areas/*.json).
  * Paths form a DAG via `unlocks` (a list, not a single next-path) - a path
  * can fork into multiple next paths, not just chain linearly. */
+/** A region's boss, on its final path: available once that path's
+ * mastery kill count is reached. Beating it records the path as cleared
+ * (bossesDefeated), pays the rewards (every win, not just the first) and
+ * unlocks `unlocks` - empty until later regions exist. */
+export interface BossDefinition {
+  speciesId: string;
+  level: number;
+  /** Most roster members that can join the fight - per boss, so each boss
+   * can be balanced on its own. */
+  squadSize: number;
+  /** Multiplies the normal wild HP for this species and level. */
+  hpMultiplier: number;
+  rewards: { bits: number; data: number };
+  unlocks: string[];
+}
+
 export interface AreaPath {
   name: string;
   levelRange: [number, number];
   digimonPool: AreaSpawnEntry[];
   mastery: { kills: number };
+  boss?: BossDefinition;
   /** Path ids unlocked once this path's mastery threshold is reached.
    * Same-area only for now - a future `"areaId:pathId"` cross-area form
    * is anticipated by the shape but nothing produces or resolves it yet. */
@@ -288,6 +331,8 @@ export interface AreaProgressState {
   activePathId: string;
   unlockedPaths: Record<string, string[]>;
   killsByPath: Record<string, number>;
+  /** `${areaId}:${pathId}` of every path whose boss has been beaten. */
+  bossesDefeated: string[];
 }
 
 /** A player's chosen (or auto-learned) next digivolve target for a given

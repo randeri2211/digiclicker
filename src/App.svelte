@@ -10,6 +10,7 @@
   import InventoryScreen from './lib/components/InventoryScreen.svelte';
   import ShopScreen from './lib/components/ShopScreen.svelte';
   import CompendiumScreen from './lib/components/CompendiumScreen.svelte';
+  import BossScreen from './lib/components/BossScreen.svelte';
   import {
     startCombatTickLoop,
     stopCombatTickLoop,
@@ -53,6 +54,8 @@
   let inventoryOpen = $state(false);
   let shopOpen = $state(false);
   let compendiumOpen = $state(false);
+  // Boss prep screen target, or null when closed.
+  let bossPrep: { areaId: string; pathId: string } | null = $state(null);
 
   $effect(() => {
     const urls = PRELOAD_SPECIES_IDS.map(getSpriteUrl).filter((url): url is string => url !== null);
@@ -127,7 +130,7 @@
       onOpenCompendium={() => (compendiumOpen = true)}
     />
     <div class="main">
-      <CombatPanel />
+      <CombatPanel onChallengeBoss={(areaId, pathId) => (bossPrep = { areaId, pathId })} />
       <Sidebar onOpenEvolution={openEvolution} />
     </div>
   {/if}
@@ -150,6 +153,10 @@
 
   {#if shopOpen}
     <ShopScreen onClose={() => (shopOpen = false)} />
+  {/if}
+
+  {#if bossPrep}
+    <BossScreen areaId={bossPrep.areaId} pathId={bossPrep.pathId} onClose={() => (bossPrep = null)} />
   {/if}
 
   {#if compendiumOpen}

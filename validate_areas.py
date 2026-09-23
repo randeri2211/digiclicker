@@ -39,6 +39,52 @@ def is_level_range(value):
     )
 
 
+def is_positive_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0
+
+
+def validate_boss(prefix, boss, paths, species):
+    """A path's optional boss: an in-game species, positive level / squad
+    size / HP multiplier, non-negative rewards, and unlock targets that
+    resolve (plain ids in this area; "areaId:pathId" is checked for shape
+    only, since other area files are validated on their own)."""
+    if boss is None:
+        return []
+    if not isinstance(boss, dict):
+        return [f"{prefix}: boss must be an object"]
+    errors = []
+    boss_id = boss.get("speciesId")
+    if boss_id not in species:
+        errors.append(f"{prefix}: boss references unknown species {boss_id!r}")
+    elif species[boss_id]["stage"] not in IN_GAME_STAGES:
+        errors.append(f"{prefix}: boss '{boss_id}' is stage {species[boss_id]['stage']!r}, not an in-game stage")
+    for field in ("level", "squadSize"):
+        value = boss.get(field)
+        if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+            errors.append(f"{prefix}: boss.{field} must be a positive integer, got {value!r}")
+    if not is_positive_number(boss.get("hpMultiplier")):
+        errors.append(f"{prefix}: boss.hpMultiplier must be a positive number, got {boss.get('hpMultiplier')!r}")
+    rewards = boss.get("rewards")
+    if not isinstance(rewards, dict):
+        errors.append(f"{prefix}: boss.rewards must be an object with bits and data")
+    else:
+        for field in ("bits", "data"):
+            value = rewards.get(field)
+            if not isinstance(value, (int, float)) or isinstance(value, bool) or value < 0:
+                errors.append(f"{prefix}: boss.rewards.{field} must be a number >= 0, got {value!r}")
+    unlocks = boss.get("unlocks")
+    if not isinstance(unlocks, list):
+        errors.append(f"{prefix}: boss.unlocks must be a list")
+    else:
+        for target in unlocks:
+            if ":" in target:
+                if len(target.split(":")) != 2 or not all(target.split(":")):
+                    errors.append(f"{prefix}: boss.unlocks '{target}' must be 'areaId:pathId'")
+            elif target not in paths:
+                errors.append(f"{prefix}: boss.unlocks references unknown path '{target}' in this area")
+    return errors
+
+
 def validate_area_file(path, species):
     errors = []
     area_id = path.stem
@@ -131,6 +177,8 @@ def validate_area_file(path, species):
                 # path ids are checked for now.
                 if ":" not in target and target not in paths:
                     errors.append(f"{prefix}: unlocks references unknown path '{target}' in this area")
+
+        errors.extend(validate_boss(prefix, p.get("boss"), paths, species))
 
     # Reachability - BFS from startingPath must reach every path in the file.
     if starting_path in paths:

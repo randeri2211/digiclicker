@@ -44,10 +44,34 @@ export function computeAttacksPerSecond(entries: RosterEntry[]): number {
   return BASE_ATTACKS_PER_SECOND + computeRosterStatTotal(entries, 'speed') * SPEED_TO_APS_SCALE;
 }
 
-// Roster's summed HP stat - funds the per-encounter fight timer (see
-// computeFightTimeLimitMs in combat/spawn.ts).
-export function computeRosterHp(entries: RosterEntry[]): number {
-  return computeRosterStatTotal(entries, 'hp');
+// ---- Boss squads ----------------------------------------------------
+// A boss fight uses only the squad, each member's stats scaled by its
+// matchup multiplier against the boss (see combat/advantage.ts) - the same
+// formulas as the roster versions above, just over a weighted list.
+
+export interface WeightedEntry {
+  entry: RosterEntry;
+  multiplier: number;
+}
+
+export function computeSquadStat(members: WeightedEntry[], statKey: keyof StatBlock): number {
+  return members.reduce((total, m) => total + computeEntryStatValue(m.entry, statKey) * m.multiplier, 0);
+}
+
+export function computeSquadDamagePerHit(members: WeightedEntry[]): number {
+  return computeSquadStat(members, 'attack') + computeSquadStat(members, 'specialAttack');
+}
+
+export function computeSquadAttacksPerSecond(members: WeightedEntry[]): number {
+  return BASE_ATTACKS_PER_SECOND + computeSquadStat(members, 'speed') * SPEED_TO_APS_SCALE;
+}
+
+export function computeSquadDps(members: WeightedEntry[]): number {
+  return computeSquadAttacksPerSecond(members) * computeSquadDamagePerHit(members);
+}
+
+export function computeSquadClickDamage(members: WeightedEntry[]): number {
+  return CLICK_DAMAGE_BASE + computeSquadDps(members) * CLICK_DAMAGE_DPS_FRACTION;
 }
 
 // Aggregate rate (attacks/sec * damage/hit) - not used by the tick loop
