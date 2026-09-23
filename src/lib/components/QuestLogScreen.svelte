@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { QUESTS, questStatus, requirementProgress, completeQuest, ITEM_CATALOG } from '../game/state/game.svelte';
+  import { QUESTS, questStatus, requirementProgress, completeQuest, ITEM_CATALOG, getNpc, NPCS, residentFlag } from '../game/state/game.svelte';
   import type { QuestStatus } from '../game/state/game.svelte';
   import type { QuestDefinition } from '../game/types';
   import { getSpriteUrl } from '../game/images';
@@ -28,6 +28,10 @@
       r.bits ? `${r.bits} bits` : '',
       r.data ? `${r.data} Data` : '',
       ...(r.items ?? []).map((i) => `${i.count}× ${ITEM_CATALOG[i.id]?.name ?? i.id}`),
+      // A resident's join flag reads as the story beat it is.
+      ...Object.values(NPCS)
+        .filter((npc) => r.flags?.includes(residentFlag(npc.id)))
+        .map((npc) => `${npc.name} joins the village`),
     ].filter(Boolean);
     return parts.join(' · ') || '-';
   }
@@ -64,11 +68,12 @@
 
     <div class="list">
       {#each listed as { quest, status } (quest.id)}
-        {@const sprite = quest.giver?.speciesId ? getSpriteUrl(quest.giver.speciesId) : null}
+        {@const giver = getNpc(quest.giver)}
+        {@const sprite = giver ? getSpriteUrl(giver.speciesId) : null}
         <article class="quest" class:ready={status === 'ready'} class:done={status === 'completed'}>
           <div class="giver">
             <div class="giver-sprite">{#if sprite}<img src={sprite} alt="" />{/if}</div>
-            <span class="giver-name">{quest.giver?.name ?? ''}</span>
+            <span class="giver-name">{giver?.name ?? ''}</span>
           </div>
           <div class="body">
             <h3 class="quest-title">{quest.title}</h3>

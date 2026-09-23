@@ -1,0 +1,112 @@
+{
+  "id": "mt-miharashi",
+  "name": "MT. MIHARASHI",
+  "label": "Digital World — File Island",
+  "startingPath": "miharashi-foothills",
+  "paths": {
+    "miharashi-foothills": {
+      "name": "Foothills",
+      "levelRange": [
+        30,
+        34
+      ],
+      "digimonPool": [
+        {
+          "id": "biyomon",
+          "weight": 3
+        },
+        {
+          "id": "muchomon",
+          "weight": 3
+        },
+        {
+          "id": "floramon",
+          "weight": 2
+        },
+        {
+          "id": "numemon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 50
+      },
+      "unlocks": [
+        "mountain-trail"
+      ]
+    },
+    "mountain-trail": {
+      "name": "Mountain Trail",
+      "levelRange": [
+        33,
+        37
+      ],
+      "digimonPool": [
+        {
+          "id": "birdramon",
+          "weight": 3
+        },
+        {
+          "id": "biyomon",
+          "weight": 2
+        },
+        {
+          "id": "kokatorimon",
+          "weight": 2
+        },
+        {
+          "id": "numemon",
+          "weight": 2
+        },
+        {
+          "id": "meramon",
+          "weight": 1
+        }
+      ],
+      "mastery": {
+        "kills": 70
+      },
+      "unlocks": [
+        "summit-crater"
+      ]
+    },
+    "summit-crater": {
+      "name": "Summit Crater",
+      "levelRange": [
+        36,
+        40
+      ],
+      "digimonPool": [
+        {
+          "id": "meramon",
+          "weight": 4
+        },
+        {
+          "id": "birdramon",
+          "weight": 3
+        },
+        {
+          "id": "tyrannomon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 90
+      },
+      "unlocks": [],
+      "boss": {
+        "speciesId": "meramon",
+        "level": 42,
+        "squadSize": 3,
+        "hpMultiplier": 5,
+        "rewards": {
+          "bits": 1000,
+          "data": 70
+        },
+        "unlocks": [
+          "freezeland:frozen-shore"
+        ]
+      }
+    }
+  }
+}

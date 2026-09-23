@@ -2,6 +2,7 @@ import type { ItemId } from '../types';
 import { ITEM_CATALOG } from './itemCatalog';
 import { currency, spendBits } from '../state/currency.svelte';
 import { addItem } from '../state/inventory.svelte';
+import { isSystemUnlocked } from '../village/village';
 
 /** False for items the Shop doesn't sell (costBits null). */
 export function canAffordItem(id: ItemId): boolean {
@@ -13,7 +14,7 @@ export function canAffordItem(id: ItemId): boolean {
  * against going negative, so this never partially applies. */
 export function buyItem(id: ItemId): boolean {
   const cost = ITEM_CATALOG[id].costBits;
-  if (cost === null || !spendBits(cost)) return false;
+  if (cost === null || !isSystemUnlocked('shop') || !spendBits(cost)) return false;
   addItem(id);
   return true;
 }

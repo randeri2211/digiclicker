@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'src/lib/data/quests.json'
+      - 'src/lib/data/npcs.json'
       - 'validate_quests.py'
       - 'src/lib/game/items/itemCatalog.ts'
       - 'src/lib/data/areas/**'
@@ -18,6 +19,7 @@ on:
   pull_request:
     paths:
       - 'src/lib/data/quests.json'
+      - 'src/lib/data/npcs.json'
       - 'validate_quests.py'
       - 'src/lib/game/items/itemCatalog.ts'
       - 'src/lib/data/areas/**'

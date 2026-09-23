@@ -1,0 +1,108 @@
+{
+  "id": "misty-lake",
+  "name": "MISTY LAKE",
+  "label": "Digital World — File Island",
+  "startingPath": "lakeshore",
+  "paths": {
+    "lakeshore": {
+      "name": "Lakeshore",
+      "levelRange": [
+        38,
+        42
+      ],
+      "digimonPool": [
+        {
+          "id": "otamamon",
+          "weight": 3
+        },
+        {
+          "id": "syakomon",
+          "weight": 3
+        },
+        {
+          "id": "gomamon",
+          "weight": 2
+        },
+        {
+          "id": "gekomon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 50
+      },
+      "unlocks": [
+        "foggy-shallows"
+      ]
+    },
+    "foggy-shallows": {
+      "name": "Foggy Shallows",
+      "levelRange": [
+        41,
+        45
+      ],
+      "digimonPool": [
+        {
+          "id": "gekomon",
+          "weight": 3
+        },
+        {
+          "id": "shellmon",
+          "weight": 3
+        },
+        {
+          "id": "octomon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 70
+      },
+      "unlocks": [
+        "deep-water"
+      ]
+    },
+    "deep-water": {
+      "name": "Deep Water",
+      "levelRange": [
+        43,
+        47
+      ],
+      "digimonPool": [
+        {
+          "id": "seadramon",
+          "weight": 3
+        },
+        {
+          "id": "octomon",
+          "weight": 3
+        },
+        {
+          "id": "shellmon",
+          "weight": 2
+        },
+        {
+          "id": "gesomon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 90
+      },
+      "unlocks": [],
+      "boss": {
+        "speciesId": "seadramon",
+        "level": 49,
+        "squadSize": 3,
+        "hpMultiplier": 5,
+        "rewards": {
+          "bits": 1600,
+          "data": 100
+        },
+        "unlocks": [
+          "ancient-ruins:outer-ruins"
+        ]
+      }
+    }
+  }
+}

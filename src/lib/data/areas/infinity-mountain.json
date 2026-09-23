@@ -1,0 +1,117 @@
+{
+  "id": "infinity-mountain",
+  "name": "INFINITY MOUNTAIN",
+  "label": "Digital World — File Island",
+  "startingPath": "mountain-base",
+  "paths": {
+    "mountain-base": {
+      "name": "Mountain Base",
+      "levelRange": [
+        42,
+        46
+      ],
+      "digimonPool": [
+        {
+          "id": "demidevimon",
+          "weight": 3
+        },
+        {
+          "id": "bakemon",
+          "weight": 3
+        },
+        {
+          "id": "meramon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 60
+      },
+      "unlocks": [
+        "ogremons-pass"
+      ]
+    },
+    "ogremons-pass": {
+      "name": "Ogremon's Pass",
+      "levelRange": [
+        45,
+        48
+      ],
+      "digimonPool": [
+        {
+          "id": "ogremon",
+          "weight": 3
+        },
+        {
+          "id": "bakemon",
+          "weight": 3
+        },
+        {
+          "id": "demidevimon",
+          "weight": 2
+        },
+        {
+          "id": "devidramon",
+          "weight": 1
+        }
+      ],
+      "mastery": {
+        "kills": 80
+      },
+      "unlocks": [],
+      "boss": {
+        "speciesId": "ogremon",
+        "level": 49,
+        "squadSize": 3,
+        "hpMultiplier": 5,
+        "rewards": {
+          "bits": 1500,
+          "data": 80
+        },
+        "unlocks": [
+          "the-peak"
+        ]
+      }
+    },
+    "the-peak": {
+      "name": "The Peak",
+      "levelRange": [
+        47,
+        50
+      ],
+      "digimonPool": [
+        {
+          "id": "devidramon",
+          "weight": 3
+        },
+        {
+          "id": "bakemon",
+          "weight": 3
+        },
+        {
+          "id": "ogremon",
+          "weight": 2
+        },
+        {
+          "id": "meramon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 100
+      },
+      "unlocks": [],
+      "boss": {
+        "speciesId": "devimon",
+        "level": 52,
+        "squadSize": 4,
+        "hpMultiplier": 6,
+        "rewards": {
+          "bits": 3000,
+          "data": 150
+        },
+        "unlocks": []
+      }
+    }
+  }
+}

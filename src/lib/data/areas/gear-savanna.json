@@ -1,0 +1,116 @@
+{
+  "id": "gear-savanna",
+  "name": "GEAR SAVANNA",
+  "label": "Digital World — File Island",
+  "startingPath": "savanna-plains",
+  "paths": {
+    "savanna-plains": {
+      "name": "Savanna Plains",
+      "levelRange": [
+        25,
+        30
+      ],
+      "digimonPool": [
+        {
+          "id": "gotsumon",
+          "weight": 3
+        },
+        {
+          "id": "gazimon",
+          "weight": 3
+        },
+        {
+          "id": "kunemon",
+          "weight": 2
+        },
+        {
+          "id": "muchomon",
+          "weight": 2
+        },
+        {
+          "id": "monochromon",
+          "weight": 1
+        }
+      ],
+      "mastery": {
+        "kills": 50
+      },
+      "unlocks": [
+        "gear-canyon"
+      ]
+    },
+    "gear-canyon": {
+      "name": "Gear Canyon",
+      "levelRange": [
+        29,
+        34
+      ],
+      "digimonPool": [
+        {
+          "id": "kokatorimon",
+          "weight": 3
+        },
+        {
+          "id": "kuwagamon",
+          "weight": 3
+        },
+        {
+          "id": "drimogemon",
+          "weight": 2
+        },
+        {
+          "id": "gotsumon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 70
+      },
+      "unlocks": [
+        "stampede-grounds"
+      ]
+    },
+    "stampede-grounds": {
+      "name": "Stampede Grounds",
+      "levelRange": [
+        33,
+        38
+      ],
+      "digimonPool": [
+        {
+          "id": "monochromon",
+          "weight": 3
+        },
+        {
+          "id": "tyrannomon",
+          "weight": 3
+        },
+        {
+          "id": "kuwagamon",
+          "weight": 2
+        },
+        {
+          "id": "kokatorimon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 90
+      },
+      "unlocks": [],
+      "boss": {
+        "speciesId": "monochromon",
+        "level": 40,
+        "squadSize": 3,
+        "hpMultiplier": 5,
+        "rewards": {
+          "bits": 800,
+          "data": 60
+        },
+        "unlocks": [
+          "mt-miharashi:miharashi-foothills"
+        ]
+      }
+    }
+  }
+}

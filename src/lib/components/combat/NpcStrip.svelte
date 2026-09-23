@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { QUESTS, questStatus, areaProgress, requirementProgress } from '../../game/state/game.svelte';
+  import { QUESTS, questStatus, areaProgress, requirementProgress, getNpc } from '../../game/state/game.svelte';
   import { getSpriteUrl } from '../../game/images';
 
   interface Props {
@@ -29,11 +29,12 @@
 {#if open.length}
   <div class="npc-strip" aria-label="Quests in this area">
     {#each open as { quest, status } (quest.id)}
-      {@const sprite = quest.giver?.speciesId ? getSpriteUrl(quest.giver.speciesId) : null}
-      <button class="npc" class:ready={status === 'ready'} onclick={onOpenQuests} title="{quest.giver?.name ?? 'Quest'}: {quest.title}">
+      {@const giver = getNpc(quest.giver)}
+      {@const sprite = giver ? getSpriteUrl(giver.speciesId) : null}
+      <button class="npc" class:ready={status === 'ready'} onclick={onOpenQuests} title="{giver?.name ?? 'Quest'}: {quest.title}">
         <span class="npc-sprite">{#if sprite}<img src={sprite} alt="" />{/if}</span>
         <span class="npc-text">
-          <span class="npc-name">{quest.giver?.name ?? 'Quest'}</span>
+          <span class="npc-name">{giver?.name ?? 'Quest'}</span>
           <span class="npc-quest">{quest.title}{#if status === 'active' && progressText(quest.id)} · {progressText(quest.id)}{/if}</span>
         </span>
         {#if status === 'ready'}<span class="bang" aria-label="ready to complete">!</span>{/if}

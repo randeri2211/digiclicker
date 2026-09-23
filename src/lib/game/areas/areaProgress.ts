@@ -1,5 +1,5 @@
 import type { AreaPath, AreaProgressState } from '../types';
-import { getArea, getPath, STARTING_AREA_ID } from './areaRegistry';
+import { AREAS, getArea, getPath, STARTING_AREA_ID } from './areaRegistry';
 
 export function pathKey(areaId: string, pathId: string): string {
   return `${areaId}:${pathId}`;
@@ -33,7 +33,11 @@ export function killsOnPath(progress: AreaProgressState, areaId: string, pathId:
 // in another area (how a boss opens the next region). Idempotent.
 function unlockPath(progress: AreaProgressState, fromAreaId: string, ref: string): void {
   const [areaId, pathId] = ref.includes(':') ? ref.split(':', 2) : [fromAreaId, ref];
-  const unlocked = progress.unlockedPaths[areaId] ?? (progress.unlockedPaths[areaId] = []);
+  // Create, then read back through `progress`: with $state, `(obj[k] = [])`
+  // evaluates to the raw array, and pushing to that skips reactivity (the
+  // unlock would only show after a reload).
+  if (!progress.unlockedPaths[areaId]) progress.unlockedPaths[areaId] = [];
+  const unlocked = progress.unlockedPaths[areaId];
   if (!unlocked.includes(pathId)) unlocked.push(pathId);
 }
 
@@ -53,6 +57,25 @@ export function recordActivePathKill(progress: AreaProgressState): void {
 
   if (kills < path.mastery.kills) return;
   for (const ref of path.unlocks) unlockPath(progress, progress.activeAreaId, ref);
+}
+
+/** Re-applies every unlock the player has already earned, from the
+ * current area data: mastered paths' `unlocks` and beaten bosses'
+ * `unlocks`. Run on load, so content added after the fact (e.g. a boss
+ * that now opens a new area) reaches old saves - unlocks are stored as
+ * results, and would otherwise only ever apply at the moment they're
+ * earned. Only ever adds; idempotent. */
+export function reapplyEarnedUnlocks(progress: AreaProgressState): void {
+  for (const [areaId, area] of Object.entries(AREAS)) {
+    for (const [pathId, path] of Object.entries(area.paths)) {
+      if (killsOnPath(progress, areaId, pathId) >= path.mastery.kills) {
+        for (const ref of path.unlocks) unlockPath(progress, areaId, ref);
+      }
+      if (path.boss && isBossDefeated(progress, areaId, pathId)) {
+        for (const ref of path.boss.unlocks) unlockPath(progress, areaId, ref);
+      }
+    }
+  }
 }
 
 /** The path has a boss and its mastery kill count has been reached. */

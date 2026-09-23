@@ -1,0 +1,93 @@
+{
+  "jijimon": {
+    "id": "jijimon",
+    "name": "Jijimon",
+    "speciesId": "jijimon",
+    "homeAreaId": "forest-sector",
+    "role": "The village elder. Keeps the quest log and the story of the Black Gears.",
+    "resident": true,
+    "startsInVillage": true
+  },
+  "tentomon": {
+    "id": "tentomon",
+    "name": "Tentomon",
+    "speciesId": "tentomon",
+    "homeAreaId": "forest-sector",
+    "role": "A curious explorer - sends parties out to survey the island.",
+    "resident": true,
+    "systems": ["expeditions"]
+  },
+  "leomon": {
+    "id": "leomon",
+    "name": "Leomon",
+    "speciesId": "leomon",
+    "homeAreaId": "forest-sector",
+    "role": "The forest's guardian, freed from a Black Gear. Escorts you across the island.",
+    "resident": true
+  },
+  "elecmon": {
+    "id": "elecmon",
+    "name": "Elecmon",
+    "speciesId": "elecmon",
+    "homeAreaId": "gear-savanna",
+    "role": "Caretaker of the island's eggs - builds new incubation slots.",
+    "resident": true,
+    "systems": ["hatchery-upgrades"]
+  },
+  "yokomon-village": {
+    "id": "yokomon-village",
+    "name": "Yokomon Village",
+    "speciesId": "yokomon",
+    "homeAreaId": "mt-miharashi",
+    "role": "Biyomon's villagers, saved from the mountain's fire - run the Mystery Egg stall.",
+    "resident": true,
+    "systems": ["mystery-eggs"]
+  },
+  "frigimon": {
+    "id": "frigimon",
+    "name": "Frigimon",
+    "speciesId": "frigimon",
+    "homeAreaId": "freezeland",
+    "role": "Freezeland's gentle keeper, lost in a blizzard that never ends."
+  },
+  "hagurumon": {
+    "id": "hagurumon",
+    "name": "Hagurumon",
+    "speciesId": "hagurumon",
+    "homeAreaId": "factorial-town",
+    "role": "A stray cog from the factory that builds itself."
+  },
+  "andromon": {
+    "id": "andromon",
+    "name": "Andromon",
+    "speciesId": "andromon",
+    "homeAreaId": "factorial-town",
+    "role": "The factory's master, freed from its core - opens the Shop.",
+    "resident": true,
+    "systems": ["shop"]
+  },
+  "whamon": {
+    "id": "whamon",
+    "name": "Whamon",
+    "speciesId": "whamon",
+    "homeAreaId": "misty-lake",
+    "role": "The lake's gentle giant - will carry you across the sea.",
+    "resident": true,
+    "systems": ["continent-travel"]
+  },
+  "kiwimon": {
+    "id": "kiwimon",
+    "name": "Kiwimon",
+    "speciesId": "kiwimon",
+    "homeAreaId": "ancient-ruins",
+    "role": "A ruin-dweller who knows every carving by heart."
+  },
+  "centarumon": {
+    "id": "centarumon",
+    "name": "Centarumon",
+    "speciesId": "centarumon",
+    "homeAreaId": "ancient-ruins",
+    "role": "Guardian of the ruins, freed - reads the eight symbols of the Crests.",
+    "resident": true
+  }
+}

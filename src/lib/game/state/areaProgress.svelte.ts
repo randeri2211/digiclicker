@@ -1,6 +1,8 @@
 import type { AreaProgressState } from '../types';
 import { initialAreaProgress, isPathUnlocked } from '../areas/areaProgress';
 import { combat } from './combat.svelte';
+import { getRegionOfArea } from '../areas/regionRegistry';
+import { isSystemUnlocked } from '../village/village';
 
 export const areaProgress: AreaProgressState = $state(initialAreaProgress());
 
@@ -12,6 +14,9 @@ export const areaProgress: AreaProgressState = $state(initialAreaProgress());
 export function travelTo(areaId: string, pathId: string): void {
   if (combat.boss) return;
   if (!isPathUnlocked(areaProgress, areaId, pathId)) return;
+  // Crossing to another region (continent) needs Whamon.
+  const crossing = getRegionOfArea(areaId) !== getRegionOfArea(areaProgress.activeAreaId);
+  if (crossing && !isSystemUnlocked('continent-travel')) return;
   if (areaId === areaProgress.activeAreaId && pathId === areaProgress.activePathId) return;
   areaProgress.activeAreaId = areaId;
   areaProgress.activePathId = pathId;

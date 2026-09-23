@@ -3,11 +3,12 @@
   import EvolutionBadgeButton from './EvolutionBadgeButton.svelte';
   import RosterButton from './RosterButton.svelte';
   import InventoryButton from './InventoryButton.svelte';
-  import ShopButton from './ShopButton.svelte';
   import HudButton from './HudButton.svelte';
   import CompendiumButton from './CompendiumButton.svelte';
   import SettingsButton from './SettingsButton.svelte';
-  import { currency, expeditions, QUESTS, questStatus } from '../../game/state/game.svelte';
+  import { currency, expeditions, QUESTS, questStatus, isSystemUnlocked, lockedHint } from '../../game/state/game.svelte';
+  import { pushToast } from '../../game/state/notifications.svelte';
+  import type { SystemId } from '../../game/types';
 
   interface Props {
     onOpenSettings: () => void;
@@ -18,10 +19,32 @@
     onOpenCompendium: () => void;
     onOpenExpeditions: () => void;
     onOpenQuests: () => void;
+    onOpenVillage: () => void;
   }
 
-  const { onOpenSettings, onOpenEvolution, onOpenRoster, onOpenInventory, onOpenShop, onOpenCompendium, onOpenExpeditions, onOpenQuests }: Props =
-    $props();
+  const {
+    onOpenSettings,
+    onOpenEvolution,
+    onOpenRoster,
+    onOpenInventory,
+    onOpenShop,
+    onOpenCompendium,
+    onOpenExpeditions,
+    onOpenQuests,
+    onOpenVillage,
+  }: Props = $props();
+
+  // A button for a village-gated system: opens it once unlocked, otherwise
+  // says who unlocks it.
+  function gated(systems: SystemId[], open: () => void) {
+    return () => {
+      if (systems.some(isSystemUnlocked)) open();
+      else pushToast('Locked', lockedHint(systems[0]));
+    };
+  }
+  const expeditionsLocked = $derived(!isSystemUnlocked('expeditions'));
+  // The Shop opens with either half: the Mystery Egg stall comes first.
+  const shopLocked = $derived(!isSystemUnlocked('shop') && !isSystemUnlocked('mystery-eggs'));
 
   // Parties back home with a haul waiting to be claimed.
   const expeditionsReady = $derived(expeditions.active.filter((e) => e.returned).length);
@@ -37,7 +60,12 @@
   </div>
   <EvolutionBadgeButton onClick={onOpenEvolution} />
   <RosterButton onClick={onOpenRoster} />
-  <HudButton title="Expeditions" onClick={onOpenExpeditions} badge={expeditionsReady}>
+  <HudButton
+    title={expeditionsLocked ? `Expeditions - ${lockedHint('expeditions')}` : 'Expeditions'}
+    locked={expeditionsLocked}
+    onClick={gated(['expeditions'], onOpenExpeditions)}
+    badge={expeditionsReady}
+  >
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6" />
       <path d="M15.5 8.5l-2 5-5 2 2-5 5-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
@@ -50,7 +78,25 @@
     </svg>
   </HudButton>
   <InventoryButton onClick={onOpenInventory} />
-  <ShopButton onClick={onOpenShop} />
+  <HudButton
+    title={shopLocked ? `Shop - ${lockedHint('mystery-eggs')}` : 'Shop'}
+    locked={shopLocked}
+    onClick={gated(['mystery-eggs', 'shop'], onOpenShop)}
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M4 9L5.5 4H18.5L20 9" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+      <path d="M4 9V19C4 19.5523 4.44772 20 5 20H19C19.5523 20 20 19.5523 20 19V9" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+      <path d="M4 9H20" stroke="currentColor" stroke-width="1.6" />
+      <path d="M9 20V14H15V20" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+    </svg>
+  </HudButton>
+  <HudButton title="Village" onClick={onOpenVillage}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 11l5-4 5 4v9H3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+      <path d="M13 13l4-3 4 3v7h-8" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+      <path d="M6.5 20v-4h3v4" stroke="currentColor" stroke-width="1.5" />
+    </svg>
+  </HudButton>
   <CompendiumButton onClick={onOpenCompendium} />
   <SettingsButton onClick={onOpenSettings} />
 </div>

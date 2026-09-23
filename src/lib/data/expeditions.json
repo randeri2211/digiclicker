@@ -49,5 +49,41 @@
         { "id": "hp-disk", "chancePercent": 20, "count": [1, 1] }
       ]
     }
+  },
+  "frozen-caverns": {
+    "id": "frozen-caverns",
+    "name": "Frozen Caverns",
+    "description": "Ice tunnels under Freezeland, where the blizzard can't reach. Water- and wind-loving Digimon bring back more.",
+    "areaId": "freezeland",
+    "unlockPathId": "blizzards-eye",
+    "favoredElements": ["Water", "Wind"],
+    "durationMinutes": 90,
+    "loot": {
+      "data": [180, 280],
+      "eggChancePercent": 15,
+      "eggTypes": ["Aquatic"],
+      "items": [
+        { "id": "hp-disk", "chancePercent": 30, "count": [1, 1] },
+        { "id": "speed-chip", "chancePercent": 20, "count": [1, 1] }
+      ]
+    }
+  },
+  "factory-scrapyard": {
+    "id": "factory-scrapyard",
+    "name": "Factory Scrapyard",
+    "description": "Mountains of discarded parts behind Factorial Town. Metal- and electric-type Digimon bring back more.",
+    "areaId": "factorial-town",
+    "unlockPathId": "factory-core",
+    "favoredElements": ["Metal", "Electric"],
+    "durationMinutes": 120,
+    "loot": {
+      "data": [250, 380],
+      "eggChancePercent": 15,
+      "eggTypes": ["Machine"],
+      "items": [
+        { "id": "attack-chip", "chancePercent": 35, "count": [1, 2] },
+        { "id": "speed-chip", "chancePercent": 25, "count": [1, 1] }
+      ]
+    }
   }
 }

@@ -2,13 +2,14 @@
 // than reaching into individual state modules directly.
 export { currency } from './currency.svelte';
 export { roster, isOwned, getRosterList } from './roster.svelte';
-export { hatchery, addEgg } from './hatchery.svelte';
+export { hatchery, addEgg, hatcherySlotCost, buyHatcherySlot } from './hatchery.svelte';
 export {
   expeditions,
   isAway,
   getFightingRoster,
   startExpedition,
   claimExpedition,
+  hasReturned,
   dismissHaul,
 } from './expeditions.svelte';
 export { progress, hasFlag, setFlag } from './progress.svelte';
@@ -31,6 +32,17 @@ export {
   isAreaUnlocked,
   isRegionUnlocked,
 } from '../areas/regionRegistry';
+export { layoutPathNodes } from '../areas/mapLayout';
+export {
+  NPCS,
+  getNpc,
+  getResidents,
+  hasJoined,
+  isSystemUnlocked,
+  lockedHint,
+  residentFlag,
+  SYSTEM_NAMES,
+} from '../village/village';
 export { automation, setAutomationEnabled, setPreference, clearPreference } from './digivolveAutomation.svelte';
 export { useAbilityReroll } from '../abilities/abilities';
 export { ABILITY_CATALOG } from '../abilities/abilityCatalog';

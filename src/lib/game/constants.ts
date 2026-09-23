@@ -19,6 +19,10 @@ import type { CurveFormula } from './combat/levelCurveFormulas';
  * state/hatchery.svelte.ts). */
 export const HATCHERY_STARTING_CAPACITY = balance.HATCHERY_STARTING_CAPACITY;
 export const HATCHERY_MAX_CAPACITY = balance.HATCHERY_MAX_CAPACITY;
+/** Bits for an extra incubation slot (Elecmon's hatchery upgrades): the
+ * first bought slot costs the base, each next one x GROWTH. */
+export const HATCHERY_SLOT_BASE_COST = balance.HATCHERY_SLOT_BASE_COST;
+export const HATCHERY_SLOT_COST_GROWTH = balance.HATCHERY_SLOT_COST_GROWTH;
 
 // ---- Digivolution requirements & scope ----------------------------
 /** Level the source must reach before digivolving into a species at the
