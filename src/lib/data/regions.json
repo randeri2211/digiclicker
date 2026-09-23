@@ -1,0 +1,126 @@
+{
+  "mapSize": [1000, 340],
+  "regions": [
+    {
+      "id": "file-island",
+      "name": "File Island",
+      "label": "Act 1",
+      "background": null,
+      "areas": [
+        { "id": "forest-sector", "name": "Forest Sector", "terrain": "forest", "x": 170, "y": 235, "r": 78 },
+        { "id": "gear-savanna", "name": "Gear Savanna", "terrain": "savanna", "x": 370, "y": 265, "r": 55 },
+        { "id": "mt-miharashi", "name": "Mt. Miharashi", "terrain": "mountain", "x": 575, "y": 270, "r": 51 },
+        { "id": "freezeland", "name": "Freezeland", "terrain": "snow", "x": 830, "y": 215, "r": 80 },
+        { "id": "factorial-town", "name": "Factorial Town", "terrain": "town", "x": 800, "y": 85, "r": 62 },
+        { "id": "misty-lake", "name": "Misty Lake", "terrain": "lake", "x": 595, "y": 85, "r": 62 },
+        { "id": "ancient-ruins", "name": "Ancient Ruins", "terrain": "ruins", "x": 380, "y": 85, "r": 62 },
+        { "id": "infinity-mountain", "name": "Infinity Mountain", "terrain": "dark", "x": 485, "y": 175, "r": 55 }
+      ],
+      "routes": [
+        ["forest-sector", "gear-savanna"],
+        ["gear-savanna", "mt-miharashi"],
+        ["mt-miharashi", "freezeland"],
+        ["freezeland", "factorial-town"],
+        ["factorial-town", "misty-lake"],
+        ["misty-lake", "ancient-ruins"],
+        ["ancient-ruins", "infinity-mountain"]
+      ]
+    },
+    {
+      "id": "server-continent",
+      "name": "Server Continent",
+      "label": "Act 2",
+      "background": null,
+      "areas": [
+        { "id": "koromon-village", "name": "Koromon Village", "terrain": "town", "x": 140, "y": 170, "r": 70 },
+        { "id": "dry-desert", "name": "Dry Desert", "terrain": "desert", "x": 330, "y": 260, "r": 59 },
+        { "id": "the-diner", "name": "The Diner", "terrain": "town", "x": 330, "y": 80, "r": 59 },
+        { "id": "gekomon-lake", "name": "Gekomon Lake", "terrain": "lake", "x": 520, "y": 80, "r": 59 },
+        { "id": "piximons-forest", "name": "Piximon's Forest", "terrain": "forest", "x": 520, "y": 260, "r": 59 },
+        { "id": "toy-town", "name": "Toy Town", "terrain": "town", "x": 705, "y": 85, "r": 60 },
+        { "id": "ogremons-road", "name": "Ogremon's Road", "terrain": "savanna", "x": 705, "y": 260, "r": 59 },
+        { "id": "datamons-pyramid", "name": "Datamon's Pyramid", "terrain": "desert", "x": 840, "y": 170, "r": 60 },
+        { "id": "etemons-network", "name": "Etemon's Network", "terrain": "digital", "x": 950, "y": 170, "r": 35 }
+      ],
+      "routes": [
+        ["koromon-village", "dry-desert"],
+        ["koromon-village", "the-diner"],
+        ["koromon-village", "gekomon-lake"],
+        ["koromon-village", "piximons-forest"],
+        ["the-diner", "gekomon-lake"],
+        ["dry-desert", "piximons-forest"],
+        ["gekomon-lake", "toy-town"],
+        ["piximons-forest", "ogremons-road"],
+        ["toy-town", "datamons-pyramid"],
+        ["ogremons-road", "datamons-pyramid"],
+        ["datamons-pyramid", "etemons-network"]
+      ]
+    },
+    {
+      "id": "myotismons-domain",
+      "name": "Myotismon's Domain",
+      "label": "Act 3",
+      "background": null,
+      "areas": [
+        { "id": "haunted-hollow", "name": "Haunted Hollow", "terrain": "dark", "x": 170, "y": 200, "r": 80 },
+        { "id": "wizardmons-tower", "name": "Wizardmon's Tower", "terrain": "ruins", "x": 400, "y": 95, "r": 70 },
+        { "id": "the-crypts", "name": "The Crypts", "terrain": "dark", "x": 420, "y": 255, "r": 62 },
+        { "id": "armor-digi-egg-vault", "name": "Armor Digi-Egg Vault", "terrain": "ruins", "x": 640, "y": 270, "r": 51 },
+        { "id": "myotismons-castle", "name": "Myotismon's Castle", "terrain": "dark", "x": 810, "y": 140, "r": 85 }
+      ],
+      "routes": [
+        ["haunted-hollow", "wizardmons-tower"],
+        ["haunted-hollow", "the-crypts"],
+        ["wizardmons-tower", "myotismons-castle"],
+        ["the-crypts", "myotismons-castle"],
+        ["the-crypts", "armor-digi-egg-vault"]
+      ]
+    },
+    {
+      "id": "spiral-mountain",
+      "name": "Spiral Mountain",
+      "label": "Act 4",
+      "background": null,
+      "areas": [
+        { "id": "poisoned-sea", "name": "Poisoned Sea", "terrain": "lake", "x": 150, "y": 235, "r": 78 },
+        { "id": "toy-forest", "name": "Toy Forest", "terrain": "forest", "x": 330, "y": 100, "r": 74 },
+        { "id": "machine-city", "name": "Machine City", "terrain": "town", "x": 540, "y": 240, "r": 74 },
+        { "id": "circus-grounds", "name": "Circus Grounds", "terrain": "dark", "x": 710, "y": 95, "r": 70 },
+        { "id": "wall-of-fire", "name": "The Wall of Fire", "terrain": "volcano", "x": 885, "y": 200, "r": 75 }
+      ],
+      "routes": [
+        ["poisoned-sea", "toy-forest"],
+        ["toy-forest", "machine-city"],
+        ["machine-city", "circus-grounds"],
+        ["circus-grounds", "wall-of-fire"]
+      ]
+    },
+    {
+      "id": "beyond-the-wall",
+      "name": "Beyond the Wall",
+      "label": "Post-game",
+      "background": null,
+      "areas": [
+        { "id": "azulongmons-realm", "name": "Azulongmon's Realm", "terrain": "sky", "x": 110, "y": 80, "r": 55 },
+        { "id": "baihumons-realm", "name": "Baihumon's Realm", "terrain": "mountain", "x": 330, "y": 80, "r": 55 },
+        { "id": "zhuqiaomons-realm", "name": "Zhuqiaomon's Realm", "terrain": "volcano", "x": 110, "y": 260, "r": 55 },
+        { "id": "ebonwumons-realm", "name": "Ebonwumon's Realm", "terrain": "forest", "x": 330, "y": 260, "r": 55 },
+        { "id": "huanglongmons-trial", "name": "Huanglongmon's Trial", "terrain": "sky", "x": 220, "y": 170, "r": 50 },
+        { "id": "royal-knights-castle", "name": "Royal Knights' Castle", "terrain": "town", "x": 580, "y": 90, "r": 66 },
+        { "id": "dark-area", "name": "The Dark Area", "terrain": "dark", "x": 580, "y": 255, "r": 62 },
+        { "id": "the-network", "name": "The Network", "terrain": "digital", "x": 800, "y": 100, "r": 65 },
+        { "id": "digital-hazard", "name": "Digital Hazard", "terrain": "volcano", "x": 850, "y": 255, "r": 62 }
+      ],
+      "routes": [
+        ["azulongmons-realm", "huanglongmons-trial"],
+        ["baihumons-realm", "huanglongmons-trial"],
+        ["zhuqiaomons-realm", "huanglongmons-trial"],
+        ["ebonwumons-realm", "huanglongmons-trial"],
+        ["huanglongmons-trial", "royal-knights-castle"],
+        ["huanglongmons-trial", "dark-area"],
+        ["royal-knights-castle", "the-network"],
+        ["dark-area", "digital-hazard"]
+      ]
+    }
+  ]
+}

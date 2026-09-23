@@ -308,13 +308,16 @@ export interface BossDefinition {
 
 export interface AreaPath {
   name: string;
+  /** Where the path's node sits on its region's map, in map coordinates
+   * (see `mapSize` in data/regions.json) - absolute, not relative to the
+   * area, so it lines up with a background image drawn for the region. */
+  map: { x: number; y: number };
   levelRange: [number, number];
   digimonPool: AreaSpawnEntry[];
   mastery: { kills: number };
   boss?: BossDefinition;
-  /** Path ids unlocked once this path's mastery threshold is reached.
-   * Same-area only for now - a future `"areaId:pathId"` cross-area form
-   * is anticipated by the shape but nothing produces or resolves it yet. */
+  /** Paths unlocked once this path's mastery threshold is reached: a path
+   * id in this area, or `"areaId:pathId"` for a path in another area. */
   unlocks: string[];
 }
 
@@ -324,6 +327,39 @@ export interface AreaData {
   label: string;
   startingPath: string;
   paths: Record<string, AreaPath>;
+}
+
+/** How an area's land is drawn on the code-drawn region map. */
+export type MapTerrain =
+  | 'forest' | 'savanna' | 'mountain' | 'snow' | 'town' | 'lake'
+  | 'ruins' | 'desert' | 'dark' | 'volcano' | 'sky' | 'digital';
+
+/** An area's landmark on its region's map. Listed even before the area is
+ * built (no data/areas file yet) - it then shows as a locked "???"
+ * silhouette, so the map doubles as the story's roadmap. */
+export interface RegionMapArea {
+  id: string;
+  name: string;
+  terrain: MapTerrain;
+  x: number;
+  y: number;
+  /** Radius of the area's land blob, in map coordinates. */
+  r: number;
+}
+
+/** One travel map (PokeClicker's Kanto / Johto): a story act's areas,
+ * their paths, and the routes drawn between areas. */
+export interface RegionData {
+  id: string;
+  name: string;
+  label: string;
+  /** Optional background art (a URL under public/); null = the map is
+   * drawn in code from the areas' terrain. */
+  background: string | null;
+  areas: RegionMapArea[];
+  /** Pairs of area ids joined by a route line - visual only; what's
+   * reachable is decided by unlocks. */
+  routes: [string, string][];
 }
 
 /** Persisted player progress through the area/path graph - which path is

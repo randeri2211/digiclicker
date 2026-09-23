@@ -65,8 +65,16 @@
 </div>
 
 <style>
+  /* Sized by the space left over, never by its content (basis 0, explicit
+     min-height): the arena empties for a moment between kills and grows a
+     timer bar in boss fights, and a content-sized arena made the map below
+     jump. It shares the column with the map 3:2; the sprite shrinks to fit
+     (container query units, see ClickableSprite). */
   .arena {
-    flex: 1;
+    flex: 3 1 0;
+    min-height: 0;
+    overflow: hidden;
+    container-type: size;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -96,9 +104,8 @@
   }
   .squad {
     position: absolute;
-    left: 50%;
+    left: 16px;
     bottom: 16px;
-    transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 10px;

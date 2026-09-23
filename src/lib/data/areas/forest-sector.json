@@ -6,6 +6,10 @@
   "paths": {
     "forest-clearing": {
       "name": "Forest Clearing",
+      "map": {
+        "x": 112,
+        "y": 268
+      },
       "levelRange": [
         1,
         10
@@ -45,6 +49,10 @@
     },
     "forest-depths": {
       "name": "Forest Depths",
+      "map": {
+        "x": 170,
+        "y": 238
+      },
       "levelRange": [
         8,
         20
@@ -92,6 +100,10 @@
     },
     "forest-heart": {
       "name": "Forest Heart",
+      "map": {
+        "x": 226,
+        "y": 208
+      },
       "levelRange": [
         18,
         30

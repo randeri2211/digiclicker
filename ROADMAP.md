@@ -28,7 +28,7 @@ As each feature ships, move its description into `GAMEPLAY_DESIGN.md`'s "Confirm
 | 4 | Data-gated hatching **(done)** | 3 (players need Data first) |
 | 5 | Unlock flags + quests framework **(done - story content: undecided)** | 2 |
 | 6 | Crest requirement for Ultimate/Mega (how Crests are obtained: undecided) | 5 |
-| 7 | Special digivolutions: Armor (Digimentals) and DNA (unlock triggers: undecided) | 5, 3 |
+| 7 | Special digivolutions: Armor (Armor Digi-Eggs) and DNA (unlock triggers: undecided) | 5, 3 |
 | 8 | Farming: Digi-Meat and other food (needs a design pass) | 3 |
 | 9 | Region travel + village residents gating systems (story Act 1) | 5 |
 | 10 | Limit Breaks: level cap above 100 (story post-game) | 5 |
@@ -69,7 +69,7 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 
 ## 3. Expeditions (Data, eggs, unique items) - done
 
-*Shipped: see GAMEPLAY_DESIGN.md "Expeditions". First version: three Forest Sector destinations, one expedition at a time, parties of up to 3; loot is Data, eggs and boss chips (Attack Chip / Speed Chip / HP Disk). Seeds (farming) and Digimentals (Armor) are added with their features.*
+*Shipped: see GAMEPLAY_DESIGN.md "Expeditions". First version: three Forest Sector destinations, one expedition at a time, parties of up to 3; loot is Data, eggs and boss chips (Attack Chip / Speed Chip / HP Disk). Seeds (farming) and Armor Digi-Eggs (Armor digivolution) are added with their features.*
 **Goal:** idle depth with a trade-off, and the game's first real **Data** source.
 
 - **Model (Digital World flavor):** "Survey unexplored zones" - each region has 1–3 **expedition destinations** (e.g. Forest Sector: *Overgrown Server Ruins*, *Misty Lake Shore*) with a **favored element**, duration and loot table. You send a party of 1–N roster entries; while away they **don't contribute to combat** (the trade-off). Destinations unlock with region progress (after its boss, or on reaching it).
@@ -79,7 +79,7 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
     - **Recovery Floppy / Attack Chip / Defense Disk** - boss-fight buffs (feature 2).
     - **Seeds / rare crop cuttings** for the farm (feature 8) - expeditions find them, the farm grows them. Food itself mainly comes from farming, so the two loops don't overlap.
     These go through the existing `ITEM_CATALOG` / `inventory` system (`items/itemCatalog.ts`, `state/inventory.svelte.ts`).
-  - **Key items** (permanent unlocks, found **once** - never consumed, so duplicates are never dropped): e.g. **Digimentals** (Armor digivolution, feature 7) as rare one-time discoveries at specific destinations. Stored as unlock flags (feature 5), not inventory counts; once found, that key item is removed from every loot table.
+  - **Key items** (permanent unlocks, found **once** - never consumed, so duplicates are never dropped): e.g. **Armor Digi-Eggs** (Armor digivolution, feature 7) as rare one-time discoveries at specific destinations. Stored as unlock flags (feature 5), not inventory counts; once found, that key item is removed from every loot table.
 - **No Crest drops:** Crests are permanent keys too, so farming them makes no sense - expeditions never drop Crests or Crest pieces.
 - **State:** `ExpeditionState { active: [{ id, destinationId, memberSpeciesIds, startedAt, endsAt }] }` - time-based (`Date.now()`), so it completes offline; resolved on load and on a timer. Max concurrent expeditions: a balance knob.
 - **UI:** Expeditions screen (top bar), party picker (reuse roster cards + advantage-style element chips), a progress bar per expedition (reuse `XpBar`-style track), a "claim" step showing the haul.
@@ -119,7 +119,7 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 ## 7. Special digivolutions: Armor and DNA
 **Goal:** bring the 70 Armor species and the 69 classified DNA fusions into play, behind meaningful goals. **What unlocks each one (which quest/boss/story beat) is not decided.**
 
-- **Armor:** re-add `'Armor'` to `IN_GAME_STAGES`; a Rookie can Armor-digivolve into the targets its data lists (`evolvesTo` edges into Armor species) by **owning** the matching **Digimental** (Courage, Friendship, Love, ... - permanent key items found once, see feature 3; never consumed), once the flag `armor-unlocked` is set (trigger to be decided). Adds the target as a new roster entry, like normal digivolve (reuse `digivolve()` with a key-item requirement - `DigivolutionRequirement` gains `keyItem`, checked against the unlock flags).
+- **Armor:** re-add `'Armor'` to `IN_GAME_STAGES`; a Rookie can Armor-digivolve into the targets its data lists (`evolvesTo` edges into Armor species) by **owning** the matching **Armor Digi-Egg** (Courage, Friendship, Love, ... - permanent key items found once, see feature 3; never consumed), once the flag `armor-unlocked` is set (trigger to be decided). Adds the target as a new roster entry, like normal digivolve (reuse `digivolve()` with a key-item requirement - `DigivolutionRequirement` gains `keyItem`, checked against the unlock flags).
 - **DNA:** the `fusion`-classified `sameStageEvolutions` edges (EvolutionGraphConverter.py, `data/fusion_edges_review.md`) define pairs → result (e.g. WarGreymon + MetalGarurumon → Omnimon). Requires **owning both sources**, a flag per fusion (e.g. `dna:omnimon`; trigger to be decided), and consumes nothing (both stay - roster rules). Fusion data needs a curated `fusions.json` (pairs), since the raw edges list sources per result, not pairs.
 - **UI:** Evolution screen gains an "Armor" and a "DNA" tab; locked entries explain their quest.
 
@@ -139,7 +139,7 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 
 ## 9. Region travel + residents gating systems
 **Goal:** the story's first act playable end to end. See STORY.md sections 3-4.
-- Real **multi-region travel**: AreaTabs is still a placeholder; regions (areas) unlock via boss `unlocks` and story flags, and the player switches between unlocked ones.
+- Real **multi-region travel** - **map done**: a PokeClicker-style region map (one per act, `regions.json` + `RegionMap.svelte`) with travel to any unlocked path. Still to do: the next areas' data, so boss `unlocks` (and story flags) actually open them.
 - **Residents unlock systems**: expeditions, the Shop, the Mystery Egg stall and hatchery upgrades each check a flag set by an Act 1 quest (Tentomon, Andromon, the Yokomon villagers, Elecmon).
 - Act 1's seven new regions, bosses and quest chain, built from STORY.md.
 

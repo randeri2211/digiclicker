@@ -28,9 +28,11 @@
     position: relative;
     cursor: pointer;
   }
+  /* Fills what the arena has left after the name tag, HP and timer bars
+     (~150px), capped at 220px - cqh is the arena's height. */
   .sprite-click-target img {
-    width: 220px;
-    height: 220px;
+    width: clamp(64px, calc(100cqh - 150px), 220px);
+    height: clamp(64px, calc(100cqh - 150px), 220px);
     object-fit: contain;
     filter: drop-shadow(0 0 24px rgba(34, 211, 238, 0.25));
   }

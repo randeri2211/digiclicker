@@ -65,6 +65,23 @@ export function isBossDefeated(progress: AreaProgressState, areaId: string, path
   return progress.bossesDefeated.includes(pathKey(areaId, pathId));
 }
 
+/** What a path's node on the region map shows, from least to most done. */
+export type PathNodeState = 'locked' | 'open' | 'mastered' | 'boss-ready' | 'cleared';
+
+// The map draws one state per path node (the active path gets a separate
+// ring, so it isn't one of these). Inputs: isPathUnlocked, killsOnPath vs
+// getPath(...).mastery.kills, and for a boss path isBossAvailable /
+// isBossDefeated.
+export function pathNodeState(progress: AreaProgressState, areaId: string, pathId: string): PathNodeState {
+  // Most urgent first, PokeClicker-style: a waiting boss outranks the
+  // (already reached) mastery, and a beaten boss is the final word.
+  if (!isPathUnlocked(progress, areaId, pathId)) return 'locked';
+  if (isBossDefeated(progress, areaId, pathId)) return 'cleared';
+  if (isBossAvailable(progress, areaId, pathId)) return 'boss-ready';
+  const mastery = getPath(areaId, pathId)?.mastery.kills ?? Infinity;
+  return killsOnPath(progress, areaId, pathId) >= mastery ? 'mastered' : 'open';
+}
+
 /** Records a boss win and applies its unlocks. True on the first clear. */
 export function recordBossVictory(progress: AreaProgressState, areaId: string, pathId: string): boolean {
   const boss = getPath(areaId, pathId)?.boss;

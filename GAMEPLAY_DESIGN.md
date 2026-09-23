@@ -382,21 +382,32 @@ on total XP earned per kill.
   `state/areaProgress.svelte.ts` and persisted like any other save data.
   Wild spawning (`pickNextWildSpawn` in `combat/spawn.ts`) draws only from
   the currently active path's pool — the old flat 3-species round-robin
-  is gone. `PathTabs.svelte` lets the player switch between unlocked
-  paths in the active area; `AreaTabs.svelte` (Forest Sector/Cave Sector/
-  Server Continent) stays a cosmetic stub until a second area has real
-  data behind it. `validate_areas.py` (run in CI, see
+  is gone. `validate_areas.py` (run in CI, see
   `.github/workflows/validate-areas.yml`) checks every area file for bad
   species references, malformed level ranges, and — the main thing this
   catches that nothing else would — paths that are unreachable from the
   area's `startingPath` (an authoring typo in `unlocks`, not a design
   choice).
-- Still open: Cave Sector/Server Continent have no real path data yet;
-  cross-area unlocks (a path's `unlocks` pointing at another area's
-  entry path) are anticipated by the schema (`"areaId:pathId"` form) but
-  nothing produces or resolves that yet, since only one area exists so
-  far; area bosses as an alternate mastery gate (proposed below) aren't
-  built - `mastery` is kill-count-only for now.
+- **Region travel map (confirmed, built):** PokeClicker's Kanto/Johto
+  model. A **region** is one map per story act (`src/lib/data/regions.json`:
+  File Island, Server Continent, Myotismon's Domain, Spiral Mountain,
+  Beyond the Wall). It lists its **areas** as landmarks (position, radius,
+  terrain) and the **routes** drawn between them; each area's **paths**
+  are nodes placed by `map: {x, y}` in the area file (absolute map
+  coordinates, so future background art lines up). `RegionMap.svelte`,
+  below the arena, replaces the old PathTabs/AreaTabs: region tabs on top
+  (locked acts show `???`), the map below, and a status line for the
+  hovered or active path. Clicking any unlocked node travels there
+  (`travelTo(areaId, pathId)` - across areas too; blocked during a boss
+  fight). Areas that are on the map but have no data file yet draw as
+  dim `???` silhouettes, so the map doubles as the story roadmap.
+- **Map art:** drawn in code for now - seeded blob land per area coloured
+  by terrain, land bridges along routes, one merged glowing coastline. A
+  region's `background` (an image URL under `public/`) replaces the drawn
+  land when art exists; routes and nodes still draw on top.
+- Still open: the other regions' areas have no path data yet; Leomon's
+  `unlocks` stays empty until Gear Savanna exists (cross-area unlocks via
+  `"areaId:pathId"` are already resolved by `unlockPath`).
 
 ### Taming mechanic — superseded
 - Originally: defeating a wild Digimon would have a chance to tame it
