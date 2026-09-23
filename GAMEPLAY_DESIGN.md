@@ -199,6 +199,39 @@ on total XP earned per kill.
   specialization abilities, once a farming system exists to specialize
   in (see "Idle production" above - still not built).
 
+### Elements & matchups (confirmed, built - used by boss fights, see ROADMAP.md)
+- Every species has an **attribute** (the wiki's Vaccine / Data / Virus;
+  anything else - Free, None, Unknown - is neutral) and an **element**:
+  Fire, Water, Plant, Electric, Earth, Wind, Metal, Light, Dark, or
+  Neutral. An element is decided, in order, by (1) a short hand-picked
+  override list for iconic species the data gets wrong, (2) the species'
+  **attacks** - keyword votes over its wiki attack list (fire/flame,
+  thunder/shock, ice/water, ...; signature attack weighted 3x, minimum
+  score 4), fetched into `data/species_attacks.json` by
+  `AttackImporter.py` - since an attack says what a Digimon fights *with*
+  (Tentomon is an "Insectoid" but fights with electricity), (3) the
+  wiki's raw type (Reptile, Sea Beast, ...), and (4) **Neutral** -
+  deliberately no hash fallback, since a random element would invent
+  matchups. All rules live in `element_mapping.py` and are applied by
+  `EvolutionGraphConverter.py`, which records the deciding step as
+  `elementSource`. Result: iconic lines read as expected (Agumon/Greymon
+  Fire, Garurumon Water, Tentomon Electric, Palmon Plant, Angemon Light,
+  Devimon Dark); 119 of the 1,296 in-game species are Neutral, mostly
+  Fresh/In-Training.
+- **Matchups** (`combat/advantage.ts`, pure - shared with the Balance
+  Lab): the attribute triangle Vaccine > Virus > Data > Vaccine, and the
+  element chart in `src/lib/data/elementChart.json` (attacker -> elements
+  it beats; Light and Dark beat each other). Each edge the attacker wins
+  adds `ADVANTAGE_BONUS` (+50%), each it loses subtracts
+  `DISADVANTAGE_PENALTY` (-25%), and the two edges add up: 2.0x at best,
+  0.5x at worst (e.g. Angemon vs Devimon is 2.0x). Applied to **all four
+  stats** of a boss-squad member - **boss fights only**; normal wild
+  fights ignore matchups.
+- `validate_elements.py` (in CI) checks every species has a known element
+  and the chart is consistent, and prints per-element counts.
+- Attribute and element show as small tags on the Stats window, Roster
+  cards and discovered Compendium entries.
+
 ### Combat: attack ticks and damage
 - Combat runs on **discrete attack ticks**, not a smooth per-second HP
   drain: the whole roster shares one attack clock (attacks/second), and

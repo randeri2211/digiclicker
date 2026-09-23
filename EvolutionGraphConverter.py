@@ -21,6 +21,14 @@ from pathlib import Path
 from evolution_junk_labels import JUNK_LABELS
 from evolution_type_mapping import TYPE_TO_STAT_AFFINITY
 from egg_type_mapping import TYPE_TO_EGG_TYPE
+from element_mapping import (
+    TYPE_TO_ELEMENT,
+    NEUTRAL,
+    ELEMENT_KEYWORDS,
+    SIGNATURE_WEIGHT,
+    MIN_ATTACK_SCORE,
+    ELEMENT_OVERRIDES,
+)
 
 STAT_AFFINITIES = ("Attack", "HP", "Speed", "SpecialAttack")
 EGG_TYPES = (
@@ -32,6 +40,7 @@ ROOT = Path(__file__).resolve().parent
 GEXF_PATH = ROOT / "data" / "evolution_graph.gexf"
 IMAGES_DIR = ROOT / "public" / "digimon" / "images"
 OUTPUT_PATH = ROOT / "src" / "lib" / "data" / "digimon-evolution.json"
+ATTACKS_PATH = ROOT / "data" / "species_attacks.json"
 
 NS = {"g": "http://www.gexf.net/1.3"}
 INVALID_FS_CHARS = re.compile(r'[<>:"/\\|?*]')
@@ -194,7 +203,62 @@ def resolve_egg_type(raw_type, slug):
     return _resolve_curated(TYPE_TO_EGG_TYPE, EGG_TYPES, raw_type, slug, "egg-type")
 
 
-def build_species(nodes, edges):
+ELEMENT_PATTERNS = {
+    element: [re.compile(r"\b" + pattern + r"\b", re.IGNORECASE) for pattern in patterns]
+    for element, patterns in ELEMENT_KEYWORDS.items()
+}
+
+
+def load_attacks():
+    """{page title: [{name, text}, ...]} from AttackImporter.py - optional:
+    without it every element falls back to the raw-type table."""
+    if not ATTACKS_PATH.exists():
+        print(f"  (no {ATTACKS_PATH.name} - elements come from raw type only; run AttackImporter.py)")
+        return {}
+    return json.loads(ATTACKS_PATH.read_text(encoding="utf-8"))
+
+
+def score_attacks(attacks):
+    """Keyword score per element over a species' attacks - the signature
+    (first) attack counts SIGNATURE_WEIGHT times."""
+    scores = collections.Counter()
+    for index, attack in enumerate(attacks):
+        weight = SIGNATURE_WEIGHT if index == 0 else 1
+        text = f"{attack.get('name', '')} {attack.get('text', '')}"
+        for element, patterns in ELEMENT_PATTERNS.items():
+            hits = sum(len(pattern.findall(text)) for pattern in patterns)
+            if hits:
+                scores[element] += weight * hits
+    return scores
+
+
+def resolve_element(slug, raw_type, attacks):
+    """Override, else the attack keywords' top scorer (if it reaches
+    MIN_ATTACK_SCORE), else the raw-type
+    table, else NEUTRAL - deliberately no hash fallback like the two
+    resolvers above: a random element would invent matchups, while Neutral
+    simply has no advantage either way (see element_mapping.py). A tie
+    between top attack scorers goes to the raw-type element if it's among
+    them, else to whichever the signature attack favors."""
+    if slug in ELEMENT_OVERRIDES:
+        return ELEMENT_OVERRIDES[slug], "override"
+    type_element = TYPE_TO_ELEMENT.get(raw_type)
+    scores = score_attacks(attacks)
+    if scores and max(scores.values()) >= MIN_ATTACK_SCORE:
+        best = max(scores.values())
+        tied = [element for element, score in scores.items() if score == best]
+        if len(tied) == 1:
+            return tied[0], "attack"
+        if type_element in tied:
+            return type_element, "attack"
+        signature = score_attacks(attacks[:1])
+        return max(tied, key=lambda element: signature.get(element, 0)), "attack"
+    if type_element:
+        return type_element, "type"
+    return NEUTRAL, "fallback"
+
+
+def build_species(nodes, edges, attacks_by_title):
     id_to_slug = {}
     slug_counts = {}
     for node_id, node in nodes.items():
@@ -211,6 +275,7 @@ def build_species(nodes, edges):
         slug = id_to_slug[node_id]
         stat_affinity, stat_affinity_source = resolve_stat_affinity(node["type"], slug)
         egg_type, egg_type_source = resolve_egg_type(node["type"], slug)
+        element, element_source = resolve_element(slug, node["type"], attacks_by_title.get(node["label"], []))
         species[slug] = {
             "id": slug,
             "name": node["label"],
@@ -222,6 +287,8 @@ def build_species(nodes, edges):
             "statAffinitySource": stat_affinity_source,
             "eggType": egg_type,
             "eggTypeSource": egg_type_source,
+            "element": element,
+            "elementSource": element_source,
             "evolvesTo": [],
             "evolvesFrom": [],
             "lateralTo": [],
@@ -410,7 +477,7 @@ def main():
     kept_nodes, dropped = filter_nodes(nodes)
     print(f"Filtered: kept {len(kept_nodes)}, dropped {dropped} junk nodes")
 
-    species = build_species(kept_nodes, edges)
+    species = build_species(kept_nodes, edges, load_attacks())
 
     with_sprite = sum(1 for s in species.values() if s["spriteUrl"])
     print(f"Resolved sprites for {with_sprite}/{len(species)} species")
@@ -420,6 +487,9 @@ def main():
 
     egg_mapped_count = sum(1 for s in species.values() if s["eggTypeSource"] == "mapped")
     print(f"eggType: {egg_mapped_count}/{len(species)} from curated table, {len(species) - egg_mapped_count} via fallback hash")
+
+    element_sources = collections.Counter(s["elementSource"] for s in species.values())
+    print("element: " + ", ".join(f"{source}: {count}" for source, count in element_sources.most_common()))
 
     skip_counts = classify_evolution_skips(species)
     total_skips = sum(skip_counts.values())

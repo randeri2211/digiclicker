@@ -13,6 +13,21 @@ export type Stage =
 
 export type StatAffinity = 'Attack' | 'HP' | 'Speed' | 'SpecialAttack';
 
+/** Combat element (see element_mapping.py) - drives the element half of
+ * the boss-fight advantage system (combat/advantage.ts, with the matchups
+ * in data/elementChart.json). Neutral has no edge either way. */
+export type Element =
+  | 'Fire'
+  | 'Water'
+  | 'Plant'
+  | 'Electric'
+  | 'Earth'
+  | 'Wind'
+  | 'Metal'
+  | 'Light'
+  | 'Dark'
+  | 'Neutral';
+
 /** The 11 Digi-Egg flavor types (see egg_type_mapping.py) - a species'
  * eggType is independent of its statAffinity, resolved from the same raw
  * wiki taxonomy but grouped by thematic flavor instead of combat archetype. */
@@ -95,6 +110,12 @@ export interface DigimonSpecies {
   /** Dominant combat archetype, resolved from real wiki taxonomy data (see
    * EvolutionGraphConverter.py) - determines which stat grows fastest. */
   statAffinity: StatAffinity;
+  /** Raw wiki attribute - 'Vaccine' / 'Data' / 'Virus' drive the
+   * attribute half of the boss-fight advantage system; anything else
+   * ('Free', 'None', ...) is neutral. */
+  attribute: string;
+  /** Resolved from the raw wiki type via element_mapping.py. */
+  element: Element;
   /** Digi-Egg flavor type, resolved the same way as statAffinity (see
    * egg_type_mapping.py) - only meaningful for Fresh-stage species, since
    * that's the only stage a Digi-Egg ever hatches into, but every species
