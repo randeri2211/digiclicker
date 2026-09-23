@@ -11,7 +11,8 @@
 
   const { onClose }: Props = $props();
 
-  const itemEntries = Object.values(ITEM_CATALOG);
+  // Only items with a price - boss chips etc. are found, not sold.
+  const itemEntries = Object.values(ITEM_CATALOG).filter((item) => item.costBits !== null);
   const eggTypes = Object.keys(MYSTERY_EGG_WEIGHTS) as EggType[];
 
   function handleBuyItem(id: ItemId) {

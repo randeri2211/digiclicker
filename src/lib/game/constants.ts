@@ -58,6 +58,10 @@ export const SPEED_TO_APS_SCALE = balance.SPEED_TO_APS_SCALE;
  * only - normal wild fights ignore matchups. */
 export const ADVANTAGE_BONUS = balance.ADVANTAGE_BONUS;
 export const DISADVANTAGE_PENALTY = balance.DISADVANTAGE_PENALTY;
+/** Each boss chip (Attack Chip, Speed Chip, HP Disk - found on
+ * expeditions) spent on a boss fight adds this fraction to its stat for
+ * the whole squad, for that one fight. */
+export const BOSS_CHIP_BONUS = balance.BOSS_CHIP_BONUS;
 /** How often the combat tick loop polls, in ms - not the attack rate
  * itself (that's attacksPerSecond above), just the granularity ticks get
  * checked/applied at. */
@@ -153,6 +157,9 @@ export const EGG_DROP_CHANCE_PERCENT = balance.EGG_DROP_CHANCE_PERCENT;
  * incubating hatchery slot) before it hatches. Placeholder - low enough that hatching isn't a second full
  * grind on top of the rare drop itself. */
 export const EGG_HATCH_LEVEL = balance.EGG_HATCH_LEVEL;
+/** Data paid to hatch an egg that has reached EGG_HATCH_LEVEL - a ready
+ * egg waits in its incubation slot (earning no more XP) until paid for. */
+export const HATCH_DATA_COST = balance.HATCH_DATA_COST;
 /** Bits price for a Mystery Digi-Egg of any type, in the Shop (see
  * game/eggs/mysteryEggs.ts) - flat across all 11 EggTypes for now. */
 export const MYSTERY_EGG_COST_BITS = balance.MYSTERY_EGG_COST_BITS;
@@ -165,6 +172,21 @@ export const DUPLICATE_HATCH_XP = balance.DUPLICATE_HATCH_XP;
 /** Bits price for one Ability Reroll Crystal in the Shop (see
  * items/itemCatalog.ts, abilities/abilities.ts's useAbilityReroll). */
 export const ABILITY_REROLL_COST_BITS = balance.ABILITY_REROLL_COST_BITS;
+
+// ---- Expeditions -------------------------------------------------------
+// A party of roster Digimon is sent to a destination (data/expeditions.json)
+// and comes back after a while with Data, sometimes an egg, and items.
+// Party members don't fight while away. See game/expeditions/.
+/** Expeditions that can run at the same time. */
+export const EXPEDITION_MAX_CONCURRENT = balance.EXPEDITION_MAX_CONCURRENT;
+/** Most Digimon in one party. */
+export const EXPEDITION_MAX_PARTY = balance.EXPEDITION_MAX_PARTY;
+/** duration = base / (1 + LEVEL_SPEED_SCALE * party's average level). */
+export const EXPEDITION_LEVEL_SPEED_SCALE = balance.EXPEDITION_LEVEL_SPEED_SCALE;
+/** haul x (1 + ELEMENT_MATCH_BONUS * members of a favored element
+ *  + STAGE_BONUS * party's average stage order (Fresh 0 .. Mega 5)). */
+export const EXPEDITION_ELEMENT_MATCH_BONUS = balance.EXPEDITION_ELEMENT_MATCH_BONUS;
+export const EXPEDITION_STAGE_BONUS = balance.EXPEDITION_STAGE_BONUS;
 
 // ---- Persistence -------------------------------------------------------
 export const AUTOSAVE_INTERVAL_MS = 15000;

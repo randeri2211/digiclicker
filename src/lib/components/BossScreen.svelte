@@ -1,5 +1,16 @@
 <script lang="ts">
-  import { getPath, getRosterList, squadMultiplier, startBossFight } from '../game/state/game.svelte';
+  import type { ItemId } from '../game/types';
+  import {
+    getPath,
+    getRosterList,
+    isAway,
+    squadMultiplier,
+    startBossFight,
+    inventory,
+    ITEM_CATALOG,
+  } from '../game/state/game.svelte';
+  import { BOSS_CHIP_STATS } from '../game/state/combat.svelte';
+  import { BOSS_CHIP_BONUS } from '../game/constants';
   import { getSpecies, getSpriteUrl, getSpeciesName } from '../game/images';
   import { levelForXp } from '../game/combat/levelCurve';
   import {
@@ -8,6 +19,7 @@
     computeSquadStat,
     computeSquadClickDamage,
     type WeightedEntry,
+    type SquadStatBonus,
   } from '../game/combat/damage';
   import { computeWildMaxHp, computeFightTimeLimitMs } from '../game/combat/spawn';
   import SpeciesTags from './shared/SpeciesTags.svelte';
@@ -33,7 +45,9 @@
   // then strongest hitters - the order Auto-pick takes them in.
   const candidates = $derived.by(() => {
     if (!boss) return [];
+    // Digimon away on an expedition can't join.
     return getRosterList()
+      .filter((entry) => !isAway(entry.speciesId))
       .map((entry) => {
         const multiplier = squadMultiplier(entry.speciesId, boss.speciesId);
         return { entry, multiplier, score: computeEntryDamagePerHit(entry) * multiplier };
@@ -66,13 +80,25 @@
     selected = selected.filter((id) => id !== speciesId);
   }
 
+  // Boss chips to spend on this fight (one of each kind at most).
+  const CHIP_IDS = Object.keys(BOSS_CHIP_STATS) as ItemId[];
+  let chips: ItemId[] = $state([]);
+  function toggleChip(id: ItemId) {
+    chips = chips.includes(id) ? chips.filter((c) => c !== id) : [...chips, id];
+  }
+  const chipBonus = $derived.by(() => {
+    const bonus: SquadStatBonus = {};
+    for (const chip of chips) for (const stat of BOSS_CHIP_STATS[chip] ?? []) bonus[stat] = (bonus[stat] ?? 0) + BOSS_CHIP_BONUS;
+    return bonus;
+  });
+
   const squad = $derived<WeightedEntry[]>(
     candidates.filter((c) => selected.includes(c.entry.speciesId)).map((c) => ({ entry: c.entry, multiplier: c.multiplier }))
   );
   const estimate = $derived.by(() => {
-    const dps = computeSquadDps(squad);
-    const timerSeconds = computeFightTimeLimitMs(computeSquadStat(squad, 'hp')) / 1000;
-    const activeDps = dps + ESTIMATE_CLICKS_PER_SECOND * computeSquadClickDamage(squad);
+    const dps = computeSquadDps(squad, chipBonus);
+    const timerSeconds = computeFightTimeLimitMs(computeSquadStat(squad, 'hp', chipBonus)) / 1000;
+    const activeDps = dps + ESTIMATE_CLICKS_PER_SECOND * computeSquadClickDamage(squad, chipBonus);
     const idleSeconds = dps > 0 ? bossHp / dps : Infinity;
     const activeSeconds = activeDps > 0 ? bossHp / activeDps : Infinity;
     const verdict: 'idle' | 'clicking' | 'lose' =
@@ -84,7 +110,7 @@
   const fmt = (n: number) => (Number.isFinite(n) ? (n >= 100 ? Math.round(n).toLocaleString() : n.toFixed(1)) : '∞');
 
   function start() {
-    if (startBossFight(areaId, pathId, selected)) onClose();
+    if (startBossFight(areaId, pathId, selected, Date.now(), chips)) onClose();
   }
 
   $effect(() => {
@@ -161,6 +187,18 @@
                 <SpeciesTags speciesId={c.entry.speciesId} />
               </div>
               <span class="mult {multiplierTone(c.multiplier)}">{formatMultiplier(c.multiplier)}</span>
+            </button>
+          {/each}
+        </div>
+      </div>
+
+      <div class="chips">
+        <span class="section-title">Boss chips <span class="dim">- +{Math.round(BOSS_CHIP_BONUS * 100)}% for this fight, found on expeditions</span></span>
+        <div class="chip-row">
+          {#each CHIP_IDS as id (id)}
+            {@const owned = inventory[id]}
+            <button class="chip" class:on={chips.includes(id)} disabled={owned === 0} aria-pressed={chips.includes(id)} onclick={() => toggleChip(id)}>
+              {ITEM_CATALOG[id].name} <span class="dim">×{owned}</span>
             </button>
           {/each}
         </div>
@@ -418,6 +456,36 @@
   }
   .mult.bad {
     color: var(--danger);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+  }
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    appearance: none;
+    font: inherit;
+    font-size: 11px;
+    padding: 5px 10px;
+    background: var(--panel-2);
+    border: 1px solid var(--panel-border);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .chip.on {
+    border-color: var(--pos);
+    color: var(--pos);
+    background: var(--pos-soft);
+  }
+  .chip:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
   .footer {
     display: flex;

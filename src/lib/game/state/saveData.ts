@@ -2,6 +2,8 @@ import type {
   AreaProgressState,
   CurrencyState,
   DigivolveAutomationState,
+  ExpeditionState,
+  ProgressState,
   HatcheryState,
   InventoryState,
   RosterState,
@@ -27,6 +29,12 @@ export interface SaveSlotData {
    * against current area data. */
   areaProgress: AreaProgressState;
   automation: DigivolveAutomationState;
+  /** Optional for saves made before expeditions existed - defaults to
+   * none running. */
+  expeditions?: ExpeditionState;
+  /** Optional for saves made before quests existed - no flags, nothing
+   * completed. */
+  progress?: ProgressState;
 }
 
 export interface SaveSlot {

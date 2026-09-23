@@ -24,12 +24,14 @@ As each feature ships, move its description into `GAMEPLAY_DESIGN.md`'s "Confirm
 |---|---|---|
 | 1 | Elements data + advantage math **(done)** | - |
 | 2 | Boss fights + squads **(done)** | 1 |
-| 3 | Expeditions (first real Data source) + unique items | - (uses 1 for element bonuses) |
-| 4 | Data-gated hatching | 3 (players need Data first) |
-| 5 | Unlock flags + quests framework (story content: undecided) | 2 |
+| 3 | Expeditions (first real Data source) + unique items **(done)** | - (uses 1 for element bonuses) |
+| 4 | Data-gated hatching **(done)** | 3 (players need Data first) |
+| 5 | Unlock flags + quests framework **(done - story content: undecided)** | 2 |
 | 6 | Crest requirement for Ultimate/Mega (how Crests are obtained: undecided) | 5 |
 | 7 | Special digivolutions: Armor (Digimentals) and DNA (unlock triggers: undecided) | 5, 3 |
 | 8 | Farming: Digi-Meat and other food (needs a design pass) | 3 |
+| 9 | Region travel + village residents gating systems (story Act 1) | 5 |
+| 10 | Limit Breaks: level cap above 100 (story post-game) | 5 |
 
 Features 1–4 are fully specified; 5–8 get a design pass (story, Crest sources/timing, farming details) before they're built.
 
@@ -65,7 +67,9 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - **Balance Lab:** a "Boss check" panel - pick a boss and a squad composition (per-stage counts + advantage count) → required vs. dealt damage, like the existing Area check.
 - **Mechanics (shields, phases):** out of scope here; designed per boss later.
 
-## 3. Expeditions (Data, eggs, unique items)
+## 3. Expeditions (Data, eggs, unique items) - done
+
+*Shipped: see GAMEPLAY_DESIGN.md "Expeditions". First version: three Forest Sector destinations, one expedition at a time, parties of up to 3; loot is Data, eggs and boss chips (Attack Chip / Speed Chip / HP Disk). Seeds (farming) and Digimentals (Armor) are added with their features.*
 **Goal:** idle depth with a trade-off, and the game's first real **Data** source.
 
 - **Model (Digital World flavor):** "Survey unexplored zones" - each region has 1–3 **expedition destinations** (e.g. Forest Sector: *Overgrown Server Ruins*, *Misty Lake Shore*) with a **favored element**, duration and loot table. You send a party of 1–N roster entries; while away they **don't contribute to combat** (the trade-off). Destinations unlock with region progress (after its boss, or on reaching it).
@@ -80,7 +84,9 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - **State:** `ExpeditionState { active: [{ id, destinationId, memberSpeciesIds, startedAt, endsAt }] }` - time-based (`Date.now()`), so it completes offline; resolved on load and on a timer. Max concurrent expeditions: a balance knob.
 - **UI:** Expeditions screen (top bar), party picker (reuse roster cards + advantage-style element chips), a progress bar per expedition (reuse `XpBar`-style track), a "claim" step showing the haul.
 
-## 4. Data-gated hatching
+## 4. Data-gated hatching - done
+
+*Shipped: flat `HATCH_DATA_COST` (20 Data) for now rather than a per-family map.*
 **Goal:** Data becomes the hatching currency; eggs stay idle-friendly.
 
 - `tryHatch` (`eggs/eggs.ts`) stops auto-hatching: an egg reaching `EGG_HATCH_LEVEL` becomes **ready** (stays in its slot, stops gaining XP).
@@ -89,7 +95,9 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - Sources of Data by then: expeditions (3) and boss rewards (2). The duplicate-hatch bonus (`TODO(human)` in `tryHatch`) lands in the same function - finish it before or with this feature.
 - **UI:** hatchery slot shows "Ready" + cost; click to hatch; the sidebar Data pill finally means something.
 
-## 5. Unlock flags + quests framework
+## 5. Unlock flags + quests framework - done
+
+*Shipped: see GAMEPLAY_DESIGN.md "Quests & progress flags". `src/lib/data/quests.json` holds four clearly marked placeholder quests (Jijimon, Tentomon, Leomon) until the storyline is written.*
 **Goal:** the mechanism for meaningful goals - what will unlock Crests and special digivolutions. **The story content (chapters, NPCs, which region tells what, when things unlock) is not decided** - this feature only builds the machinery, with placeholder test quests.
 
 - **Unlock flags:** one generic `flags: Record<string, true>` store that every gated system reads (e.g. `crest:courage`, `crest:courage:awakened`, `armor-unlocked`, `dna:omnimon`). Anything can set a flag - a quest, a boss, an expedition find - so the story can be designed later without touching the gated systems.
@@ -128,6 +136,17 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - **Hooks already waiting:** the "farming specialization" special abilities parked in GAMEPLAY_DESIGN.md ("Special Abilities") plug in here - e.g. a +yield ability for farmhands.
 - **Tunables:** grow times, yields, XP per food, plot costs in `balance.json`; a Balance Lab chart of food XP per hour vs. kill XP per hour, so feeding stays a supplement to combat rather than a replacement.
 - **Open questions for the design pass:** is food bought/planted with bits or seeds only; how many plots; does a plot need care (watering) or is it pure idle; is farming unlocked from the start or after the first boss.
+
+## 9. Region travel + residents gating systems
+**Goal:** the story's first act playable end to end. See STORY.md sections 3-4.
+- Real **multi-region travel**: AreaTabs is still a placeholder; regions (areas) unlock via boss `unlocks` and story flags, and the player switches between unlocked ones.
+- **Residents unlock systems**: expeditions, the Shop, the Mystery Egg stall and hatchery upgrades each check a flag set by an Act 1 quest (Tentomon, Andromon, the Yokomon villagers, Elecmon).
+- Act 1's seven new regions, bosses and quest chain, built from STORY.md.
+
+## 10. Limit Breaks (level cap above 100)
+**Goal:** the post-game's progression. See STORY.md section 8.
+- `MAX_LEVEL` rises in steps (100 → 150) as Limit Breaks are earned from post-game bosses; the XP curves (feature: leveling curves) continue past Lv 100.
+- One global cap for the whole roster (decided); the XP curve stays as is - XP-gain boosts come through the story instead (STORY.md 8.1b).
 
 ## Parked
 - **Signature moves** - per-species active moves; revisit when a small curated set (e.g. only Megas or boss-relevant lines) is feasible.

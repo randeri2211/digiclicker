@@ -5,6 +5,9 @@ import { combat } from './combat.svelte';
 import { inventory } from './inventory.svelte';
 import { areaProgress } from './areaProgress.svelte';
 import { automation } from './digivolveAutomation.svelte';
+import { expeditions, updateExpeditions } from './expeditions.svelte';
+import { progress } from './progress.svelte';
+import { resetQuestWatch } from '../quests/quests';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
 import type { AreaProgressState, InventoryState, RosterState } from '../types';
@@ -26,8 +29,8 @@ function normalizeInventory(loadedInventory: InventoryState): InventoryState {
 // Falls back to the starting area's starting path if the saved
 // activePathId no longer resolves against current area data (area
 // content can change between plays), rather than leaving the player on a
-// dangling reference.
-// Saves made before bosses existed lack bossesDefeated - nothing beaten.
+// dangling reference. Saves made before bosses existed lack
+// bossesDefeated - nothing beaten.
 function normalizeAreaProgress(loaded: AreaProgressState): AreaProgressState {
   if (!getPath(loaded.activeAreaId, loaded.activePathId)) return initialAreaProgress();
   return { ...loaded, bossesDefeated: loaded.bossesDefeated ?? [] };
@@ -69,6 +72,8 @@ function snapshotLiveState(): SaveSlotData {
       inventory,
       areaProgress,
       automation,
+      expeditions,
+      progress,
     })
   );
 }
@@ -87,6 +92,14 @@ function applySlotToLiveState(data: SaveSlotData): void {
   Object.assign(areaProgress, normalizeAreaProgress(data.areaProgress));
   replaceRecord(automation.preferences, data.automation.preferences);
   automation.enabled = data.automation.enabled;
+  // Parties whose time ran out while the game was closed are back now.
+  expeditions.active = data.expeditions?.active ?? [];
+  expeditions.lastHaul = null;
+  updateExpeditions();
+  replaceRecord(progress.flags, data.progress?.flags ?? {});
+  progress.completedQuests = data.progress?.completedQuests ?? [];
+  // Quests already ready in this save shouldn't all announce themselves.
+  resetQuestWatch();
 }
 
 export function loadSlotIntoLiveState(slotId: string): void {

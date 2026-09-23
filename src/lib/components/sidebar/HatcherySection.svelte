@@ -1,9 +1,9 @@
 <script lang="ts">
   import HatcherySlot from './HatcherySlot.svelte';
-  import { hatchery } from '../../game/state/game.svelte';
+  import { hatchery, currency, hatchEgg, isEggReady } from '../../game/state/game.svelte';
   import { getEggSpriteUrl } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
-  import { EGG_HATCH_LEVEL } from '../../game/constants';
+  import { EGG_HATCH_LEVEL, HATCH_DATA_COST } from '../../game/constants';
 
   const emptyCount = $derived(Math.max(0, hatchery.capacity - hatchery.incubating.length));
   const lockedCount = $derived(Math.max(0, hatchery.maxCapacity - hatchery.capacity));
@@ -21,6 +21,10 @@
         spriteUrl={getEggSpriteUrl(egg.eggType)}
         level={levelForXp(egg.xp)}
         isMystery={egg.isMystery}
+        ready={isEggReady(egg)}
+        readyLabel="{HATCH_DATA_COST} Data"
+        affordable={currency.data >= HATCH_DATA_COST}
+        onHatch={() => hatchEgg(egg.eggId)}
       />
     {/each}
     {#each Array.from({ length: emptyCount }) as _, i (i)}
@@ -38,7 +42,7 @@
         stroke-width="1.3"
       />
     </svg>
-    Hatches at Lv {EGG_HATCH_LEVEL}{#if hatchery.stored.length > 0}&nbsp;· {hatchery.stored.length} waiting{/if}
+    Ready at Lv {EGG_HATCH_LEVEL}, hatch for {HATCH_DATA_COST} Data{#if hatchery.stored.length > 0}&nbsp;· {hatchery.stored.length} waiting{/if}
   </div>
 </div>
 

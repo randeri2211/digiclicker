@@ -1,5 +1,7 @@
-import type { CombatState, Stage, SquadMember } from '../types';
-import { roster, getRosterList } from './roster.svelte';
+import type { CombatState, ItemId, Stage, SquadMember } from '../types';
+import { roster } from './roster.svelte';
+import { getFightingRoster, isAway } from './expeditions.svelte';
+import { removeItem } from './inventory.svelte';
 import { addEgg } from './hatchery.svelte';
 import { currency } from './currency.svelte';
 import {
@@ -11,6 +13,7 @@ import {
   computeSquadClickDamage,
   computeSquadStat,
   type WeightedEntry,
+  type SquadStatBonus,
 } from '../combat/damage';
 import { pickNextWildSpawn, spawnDebugWild, makeBossSpawn, computeKillXp, computeKillBits } from '../combat/spawn';
 import { advantageMultiplier } from '../combat/advantage';
@@ -20,7 +23,14 @@ import { getSpecies } from '../images';
 import { areaProgress } from './areaProgress.svelte';
 import { getActivePath, recordActivePathKill, isBossAvailable, recordBossVictory } from '../areas/areaProgress';
 import { getPath } from '../areas/areaRegistry';
-import { ADVANTAGE_BONUS, DISADVANTAGE_PENALTY } from '../constants';
+import { ADVANTAGE_BONUS, DISADVANTAGE_PENALTY, BOSS_CHIP_BONUS } from '../constants';
+
+/** Boss chip item -> the squad stats it boosts for one boss fight. */
+export const BOSS_CHIP_STATS: Partial<Record<ItemId, (keyof SquadStatBonus)[]>> = {
+  'attack-chip': ['attack', 'specialAttack'],
+  'speed-chip': ['speed'],
+  'hp-disk': ['hp'],
+};
 
 export const combat: CombatState = $state({ wild: null, damagePopup: null, boss: null, lastBossResult: null });
 
@@ -63,16 +73,32 @@ function squadEntries(squad: SquadMember[]): WeightedEntry[] {
 
 /** Starts the boss on that path with the chosen squad. False and no-op
  * unless the boss is available, no other boss fight is running, and the
- * squad is 1..squadSize owned, distinct species. */
-export function startBossFight(areaId: string, pathId: string, squadSpeciesIds: string[], now: number = Date.now()): boolean {
+ * squad is 1..squadSize owned, distinct species who aren't away on an
+ * expedition. Each chip in `chips` (one of each kind at most) is spent
+ * and boosts its stats for the whole squad for this fight; chips the
+ * player doesn't own are ignored. */
+export function startBossFight(
+  areaId: string,
+  pathId: string,
+  squadSpeciesIds: string[],
+  now: number = Date.now(),
+  chips: ItemId[] = []
+): boolean {
   const boss = getPath(areaId, pathId)?.boss;
   if (!boss || combat.boss || !isBossAvailable(areaProgress, areaId, pathId)) return false;
   const unique = [...new Set(squadSpeciesIds)];
-  if (unique.length === 0 || unique.length > boss.squadSize || unique.some((id) => !roster[id])) return false;
+  if (unique.length === 0 || unique.length > boss.squadSize || unique.some((id) => !roster[id] || isAway(id))) return false;
+
+  const statBonus: SquadStatBonus = {};
+  for (const chip of new Set(chips)) {
+    const stats = BOSS_CHIP_STATS[chip];
+    if (!stats || !removeItem(chip, 1)) continue;
+    for (const stat of stats) statBonus[stat] = (statBonus[stat] ?? 0) + BOSS_CHIP_BONUS;
+  }
 
   const squad = unique.map((speciesId) => ({ speciesId, multiplier: squadMultiplier(speciesId, boss.speciesId) }));
-  combat.boss = { areaId, pathId, squad };
-  combat.wild = makeBossSpawn(now, boss, computeSquadStat(squadEntries(squad), 'hp'));
+  combat.boss = { areaId, pathId, squad, statBonus };
+  combat.wild = makeBossSpawn(now, boss, computeSquadStat(squadEntries(squad), 'hp', statBonus));
   combat.damagePopup = null;
   return true;
 }
@@ -139,7 +165,9 @@ export function handleClick() {
   const wild = combat.wild;
   if (!wild) return;
 
-  const damage = combat.boss ? computeSquadClickDamage(squadEntries(combat.boss.squad)) : computeClickDamage(getRosterList());
+  const damage = combat.boss
+    ? computeSquadClickDamage(squadEntries(combat.boss.squad), combat.boss.statBonus)
+    : computeClickDamage(getFightingRoster());
   wild.currentHp = Math.max(0, wild.currentHp - damage);
   showDamagePopup(damage);
 
@@ -169,10 +197,12 @@ export function tick(now: number) {
   }
 
   const elapsedSeconds = (now - wild.lastTickAt) / 1000;
-  // A boss fight uses only the squad (with matchup multipliers); a normal
-  // fight uses the whole roster.
+  // A boss fight uses only the squad (with matchup multipliers and chip
+  // bonuses); a normal fight uses the whole roster minus anyone away on an
+  // expedition.
   const squad = combat.boss ? squadEntries(combat.boss.squad) : null;
-  const attacksPerSecond = squad ? computeSquadAttacksPerSecond(squad) : computeAttacksPerSecond(getRosterList());
+  const bonus = combat.boss?.statBonus ?? {};
+  const attacksPerSecond = squad ? computeSquadAttacksPerSecond(squad, bonus) : computeAttacksPerSecond(getFightingRoster());
 
   // Discrete attack ticks, not a smooth drain: Speed sets how many whole
   // attacks land per second, each dealing the fighters' flat
@@ -184,7 +214,7 @@ export function tick(now: number) {
   const hits = Math.floor(wild.attackProgress);
   if (hits > 0) {
     wild.attackProgress -= hits;
-    const damagePerHit = squad ? computeSquadDamagePerHit(squad) : computeRosterDamagePerHit(getRosterList());
+    const damagePerHit = squad ? computeSquadDamagePerHit(squad, bonus) : computeRosterDamagePerHit(getFightingRoster());
     wild.currentHp = Math.max(0, wild.currentHp - hits * damagePerHit);
   }
   wild.lastTickAt = now;

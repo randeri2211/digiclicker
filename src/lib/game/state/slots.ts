@@ -13,6 +13,8 @@ function freshSlotData(): SaveSlotData {
     inventory: emptyInventory(),
     areaProgress: initialAreaProgress(),
     automation: { enabled: false, preferences: {} },
+    expeditions: { active: [], lastHaul: null },
+    progress: { flags: {}, completedQuests: [] },
   };
 }
 

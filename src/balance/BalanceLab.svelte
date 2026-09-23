@@ -123,6 +123,20 @@
       fields: [
         { path: ['ADVANTAGE_BONUS'], label: 'Advantage bonus', step: 0.05 },
         { path: ['DISADVANTAGE_PENALTY'], label: 'Disadvantage penalty', step: 0.05 },
+        { path: ['BOSS_CHIP_BONUS'], label: 'Boss chip bonus', step: 0.05 },
+      ],
+    },
+    {
+      id: 'expeditions',
+      title: 'Expeditions',
+      note: 'Duration ÷ (1 + speed × avg level) · haul × (1 + match × favored members + stage × avg stage)',
+      open: false,
+      fields: [
+        { path: ['EXPEDITION_MAX_CONCURRENT'], label: 'Expeditions at once', step: 1 },
+        { path: ['EXPEDITION_MAX_PARTY'], label: 'Party size', step: 1 },
+        { path: ['EXPEDITION_LEVEL_SPEED_SCALE'], label: 'Speed per party level', step: 0.005 },
+        { path: ['EXPEDITION_ELEMENT_MATCH_BONUS'], label: 'Haul per favored member', step: 0.05 },
+        { path: ['EXPEDITION_STAGE_BONUS'], label: 'Haul per avg stage', step: 0.05 },
       ],
     },
     {
@@ -221,6 +235,7 @@
         { path: ['KILL_BITS_PER_LEVEL'], label: 'Kill bits per wild level', step: 1 },
         { path: ['EGG_DROP_CHANCE_PERCENT'], label: 'Egg drop chance %', step: 0.05 },
         { path: ['EGG_HATCH_LEVEL'], label: 'Egg hatch level', step: 1 },
+        { path: ['HATCH_DATA_COST'], label: 'Hatch cost (Data)', step: 5 },
         { path: ['DUPLICATE_HATCH_XP'], label: 'Duplicate hatch XP', step: 50 },
         { path: ['HATCHERY_STARTING_CAPACITY'], label: 'Hatchery slots at start', step: 1 },
         { path: ['HATCHERY_MAX_CAPACITY'], label: 'Hatchery slots max', step: 1 },

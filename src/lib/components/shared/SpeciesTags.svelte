@@ -3,7 +3,7 @@
 
   // Identity dots only - chip text stays in the normal text color, so a
   // hue never has to carry readability on the dark panels.
-  const ELEMENT_COLOR: Record<Element, string> = {
+  export const ELEMENT_COLOR: Record<Element, string> = {
     Fire: '#e8663d',
     Water: '#3a8fe8',
     Plant: '#3fae5a',

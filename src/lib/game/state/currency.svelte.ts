@@ -16,3 +16,10 @@ export function spendBits(amount: number): boolean {
   currency.bits -= amount;
   return true;
 }
+
+/** False and no-op if Data is insufficient - never allows going negative. */
+export function spendData(amount: number): boolean {
+  if (currency.data < amount) return false;
+  currency.data -= amount;
+  return true;
+}
