@@ -24,6 +24,15 @@ export const HATCHERY_MAX_CAPACITY = balance.HATCHERY_MAX_CAPACITY;
 export const HATCHERY_SLOT_BASE_COST = balance.HATCHERY_SLOT_BASE_COST;
 export const HATCHERY_SLOT_COST_GROWTH = balance.HATCHERY_SLOT_COST_GROWTH;
 
+// ---- Offline progress ------------------------------------------------
+/** Most time away that counts - the game closed, or a background tab the
+ * browser throttled. Wild fights are fast-forwarded kill by kill with the
+ * normal rewards (state/combat.svelte.ts fastForwardWildCombat). */
+export const OFFLINE_PROGRESS_CAP_HOURS = balance.OFFLINE_PROGRESS_CAP_HOURS;
+/** Fraction of the (capped) time away that's actually fought - 1 = the
+ * same pace as playing. */
+export const OFFLINE_PROGRESS_EFFICIENCY = balance.OFFLINE_PROGRESS_EFFICIENCY;
+
 // ---- Digivolution requirements & scope ----------------------------
 /** Level the source must reach before digivolving into a species at the
  * given target stage. A stage with no entry has no level requirement

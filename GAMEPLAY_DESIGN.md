@@ -382,6 +382,28 @@ on total XP earned per kill.
   game's - change a formula in the game and change it there too. The
   page isn't part of the production build.
 
+### Offline progress (confirmed, built)
+- Time the game wasn't ticking is **fast-forwarded with the real combat
+  rules**: `fastForwardWildCombat` in `state/combat.svelte.ts` jumps kill
+  to kill (each wild takes ceil(HP / damage per hit) attacks at the
+  roster's attack rate, the same discrete hits as a live tick; a new wild
+  costs one tick to spawn) and resolves every kill through the normal
+  `resolveKill` - XP, bits, path mastery unlocks, egg drops,
+  auto-digivolve. Damage is recomputed after each kill, so levelling up
+  while away speeds it up. Tested to match real ticking exactly.
+- Two sources of lost time, one mechanism (`state/offline.svelte.ts`):
+  **game closed** - on load, the time since the save's `savedAt`;
+  **background tab** - browsers throttle hidden tabs (down to one timer a
+  minute), so a tick-loop gap over 5s is fast-forwarded instead of
+  landing as one oversized tick; gaps collect while hidden.
+- Counted time = min(away, `OFFLINE_PROGRESS_CAP_HOURS` 8h) x
+  `OFFLINE_PROGRESS_EFFICIENCY` (1). Both in the Balance Lab. No combat
+  during a boss fight (its timer is real time). Expeditions were already
+  time-based.
+- **Welcome back** screen when a minute or more was caught up: time away
+  (and the cap, if hit), kills, bits, eggs found, Digimon that digivolved,
+  level-ups, paths that opened.
+
 ### Idle production
 - Roster auto-attack (see Core click loop) *is* the idle/offline
   production mechanic for now — no separate farm/area-assignment system.

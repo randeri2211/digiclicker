@@ -245,6 +245,15 @@
         { path: ['ABILITY_REROLL_COST_BITS'], label: 'Ability reroll price (bits)', step: 50 },
       ],
     },
+    {
+      id: 'offline',
+      title: 'Offline progress',
+      open: false,
+      fields: [
+        { path: ['OFFLINE_PROGRESS_CAP_HOURS'], label: 'Max hours counted', step: 1 },
+        { path: ['OFFLINE_PROGRESS_EFFICIENCY'], label: 'Efficiency (1 = full pace)', step: 0.05 },
+      ],
+    },
   ];
 
   // ---- File state ------------------------------------------------------

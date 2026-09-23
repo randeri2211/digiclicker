@@ -2,6 +2,7 @@
   import TopBar from './lib/components/hud/TopBar.svelte';
   import CombatPanel from './lib/components/combat/CombatPanel.svelte';
   import VillageScreen from './lib/components/VillageScreen.svelte';
+  import OfflineReportScreen from './lib/components/OfflineReportScreen.svelte';
   import Sidebar from './lib/components/sidebar/Sidebar.svelte';
   import LoadingScreen from './lib/components/LoadingScreen.svelte';
   import MainMenu from './lib/components/MainMenu.svelte';
@@ -187,6 +188,7 @@
 
   {#if screen === 'game'}
     <Toasts />
+    <OfflineReportScreen />
   {/if}
 </div>
 

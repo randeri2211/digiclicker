@@ -9,6 +9,7 @@ import { expeditions, updateExpeditions } from './expeditions.svelte';
 import { progress } from './progress.svelte';
 import { resetQuestWatch } from '../quests/quests';
 import { resetResidentWatch } from '../village/village';
+import { catchUpSinceSave, dismissOfflineReport } from './offline.svelte';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
 import type { AreaProgressState, InventoryState, RosterState } from '../types';
@@ -112,12 +113,15 @@ export function loadSlotIntoLiveState(slotId: string): void {
   if (!slot) return;
   applySlotToLiveState(slot.data);
   activeSlot.id = slotId;
+  // The game was closed since this save was written - fight that time now.
+  catchUpSinceSave(slot.savedAt);
 }
 
 export function startNewGameInSlot(name?: string): void {
   const slot = createSlot(name);
   applySlotToLiveState(slot.data);
   activeSlot.id = slot.id;
+  dismissOfflineReport();
 }
 
 export function saveGame(): void {

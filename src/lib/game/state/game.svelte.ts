@@ -84,3 +84,5 @@ export type { DigivolutionOption } from '../evolution/digivolve';
 export { findRootAncestors, rollEggDrop, hatchEgg, isEggReady } from '../eggs/eggs';
 export { buyMysteryEgg } from '../eggs/mysteryEggs';
 export { getRosterEntryMenuItems } from '../roster/rosterMenu';
+export { offline, dismissOfflineReport } from './offline.svelte';
+export type { OfflineReport } from './offline.svelte';

@@ -23,7 +23,7 @@ import { getSpecies } from '../images';
 import { areaProgress } from './areaProgress.svelte';
 import { getActivePath, recordActivePathKill, isBossAvailable, recordBossVictory } from '../areas/areaProgress';
 import { getPath } from '../areas/areaRegistry';
-import { ADVANTAGE_BONUS, DISADVANTAGE_PENALTY, BOSS_CHIP_BONUS } from '../constants';
+import { ADVANTAGE_BONUS, DISADVANTAGE_PENALTY, BOSS_CHIP_BONUS, COMBAT_TICK_INTERVAL_MS } from '../constants';
 
 /** Boss chip item -> the squad stats it boosts for one boss fight. */
 export const BOSS_CHIP_STATS: Partial<Record<ItemId, (keyof SquadStatBonus)[]>> = {
@@ -159,6 +159,56 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
 
   const egg = rollEggDrop(wild.speciesId);
   if (egg) addEgg(egg);
+}
+
+// Safety stop for one fast-forward - far above anything the time cap allows
+// at sane kill speeds, so it only guards against a broken (zero-HP) setup.
+const FAST_FORWARD_MAX_KILLS = 200_000;
+
+/**
+ * Plays `durationMs` of normal wild combat instantly - for time the game
+ * wasn't ticking (closed, or a throttled background tab). Kill by kill with
+ * the real rules: each wild takes ceil(HP / damage per hit) attacks at the
+ * roster's attack rate (the same discrete hits as tick()), a new wild costs
+ * one tick to spawn, and every kill goes through resolveKill - XP, bits,
+ * path mastery, egg drops, auto-digivolve. Damage is recomputed after every
+ * kill, so levelling up during the time away speeds it up. Leftover time
+ * chips at the current wild. No-op during a boss fight or debug spawns.
+ * Returns the number of kills.
+ */
+export function fastForwardWildCombat(durationMs: number, now: number): number {
+  if (combat.boss || debugSpawn.enabled || durationMs <= 0) return 0;
+  let remaining = durationMs / 1000;
+  let kills = 0;
+  while (remaining > 0 && kills < FAST_FORWARD_MAX_KILLS) {
+    if (!combat.wild) {
+      const path = getActivePath(areaProgress);
+      if (!path) break;
+      combat.wild = pickNextWildSpawn(now, path);
+      remaining -= COMBAT_TICK_INTERVAL_MS / 1000;
+      continue;
+    }
+    const wild = combat.wild;
+    const fighters = getFightingRoster();
+    const attacksPerSecond = computeAttacksPerSecond(fighters);
+    const damagePerHit = computeRosterDamagePerHit(fighters);
+    if (attacksPerSecond <= 0 || damagePerHit <= 0) break;
+
+    const secondsToKill = Math.ceil(wild.currentHp / damagePerHit) / attacksPerSecond;
+    if (secondsToKill > remaining) {
+      const hits = Math.floor(remaining * attacksPerSecond);
+      wild.currentHp = Math.max(1, wild.currentHp - hits * damagePerHit);
+      break;
+    }
+    remaining -= secondsToKill;
+    resolveKill(wild);
+    kills += 1;
+  }
+  if (combat.wild) {
+    combat.wild.lastTickAt = now;
+    combat.wild.attackProgress = 0;
+  }
+  return kills;
 }
 
 export function handleClick() {
