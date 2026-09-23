@@ -1,20 +1,20 @@
 <script lang="ts">
-  import type { DigimonInstance, StatBlock, StatRangeBlock } from '../../game/types';
-  import { getSpecies, getSpriteUrl, getEggSpriteUrl } from '../../game/images';
+  import type { RosterEntry, StatBlock, StatRangeBlock } from '../../game/types';
+  import { getSpecies, getSpriteUrl, getSpeciesName } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import {
+    roster,
     getDigivolveOptions,
-    getDedigivolveOptions,
     digivolve,
-    dedigivolve,
-    ITEM_CATALOG,
+    automation,
+    setPreference,
+    clearPreference,
   } from '../../game/state/game.svelte';
   import type { DigivolutionOption } from '../../game/state/game.svelte';
-  import { getItemCount } from '../../game/state/inventory.svelte';
+  import { MAX_LEVEL } from '../../game/constants';
 
-  function formatStatBlock(block: StatBlock, signed: boolean): string {
-    const fmt = (n: number) => (signed ? `${n >= 0 ? '+' : ''}${n}` : `${n}`);
-    return `ATK ${fmt(block.attack)} · DEF ${fmt(block.defense)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
+  function formatStatBlock(block: StatBlock): string {
+    return `ATK ${block.attack} · HP ${block.hp} · SPD ${block.speed} · SPA ${block.specialAttack}`;
   }
 
   // Ranges are shown instead of a rolled number - the actual roll only
@@ -27,51 +27,103 @@
       const sign = signed && lo >= 0 ? '+' : '';
       return lo === hi ? `${sign}${lo}` : `${sign}${lo}–${hi}`;
     };
-    return `ATK ${fmt(block.attack)} · DEF ${fmt(block.defense)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
+    return `ATK ${fmt(block.attack)} · HP ${fmt(block.hp)} · SPD ${fmt(block.speed)} · SPA ${fmt(block.specialAttack)}`;
   }
 
   interface Props {
-    instance: DigimonInstance;
+    entry: RosterEntry;
   }
 
-  const { instance }: Props = $props();
+  const { entry }: Props = $props();
 
-  let digivolveOptions: DigivolutionOption[] = $state([]);
-  let dedigivolveOptions: DigivolutionOption[] = $state([]);
+  // Options only carry deterministic ranges (no rolls), so re-deriving on
+  // every xp change is safe - and needed, since the inherited-bonus range
+  // grows with the source's level and `owned` flips after a digivolve
+  // (which leaves entry.speciesId unchanged).
+  const options = $derived(getDigivolveOptions(entry));
+  const currentSpecies = $derived(getSpecies(entry.speciesId));
+  const currentName = $derived(getSpeciesName(entry.speciesId));
+  const currentSprite = $derived(getSpriteUrl(entry.speciesId));
 
-  $effect(() => {
-    // Depends only on speciesId (and formHistory, which only ever changes
-    // in lockstep with speciesId) - deliberately never reads instance.xp,
-    // so the combat tick loop's constant XP mutation doesn't re-roll these
-    // previews while the graph just sits open.
-    void instance.speciesId;
-    digivolveOptions = getDigivolveOptions(instance);
-    dedigivolveOptions = getDedigivolveOptions(instance);
-  });
+  function isCommittable(option: DigivolutionOption): boolean {
+    return option.requirementMet && option.canImprove;
+  }
 
-  const currentSpecies = $derived(getSpecies(instance.speciesId));
-  // An unhatched egg's speciesId is already resolved but hidden until it
-  // hatches - show the per-type egg art/name instead of spoiling it.
-  const currentSprite = $derived(instance.eggState ? getEggSpriteUrl(instance.eggState.eggType) : getSpriteUrl(instance.speciesId));
-  const currentName = $derived(instance.eggState ? `Digi-Egg (${instance.eggState.eggType})` : (currentSpecies?.name ?? instance.speciesId));
-  const currentStage = $derived(instance.eggState ? 'Egg' : (currentSpecies?.stage ?? 'Unknown'));
+  // What an owned target's bonus could end up as after an upgrade - each
+  // stat keeps the higher of its current value and the roll (see
+  // digivolve()), so the outcome range is floored at the current value.
+  function upgradeOutcomeRange(range: StatRangeBlock, current: StatBlock): StatRangeBlock {
+    const floorAt = ([min, max]: [number, number], cur: number): [number, number] => [
+      Math.max(cur, Math.round(min)),
+      Math.max(cur, Math.round(max)),
+    ];
+    return {
+      attack: floorAt(range.attack, current.attack),
+      hp: floorAt(range.hp, current.hp),
+      speed: floorAt(range.speed, current.speed),
+      specialAttack: floorAt(range.specialAttack, current.specialAttack),
+    };
+  }
 
   function commitDigivolve(option: DigivolutionOption) {
-    digivolve(instance, option.species.id);
+    digivolve(entry, option.species.id);
   }
 
-  function commitDedigivolve(option: DigivolutionOption) {
-    dedigivolve(instance, option.species.id);
+  // Only one option can be mid-edit at a time (one preference per source
+  // species anyway) - nothing is written to the real preference until
+  // Confirm, so adjusting the level or backing out costs nothing.
+  let pendingPinTargetId: string | null = $state(null);
+  let pendingMinLevel: number = $state(0);
+
+  function startPinEdit(option: DigivolutionOption, event: Event) {
+    event.stopPropagation();
+    const existing = automation.preferences[entry.speciesId];
+    pendingPinTargetId = option.species.id;
+    pendingMinLevel = existing?.targetSpeciesId === option.species.id ? existing.minLevel : (option.requirement?.minLevel ?? 0);
+  }
+
+  function cancelPinEdit(event: Event) {
+    event.stopPropagation();
+    pendingPinTargetId = null;
+  }
+
+  function unpin(event: Event) {
+    event.stopPropagation();
+    clearPreference(entry.speciesId);
+    pendingPinTargetId = null;
+  }
+
+  // Confirm is the only moment a preference actually gets written - caps
+  // the entered level to MAX_LEVEL, then checks eligibility right away
+  // rather than silently waiting for the next kill: if this entry already
+  // meets the level just confirmed, try digivolving immediately
+  // (digivolve() itself re-checks the real requirement and ownership). A
+  // same-target preference is left untouched by digivolve(), so the
+  // custom level survives.
+  function confirmPin(option: DigivolutionOption, event: Event) {
+    event.stopPropagation();
+    const clampedLevel = Math.min(Math.max(0, Math.round(pendingMinLevel) || 0), MAX_LEVEL);
+    setPreference(entry.speciesId, option.species.id, clampedLevel);
+    pendingPinTargetId = null;
+
+    if (levelForXp(entry.xp) >= clampedLevel) {
+      digivolve(entry, option.species.id);
+    }
   }
 </script>
 
-{#snippet optionCard(option: DigivolutionOption, onCommit: (o: DigivolutionOption) => void)}
+{#snippet optionCard(option: DigivolutionOption)}
   {@const sprite = getSpriteUrl(option.species.id)}
+  {@const pinnedPreference = automation.preferences[entry.speciesId]}
+  {@const isPinned = pinnedPreference?.targetSpeciesId === option.species.id}
+  {@const isEditing = pendingPinTargetId === option.species.id}
+  {@const committable = isCommittable(option)}
   <div
     class="option-card"
-    class:blocked={!option.requirementMet}
-    onclick={() => option.requirementMet && onCommit(option)}
-    onkeydown={(e) => e.key === 'Enter' && option.requirementMet && onCommit(option)}
+    class:blocked={!committable}
+    class:owned={option.owned}
+    onclick={() => committable && commitDigivolve(option)}
+    onkeydown={(e) => e.key === 'Enter' && committable && commitDigivolve(option)}
     role="button"
     tabindex="0"
   >
@@ -81,35 +133,77 @@
       {:else}
         <span class="no-sprite">{option.species.name}</span>
       {/if}
+      {#if option.owned}
+        <span class="owned-badge">Owned</span>
+      {/if}
     </div>
     <div class="option-name">{option.species.name}</div>
     <div class="option-stage">{option.species.stage} · {option.species.statAffinity}</div>
-    <div class="option-bonus">{formatStatRange(option.digivolutionStatsBonusRange, true)}</div>
-    <div class="option-growth">Growth/lvl: {formatStatRange(option.growthPerLevelRange, false)}</div>
+    {#if option.owned}
+      {@const ownedEntry = roster[option.species.id]}
+      <div class="option-req">
+        {ownedEntry.inheritedFromLevel > 0 ? `Best from Lv ${ownedEntry.inheritedFromLevel}` : 'Never digivolved into'}
+      </div>
+      <div class="option-growth">Current: {formatStatBlock(ownedEntry.inheritedBonus)}</div>
+      {#if option.canImprove}
+        <div class="option-bonus">
+          Upgrade: {formatStatRange(upgradeOutcomeRange(option.inheritedBonusRange, ownedEntry.inheritedBonus), true)}
+        </div>
+      {:else}
+        <div class="option-req">Can't improve at Lv {levelForXp(entry.xp)}</div>
+      {/if}
+    {:else}
+      <div class="option-bonus">Inherited: {formatStatRange(option.inheritedBonusRange, true)}</div>
+      <div class="option-growth">Growth/lvl: {formatStatRange(option.growthPerLevelRange, false)}</div>
+    {/if}
     <div class="option-req">
-      {#if option.requirement?.itemId !== undefined}
-        {@const count = option.requirement.itemCount ?? 1}
-        {@const have = getItemCount(option.requirement.itemId)}
-        Needs {count}x {ITEM_CATALOG[option.requirement.itemId].name} (have {have})
-      {:else if option.requirement?.minLevel !== undefined}
+      {#if option.requirement}
         Requires Lv {option.requirement.minLevel}
       {:else}
         No requirements
       {/if}
     </div>
+    {#if !option.owned}
+      <div class="pin-row">
+        {#if isEditing}
+          <label class="pin-level">
+            Min Lv
+            <input
+              type="number"
+              min="0"
+              max={MAX_LEVEL}
+              bind:value={pendingMinLevel}
+              onclick={(e) => e.stopPropagation()}
+            />
+          </label>
+          <button class="pin-btn confirm" onclick={(e) => confirmPin(option, e)}>Confirm</button>
+          <button class="pin-btn" onclick={cancelPinEdit}>Cancel</button>
+        {:else if isPinned}
+          <span class="pin-btn pinned">Pinned (Lv {pinnedPreference?.minLevel})</span>
+          <button class="pin-btn" onclick={(e) => startPinEdit(option, e)}>Edit</button>
+          <button class="pin-btn" onclick={unpin}>Unpin</button>
+        {:else}
+          <button class="pin-btn" onclick={(e) => startPinEdit(option, e)}>Pin</button>
+        {/if}
+      </div>
+    {/if}
   </div>
 {/snippet}
 
 <div class="graph">
   <div class="tier-label">Digivolves to</div>
   <div class="tier-row">
-    {#if digivolveOptions.length === 0}
+    {#if options.length === 0}
       <div class="empty-note">No further digivolutions available.</div>
     {:else}
-      {#each digivolveOptions as option (option.species.id)}
-        {@render optionCard(option, commitDigivolve)}
+      {#each options as option (option.species.id)}
+        {@render optionCard(option)}
       {/each}
     {/if}
+  </div>
+  <div class="reset-note">
+    Digivolving adds the new form to your roster - or, for one you own, rerolls its inherited bonus and keeps the
+    higher value per stat - and resets {currentName} to Lv 1.
   </div>
 
   <div class="stem"></div>
@@ -124,23 +218,10 @@
     </div>
     <div class="current-name">{currentName}</div>
     <div class="current-meta">
-      {currentStage} · Lv {levelForXp(instance.xp)}
+      {currentSpecies?.stage ?? 'Unknown'} · Lv {levelForXp(entry.xp)}
     </div>
-    <div class="current-stats">Digivolution stats: {formatStatBlock(instance.digivolutionStats, false)}</div>
+    <div class="current-stats">Inherited bonus: {formatStatBlock(entry.inheritedBonus)}</div>
   </div>
-
-  <div class="stem"></div>
-
-  <div class="tier-row">
-    {#if dedigivolveOptions.length === 0}
-      <div class="empty-note">No prior forms in the evolution graph.</div>
-    {:else}
-      {#each dedigivolveOptions as option (option.species.id)}
-        {@render optionCard(option, commitDedigivolve)}
-      {/each}
-    {/if}
-  </div>
-  <div class="tier-label">De-digivolves to</div>
 </div>
 
 <style>
@@ -166,9 +247,12 @@
     max-width: 100%;
     border-top: 1px solid var(--panel-border);
   }
-  .tier-row:last-of-type {
-    border-top: none;
-    border-bottom: 1px solid var(--panel-border);
+  .reset-note {
+    max-width: 640px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 4px;
   }
   .stem {
     width: 1px;
@@ -201,7 +285,11 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+  .option-card.owned {
+    border-style: dashed;
+  }
   .option-sprite {
+    position: relative;
     width: 64px;
     height: 64px;
     display: flex;
@@ -214,6 +302,19 @@
     width: 82%;
     height: 82%;
     object-fit: contain;
+  }
+  .owned-badge {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--pos);
+    background: var(--panel);
+    border: 1px solid var(--pos);
+    padding: 0 4px;
   }
   .no-sprite {
     font-size: 10px;
@@ -241,6 +342,50 @@
   .option-req {
     font-size: 9px;
     color: var(--text-dim);
+  }
+  .pin-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .pin-btn {
+    appearance: none;
+    font: inherit;
+    font-family: var(--mono);
+    background: var(--panel-2);
+    border: 1px solid var(--panel-border);
+    color: var(--text-dim);
+    font-size: 9px;
+    padding: 3px 8px;
+    cursor: pointer;
+  }
+  .pin-btn.pinned {
+    color: var(--text-h);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    cursor: default;
+  }
+  .pin-btn.confirm {
+    color: var(--pos);
+    border-color: var(--pos);
+  }
+  .pin-level {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+  .pin-level input {
+    width: 42px;
+    font: inherit;
+    font-family: var(--mono);
+    background: var(--panel-2);
+    border: 1px solid var(--panel-border);
+    color: var(--text-h);
+    padding: 2px 4px;
   }
 
   .current-card {

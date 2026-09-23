@@ -3,17 +3,14 @@
     variant: 'filled' | 'empty' | 'locked';
     spriteUrl?: string | null;
     level?: number;
-    /** Digivolution-eligibility indicator. */
-    ready?: boolean;
-    isActive?: boolean;
-    /** Only fired for filled slots - empty/locked slots have nothing to act on. */
-    onClick?: (event: MouseEvent) => void;
+    /** True only for a Mystery Digi-Egg (bought from the Shop). */
+    isMystery?: boolean;
   }
 
-  const { variant, spriteUrl = null, level, ready = false, isActive = false, onClick }: Props = $props();
+  const { variant, spriteUrl = null, level, isMystery = false }: Props = $props();
 </script>
 
-{#snippet slotContent()}
+<div class="slot" class:empty={variant === 'empty'} class:locked={variant === 'locked'}>
   {#if variant === 'filled'}
     {#if spriteUrl}
       <img src={spriteUrl} alt="" />
@@ -21,8 +18,8 @@
     {#if level !== undefined}
       <span class="slot-lv">Lv {level}</span>
     {/if}
-    {#if ready}
-      <span class="slot-ready"></span>
+    {#if isMystery}
+      <span class="slot-mystery">?</span>
     {/if}
   {:else if variant === 'empty'}
     +
@@ -32,33 +29,7 @@
       <path d="M8 11V7a4 4 0 018 0v4" stroke="currentColor" stroke-width="1.8" />
     </svg>
   {/if}
-{/snippet}
-
-{#if variant === 'filled' && onClick}
-  <div
-    class="slot clickable"
-    class:active-slot={isActive}
-    onclick={onClick}
-    onkeydown={(e) => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      e.preventDefault();
-      e.currentTarget.click();
-    }}
-    role="button"
-    tabindex="0"
-  >
-    {@render slotContent()}
-  </div>
-{:else}
-  <div
-    class="slot"
-    class:active-slot={isActive}
-    class:empty={variant === 'empty'}
-    class:locked={variant === 'locked'}
-  >
-    {@render slotContent()}
-  </div>
-{/if}
+</div>
 
 <style>
   .slot {
@@ -70,15 +41,6 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-  }
-  .slot.active-slot {
-    border-color: var(--panel-border-strong);
-  }
-  .slot.clickable {
-    cursor: pointer;
-  }
-  .slot.clickable:hover {
-    border-color: var(--accent);
   }
   .slot img {
     width: 78%;
@@ -95,15 +57,22 @@
     color: var(--text-h);
     border: 1px solid var(--panel-border);
   }
-  .slot-ready {
+  .slot-mystery {
     position: absolute;
     top: 4px;
-    right: 4px;
-    width: 8px;
-    height: 8px;
-    background: var(--warn);
-    box-shadow: 0 0 6px var(--warn);
-    border-radius: 50%;
+    left: 4px;
+    font-family: var(--head);
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-h);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    width: 13px;
+    height: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
   .slot.empty {
     color: var(--text-dim);

@@ -1,9 +1,10 @@
-import type { DigimonInstance, DigimonSpecies } from '../types';
+import type { DigimonSpecies, Egg, EggType } from '../types';
 import { getSpecies } from '../images';
-import { createDigimonInstance } from '../roster/starterRoster';
+import { createRosterEntry } from '../roster/starterRoster';
 import { levelForXp } from '../combat/levelCurve';
-import { EGG_DROP_CHANCE_PERCENT, EGG_HATCH_LEVEL, IN_GAME_STAGES } from '../constants';
-import { recordDiscovery } from '../state/compendium.svelte';
+import { DUPLICATE_HATCH_XP, EGG_DROP_CHANCE_PERCENT, EGG_HATCH_LEVEL, IN_GAME_STAGES } from '../constants';
+import { roster, addToRoster } from '../state/roster.svelte';
+import { removeIncubatingEgg } from '../state/hatchery.svelte';
 
 function isInGameSpecies(species: DigimonSpecies): boolean {
   return IN_GAME_STAGES.has(species.stage);
@@ -45,14 +46,18 @@ export function findRootAncestors(speciesId: string): string[] {
   return [...roots];
 }
 
+export function createEgg(speciesId: string, eggType: EggType, isMystery: boolean): Egg {
+  return { eggId: crypto.randomUUID(), speciesId, eggType, isMystery, xp: 0 };
+}
+
 /**
  * Rolls for a rare Digi-Egg drop from a kill. On a hit, resolves the
  * dropped egg to a random Fresh-stage ancestor of the killed species (see
- * findRootAncestors) and builds its (already-resolved, but hidden behind
- * eggState) instance. Returns null on a miss, or when the killed species
- * has no traceable Fresh ancestor at all.
+ * findRootAncestors) - already resolved, but hidden from the player until
+ * it hatches. Returns null on a miss, or when the killed species has no
+ * traceable Fresh ancestor at all.
  */
-export function rollEggDrop(killedSpeciesId: string): DigimonInstance | null {
+export function rollEggDrop(killedSpeciesId: string): Egg | null {
   if (Math.random() * 100 >= EGG_DROP_CHANCE_PERCENT) return null;
 
   const roots = findRootAncestors(killedSpeciesId);
@@ -62,27 +67,25 @@ export function rollEggDrop(killedSpeciesId: string): DigimonInstance | null {
   const targetSpecies = getSpecies(targetSpeciesId);
   if (!targetSpecies) return null;
 
-  const instance = createDigimonInstance(targetSpeciesId, 0);
-  instance.eggState = { eggType: targetSpecies.eggType, hatchAtLevel: EGG_HATCH_LEVEL };
-  return instance;
+  return createEgg(targetSpeciesId, targetSpecies.eggType, false);
 }
 
 /**
- * Checks whether an egg instance has reached its hatch threshold; if so,
- * clears eggState and resets xp to 0 (same reset digivolve/de-digivolve
- * already apply, for the same "every transition resets" consistency).
- * Called wherever xp is awarded (see awardKillXp in combat/xp.ts) - not a
- * separate sweep.
+ * Hatches an incubating egg once it reaches EGG_HATCH_LEVEL - removes it
+ * from the hatchery and either adds its species to the roster (the reveal
+ * moment - also what credits it in the Compendium) or, if that species is
+ * already owned, converts it into a bonus for the existing entry instead
+ * of a second copy. Called wherever xp is awarded (see awardKillXp in
+ * combat/xp.ts) - not a separate sweep.
  */
-export function tryHatch(instance: DigimonInstance): boolean {
-  if (!instance.eggState) return false;
-  if (levelForXp(instance.xp) < instance.eggState.hatchAtLevel) return false;
+export function tryHatch(egg: Egg): boolean {
+  if (levelForXp(egg.xp) < EGG_HATCH_LEVEL) return false;
 
-  instance.eggState = null;
-  instance.xp = 0;
-  // The reveal moment - instance.speciesId was resolved back at drop time
-  // but hidden behind eggState until now, so this is the first point it's
-  // safe to credit toward the compendium.
-  recordDiscovery(instance.speciesId);
+  removeIncubatingEgg(egg.eggId);
+  if (addToRoster(createRosterEntry(egg.speciesId))) return true;
+
+  // TODO(human): this species is already owned - turn the egg into a bonus
+  // for `existing` instead of a second copy.
+  const existing = roster[egg.speciesId];
   return true;
 }

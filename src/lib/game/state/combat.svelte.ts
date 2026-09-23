@@ -1,7 +1,8 @@
 import type { CombatState, Stage } from '../types';
-import { team } from './team.svelte';
+import { getRosterList } from './roster.svelte';
+import { addEgg } from './hatchery.svelte';
 import { currency } from './currency.svelte';
-import { computeClickDamage, computeAttacksPerSecond, computeTeamDamagePerHit } from '../combat/damage';
+import { computeClickDamage, computeAttacksPerSecond, computeRosterDamagePerHit, computeRosterHp } from '../combat/damage';
 import { pickNextWildSpawn, spawnDebugWild, computeKillXp, computeKillBits } from '../combat/spawn';
 import { awardKillXp } from '../combat/xp';
 import { rollEggDrop } from '../eggs/eggs';
@@ -36,19 +37,19 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
   const xpValue = computeKillXp(wild.level);
   const bitsValue = computeKillBits(wild.level);
 
-  awardKillXp(xpValue, team);
+  awardKillXp(xpValue);
   currency.bits += bitsValue;
   recordActivePathKill(areaProgress);
 
   const egg = rollEggDrop(wild.speciesId);
-  if (egg) team.reserveMembers.push(egg);
+  if (egg) addEgg(egg);
 }
 
 export function handleClick() {
   const wild = combat.wild;
   if (!wild) return;
 
-  const damage = computeClickDamage();
+  const damage = computeClickDamage(getRosterList());
   wild.currentHp = Math.max(0, wild.currentHp - damage);
   showDamagePopup(damage);
 
@@ -62,26 +63,28 @@ export function handleClick() {
 // changes, and by tick() below whenever a new spawn is due.
 export function applyDebugSpawn(now: number = Date.now()): void {
   if (!debugSpawn.enabled) return;
-  const wild = spawnDebugWild(now, debugSpawn.stage, debugSpawn.level);
+  const wild = spawnDebugWild(now, debugSpawn.stage, debugSpawn.level, computeRosterHp(getRosterList()));
   if (wild) combat.wild = wild;
 }
 
 export function tick(now: number) {
   const wild = combat.wild;
   if (!wild) {
-    combat.wild = debugSpawn.enabled ? spawnDebugWild(now, debugSpawn.stage, debugSpawn.level) : null;
+    const rosterHp = computeRosterHp(getRosterList());
+    combat.wild = debugSpawn.enabled ? spawnDebugWild(now, debugSpawn.stage, debugSpawn.level, rosterHp) : null;
     if (!combat.wild) {
       const activePath = getActivePath(areaProgress);
-      if (activePath) combat.wild = pickNextWildSpawn(now, activePath);
+      if (activePath) combat.wild = pickNextWildSpawn(now, activePath, rosterHp);
     }
     return;
   }
 
   const elapsedSeconds = (now - wild.lastTickAt) / 1000;
-  const attacksPerSecond = computeAttacksPerSecond(team.activeMembers);
+  const rosterList = getRosterList();
+  const attacksPerSecond = computeAttacksPerSecond(rosterList);
 
-  // Discrete attack ticks, not a smooth drain: team Speed sets how many
-  // whole attacks land per second, each dealing the team's flat
+  // Discrete attack ticks, not a smooth drain: roster Speed sets how many
+  // whole attacks land per second, each dealing the roster's flat
   // Attack+SpecialAttack total. Fractional progress toward the next attack
   // carries over in wild.attackProgress instead of being dropped, so the
   // long-run rate still averages out to attacksPerSecond * damagePerHit
@@ -90,12 +93,20 @@ export function tick(now: number) {
   const hits = Math.floor(wild.attackProgress);
   if (hits > 0) {
     wild.attackProgress -= hits;
-    const damagePerHit = computeTeamDamagePerHit(team.activeMembers);
+    const damagePerHit = computeRosterDamagePerHit(rosterList);
     wild.currentHp = Math.max(0, wild.currentHp - hits * damagePerHit);
   }
   wild.lastTickAt = now;
 
   if (wild.currentHp <= 0) {
     resolveKill(wild);
+    return;
+  }
+
+  // Timed out before being defeated - no reward, mirrors how resolveKill
+  // clears combat.wild before granting rewards. The next tick()'s !wild
+  // branch spawns a fresh wild, same respawn gap as after a normal kill.
+  if (now >= wild.spawnedAt + wild.timeLimitMs) {
+    combat.wild = null;
   }
 }

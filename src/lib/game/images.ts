@@ -1,5 +1,5 @@
 import rawData from '../data/digimon-evolution.json';
-import type { DigimonSpecies, EggType, Stage } from './types';
+import type { DigimonSpecies, Egg, EggType, Stage } from './types';
 
 interface EvolutionData {
   species: Record<string, DigimonSpecies>;
@@ -37,4 +37,15 @@ export function getSpriteUrl(speciesId: string): string | null {
 // getSpriteUrl above.
 export function getEggSpriteUrl(eggType: EggType): string {
   return `/digimon/eggs/${eggType}/egg-base.png`;
+}
+
+/** Kill-drop and Mystery eggs share the same per-type sprite - callers
+ * pair this with getEggSpriteUrl, and add the "?" overlay when
+ * egg.isMystery. */
+export function getEggDisplayName(egg: Egg): string {
+  return egg.isMystery ? `Mystery ${egg.eggType} Digi-Egg` : `Digi-Egg (${egg.eggType})`;
+}
+
+export function getSpeciesName(speciesId: string): string {
+  return getSpecies(speciesId)?.name ?? speciesId;
 }

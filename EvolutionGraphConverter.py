@@ -22,7 +22,7 @@ from evolution_junk_labels import JUNK_LABELS
 from evolution_type_mapping import TYPE_TO_STAT_AFFINITY
 from egg_type_mapping import TYPE_TO_EGG_TYPE
 
-STAT_AFFINITIES = ("Attack", "Defense", "Speed", "SpecialAttack")
+STAT_AFFINITIES = ("Attack", "HP", "Speed", "SpecialAttack")
 EGG_TYPES = (
     "Dragon", "Beast", "Dinosaur", "Bird", "Aquatic", "Insect",
     "Plant", "Machine", "Mineral", "Evil", "Holy",

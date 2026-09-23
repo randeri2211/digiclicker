@@ -1,25 +1,32 @@
-import type { AreaProgressState, CompendiumState, CurrencyState, InventoryState, TeamState, WildSpawnState } from '../types';
+import type {
+  AreaProgressState,
+  CurrencyState,
+  DigivolveAutomationState,
+  HatcheryState,
+  InventoryState,
+  RosterState,
+  WildSpawnState,
+} from '../types';
 
-export const CURRENT_SAVE_VERSION = 1;
-export const SAVE_KEY = 'digiclicker-saves-v1';
+// v2 = one-entry-per-species roster (replaced v1's active/training/reserve
+// team). v1 saves stay untouched under their own key - never read, never
+// deleted - so a converter could still be written later if wanted.
+export const CURRENT_SAVE_VERSION = 2;
+export const SAVE_KEY = 'digiclicker-saves-v2';
 
 export interface SaveSlotData {
   currency: CurrencyState;
-  team: TeamState;
+  roster: RosterState;
+  hatchery: HatcheryState;
   wild: WildSpawnState | null;
-  /** Optional for backward compat with saves made before items existed -
-   * normalizeInventory in persistence.svelte.ts backfills missing/partial
-   * inventories to 0 per ITEM_CATALOG entry. */
-  inventory?: InventoryState;
-  /** Optional for backward compat with saves made before areas existed -
-   * normalizeAreaProgress in persistence.svelte.ts defaults to the
-   * starting area/path if missing, or if the saved activePathId no longer
-   * resolves against current area data. */
-  areaProgress?: AreaProgressState;
-  /** Optional for backward compat with saves made before the compendium
-   * existed - normalizeCompendium in persistence.svelte.ts backfills it
-   * from the loaded team's formHistory on first load if missing. */
-  compendium?: CompendiumState;
+  /** normalizeInventory in persistence.svelte.ts backfills any ITEM_CATALOG
+   * entry missing from it (items added after the save was made). */
+  inventory: InventoryState;
+  /** normalizeAreaProgress in persistence.svelte.ts falls back to the
+   * starting area/path if the saved activePathId no longer resolves
+   * against current area data. */
+  areaProgress: AreaProgressState;
+  automation: DigivolveAutomationState;
 }
 
 export interface SaveSlot {

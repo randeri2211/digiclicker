@@ -1,14 +1,18 @@
 import { loadSaveFile, writeSaveFile } from './saveData';
 import type { SaveSlot, SaveSlotData } from './saveData';
-import { createStarterTeam } from '../roster/starterRoster';
+import { createStarterRoster, createEmptyHatchery } from '../roster/starterRoster';
 import { initialAreaProgress } from '../areas/areaProgress';
+import { emptyInventory } from './inventory.svelte';
 
 function freshSlotData(): SaveSlotData {
   return {
     currency: { bits: 0, data: 0 },
-    team: createStarterTeam(),
+    roster: createStarterRoster(),
+    hatchery: createEmptyHatchery(),
     wild: null,
+    inventory: emptyInventory(),
     areaProgress: initialAreaProgress(),
+    automation: { enabled: false, preferences: {} },
   };
 }
 

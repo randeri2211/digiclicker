@@ -1,7 +1,7 @@
 import type { InventoryState, ItemId } from '../types';
 import { ITEM_CATALOG } from '../items/itemCatalog';
 
-function emptyInventory(): InventoryState {
+export function emptyInventory(): InventoryState {
   const entries = Object.keys(ITEM_CATALOG).map((id) => [id, 0]);
   return Object.fromEntries(entries) as InventoryState;
 }

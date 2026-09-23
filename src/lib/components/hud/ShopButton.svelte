@@ -8,17 +8,17 @@
 
 <div
   class="icon-btn"
-  title="Digimon Hub"
+  title="Shop"
   onclick={onClick}
   onkeydown={(e) => e.key === 'Enter' && onClick()}
   role="button"
   tabindex="0"
 >
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.6" />
-    <rect x="13" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.6" />
-    <rect x="3" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.6" />
-    <rect x="13" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.6" />
+    <path d="M4 9L5.5 4H18.5L20 9" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+    <path d="M4 9V19C4 19.5523 4.44772 20 5 20H19C19.5523 20 20 19.5523 20 19V9" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+    <path d="M4 9H20" stroke="currentColor" stroke-width="1.6" />
+    <path d="M9 20V14H15V20" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
   </svg>
 </div>
 

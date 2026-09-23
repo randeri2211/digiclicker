@@ -1,24 +1,28 @@
 <script lang="ts">
   import DigimonList from './DigimonList.svelte';
   import EvolutionGraph from './EvolutionGraph.svelte';
-  import { team, isReadyToDigivolve } from '../../game/state/game.svelte';
+  import { roster, getRosterList, isReadyToDigivolve } from '../../game/state/game.svelte';
 
   interface Props {
+    /** Opens with this entry selected (e.g. from a roster menu's
+     * "Digivolve…" action) instead of the default pick. */
+    initialSpeciesId?: string | null;
     onClose: () => void;
   }
 
-  const { onClose }: Props = $props();
+  const { initialSpeciesId = null, onClose }: Props = $props();
 
-  const allMembers = $derived([...team.activeMembers, ...team.trainingMembers]);
+  const entries = $derived(getRosterList());
 
   function pickDefaultSelection(): string | null {
-    const ready = allMembers.find(isReadyToDigivolve);
-    return (ready ?? allMembers[0])?.instanceId ?? null;
+    if (initialSpeciesId && roster[initialSpeciesId]) return initialSpeciesId;
+    const ready = entries.find(isReadyToDigivolve);
+    return (ready ?? entries[0])?.speciesId ?? null;
   }
 
-  let selectedInstanceId: string | null = $state(pickDefaultSelection());
+  let selectedSpeciesId: string | null = $state(pickDefaultSelection());
 
-  const selectedInstance = $derived(allMembers.find((m) => m.instanceId === selectedInstanceId) ?? null);
+  const selectedEntry = $derived(selectedSpeciesId ? (roster[selectedSpeciesId] ?? null) : null);
 
   $effect(() => {
     // A keydown handler on the backdrop element only fires while the
@@ -54,16 +58,12 @@
 
     <div class="body">
       <div class="list-pane">
-        <DigimonList
-          members={allMembers}
-          {selectedInstanceId}
-          onSelect={(id) => (selectedInstanceId = id)}
-        />
+        <DigimonList {entries} {selectedSpeciesId} onSelect={(id) => (selectedSpeciesId = id)} />
       </div>
       <div class="graph-pane">
-        {#if selectedInstance}
-          {#key selectedInstance.instanceId}
-            <EvolutionGraph instance={selectedInstance} />
+        {#if selectedEntry}
+          {#key selectedEntry.speciesId}
+            <EvolutionGraph entry={selectedEntry} />
           {/key}
         {:else}
           <div class="empty-note">No Digimon to show.</div>

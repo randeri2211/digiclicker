@@ -11,7 +11,7 @@ export type Stage =
   | 'Burst Mode'
   | 'Unknown';
 
-export type StatAffinity = 'Attack' | 'Defense' | 'Speed' | 'SpecialAttack';
+export type StatAffinity = 'Attack' | 'HP' | 'Speed' | 'SpecialAttack';
 
 /** The 11 Digi-Egg flavor types (see egg_type_mapping.py) - a species'
  * eggType is independent of its statAffinity, resolved from the same raw
@@ -29,10 +29,9 @@ export type EggType =
   | 'Evil'
   | 'Holy';
 
-/** One member for now (the de-digivolve item) - a plain string union so
- * adding a new item later is just adding a new member here plus a matching
- * ITEM_CATALOG entry (see src/lib/game/items/itemCatalog.ts). */
-export type ItemId = 'dedigivolve-crystal';
+/** A plain string union - adding a new item is a new member here plus a
+ * matching ITEM_CATALOG entry (see src/lib/game/items/itemCatalog.ts). */
+export type ItemId = 'ability-reroll-crystal';
 
 export interface ItemDefinition {
   id: ItemId;
@@ -45,9 +44,41 @@ export interface ItemDefinition {
  * initialization) - lookups never need a `?? 0` fallback. */
 export type InventoryState = Record<ItemId, number>;
 
+/** 4 stats x 3 rarity tiers - a plain string union so adding a new
+ * ability is a new member here plus a matching ABILITY_CATALOG entry
+ * (see src/lib/game/abilities/abilityCatalog.ts). */
+export type AbilityId =
+  | 'attack-minor'
+  | 'attack-major'
+  | 'attack-superior'
+  | 'hp-minor'
+  | 'hp-major'
+  | 'hp-superior'
+  | 'speed-minor'
+  | 'speed-major'
+  | 'speed-superior'
+  | 'special-attack-minor'
+  | 'special-attack-major'
+  | 'special-attack-superior';
+
+export interface AbilityDefinition {
+  id: AbilityId;
+  name: string;
+  description: string;
+  statKey: keyof StatBlock;
+  /** e.g. 10 = +10% to statKey. */
+  percent: number;
+  /** Rarity weight for rerollAbility's weighted pick - higher rolls more
+   * often, same convention as AreaSpawnEntry/mystery-egg pool weights. */
+  weight: number;
+}
+
 export interface StatBlock {
   attack: number;
-  defense: number;
+  /** Funds the per-encounter fight timer (see combat/spawn.ts's
+   * computeFightTimeLimitMs) - the last stat to gain a live mechanical
+   * effect, formerly called Defense. */
+  hp: number;
   speed: number;
   specialAttack: number;
 }
@@ -98,49 +129,61 @@ export interface DigimonSpecies {
   spriteUrl: string | null;
 }
 
-export interface DigimonInstance {
-  /** Distinct from speciesId - a future taming system could produce duplicate species. */
-  instanceId: string;
+/** One owned species - the roster holds at most one entry per species
+ * (keyed by speciesId in RosterState), and every entry contributes its
+ * stats and receives full kill XP. Created by the starter roster, an egg
+ * hatch, or a digivolve (see evolution/digivolve.ts). */
+export interface RosterEntry {
   speciesId: string;
   xp: number;
-  /** Every distinct species this instance has ever been, first-visited order,
-   * always including the current speciesId. Not consulted for de-digivolve
-   * options (those come from the evolution graph's evolvesFrom instead) -
-   * this is a completion-tracking record for later (e.g. Digivolution
-   * Compendium progress). */
-  formHistory: string[];
-  /** Rolled ONCE at instance creation, from the birth-form's (stage,
-   * statAffinity). Never rerolled by digivolve/de-digivolve - fixed for the
-   * instance's whole life, Pokemon-IV-style individual variance. */
+  /** Rolled once when this entry is created, from its species' (stage,
+   * statAffinity) - Pokemon-IV-style individual variance, never rerolled. */
   baseStats: StatBlock;
-  /** REPLACED (not accumulated) on every digivolve AND de-digivolve, rolled
-   * from the new current form's (stage, statAffinity). Drives per-level growth
-   * until the next form change rerolls it again. */
+  /** Rolled once when this entry is created, same as baseStats. */
   growthPerLevel: StatBlock;
-  /** Form-independent bonus pool (see GAMEPLAY_DESIGN.md) - accumulates
-   * PER-STAT (+=) on every digivolve/de-digivolve, using that transition's
-   * rolled bonus. Layered on top of baseStats/growthPerLevel, not scaled
-   * by the current form. */
-  digivolutionStats: StatBlock;
-  /** Non-null while this instance hasn't hatched yet - speciesId is
-   * already resolved (decided the moment the egg dropped), only
-   * display/digivolve-eligibility are gated on this. Cleared (hatches,
-   * resetting xp to 0 - same as digivolve/de-digivolve) the moment xp
-   * crosses hatchAtLevel; checked wherever xp is awarded (see
-   * tryHatch in game/eggs/eggs.ts). */
-  eggState: { eggType: EggType; hatchAtLevel: number } | null;
+  /** Rolled when a digivolve creates this entry, scaled by the source's
+   * level right before it digivolved (see rollInheritedBonus in
+   * combat/stats.ts) - zero for starters and hatched entries. Digivolving
+   * into this species AGAIN (an "upgrade") rolls a fresh bonus and keeps
+   * the higher value per stat, so it can only ever improve. Rewards
+   * letting a source level longer before digivolving it. */
+  inheritedBonus: StatBlock;
+  /** Highest source level any digivolve into this entry has come from - 0
+   * if never digivolved into (starters, hatched entries). Shown on the
+   * Evolution screen so the player knows what level beats the current
+   * bonus. */
+  inheritedFromLevel: number;
+  /** Null until an Ability Reroll Crystal is used on this entry (see
+   * abilities/abilities.ts's useAbilityReroll) - that item is the only
+   * source, nothing rolls one automatically. */
+  abilityId: AbilityId | null;
 }
 
-export interface TeamState {
-  activeCapacity: number;
-  activeMaxCapacity: number;
-  activeMembers: DigimonInstance[];
-  trainingCapacity: number;
-  trainingMaxCapacity: number;
-  trainingMembers: DigimonInstance[];
-  /** The "Digimon Hub" - caught Digimon that aren't on either team. No
-   * capacity limit, unlike activeMembers/trainingMembers. */
-  reserveMembers: DigimonInstance[];
+/** Keyed by speciesId - the key itself enforces "one per species". */
+export type RosterState = Record<string, RosterEntry>;
+
+/** An unhatched Digi-Egg. speciesId is already resolved (decided the
+ * moment the egg dropped/was bought) but hidden from the player until it
+ * hatches. isMystery distinguishes a player-bought Mystery Digi-Egg
+ * (game/eggs/mysteryEggs.ts) from a wild kill-drop (game/eggs/eggs.ts's
+ * rollEggDrop) - same hatching mechanics, only display differs. */
+export interface Egg {
+  eggId: string;
+  speciesId: string;
+  eggType: EggType;
+  isMystery: boolean;
+  xp: number;
+}
+
+/** Eggs live here, never in the roster. Only incubating eggs (up to
+ * capacity) gain kill XP toward hatching; stored eggs wait, uncapped, and
+ * move into a free incubating slot automatically (see
+ * state/hatchery.svelte.ts's fillIncubatingSlots). */
+export interface HatcheryState {
+  capacity: number;
+  maxCapacity: number;
+  incubating: Egg[];
+  stored: Egg[];
 }
 
 export interface CurrencyState {
@@ -156,9 +199,19 @@ export interface WildSpawnState {
   currentHp: number;
   lastTickAt: number;
   /** Fractional attacks accumulated since the last whole attack tick fired
-   * (team attacksPerSecond * elapsedSeconds, carried over so partial
+   * (roster attacksPerSecond * elapsedSeconds, carried over so partial
    * progress isn't lost between polls of the tick loop). */
   attackProgress: number;
+  /** When this encounter started - immutable for its lifetime, unlike
+   * lastTickAt (which updates every tick). Paired with timeLimitMs to
+   * know when the fight times out (see combat/spawn.ts,
+   * state/combat.svelte.ts's tick()). */
+  spawnedAt: number;
+  /** This encounter's total duration, fixed at spawn time from the
+   * roster's summed HP stat at that moment (see
+   * computeFightTimeLimitMs in combat/spawn.ts) - doesn't change if
+   * roster HP changes mid-fight. */
+  timeLimitMs: number;
 }
 
 export interface DamagePopupState {
@@ -216,8 +269,24 @@ export interface AreaProgressState {
   killsByPath: Record<string, number>;
 }
 
-/** Permanent record of every species the player has ever had revealed to
- * them (starter team, egg hatch, digivolve/de-digivolve) - a presence map
- * keyed by speciesId, never entries removed even if the player later loses
- * every instance of that form. See state/compendium.svelte.ts. */
-export type CompendiumState = Record<string, true>;
+/** A player's chosen (or auto-learned) next digivolve target for a given
+ * source species - minLevel is an optional extra floor ON TOP OF the
+ * target's normal DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE requirement (never
+ * below it), letting a Digimon "cook" longer before auto-firing - a
+ * higher source level means a bigger inheritedBonus on the new form. Fires
+ * at most once per target, since an already-owned target can't be
+ * digivolved into again. */
+export interface DigivolvePreference {
+  targetSpeciesId: string;
+  minLevel: number;
+}
+
+/** Keyed by source speciesId (the owned Digimon digivolving), not an
+ * abstract "line" - the evolution graph is a messy multi-parent DAG, so
+ * "current species" is the only well-defined key. Populated either by
+ * pinning ahead of time or automatically from the most recent manual
+ * digivolve choice - see evolution/digivolve.ts. */
+export interface DigivolveAutomationState {
+  enabled: boolean;
+  preferences: Record<string, DigivolvePreference>;
+}
