@@ -62,6 +62,8 @@ export function requirementProgress(req: QuestRequirement): RequirementProgress 
       return progressOf(`Bring ${req.count}× ${ITEM_CATALOG[req.itemId]?.name ?? req.itemId}`, inventory[req.itemId] ?? 0, req.count);
     case 'has-flag':
       return progressOf(req.flag, hasFlag(req.flag) ? 1 : 0, 1);
+    case 'roster-size':
+      return progressOf(`Own ${req.count} Digimon`, getRosterList().length, req.count);
   }
 }
 

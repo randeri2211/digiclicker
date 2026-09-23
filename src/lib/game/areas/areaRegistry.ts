@@ -1,4 +1,11 @@
 import forestSectorData from '../../data/areas/forest-sector.json';
+import gearSavannaData from '../../data/areas/gear-savanna.json';
+import mtMiharashiData from '../../data/areas/mt-miharashi.json';
+import freezelandData from '../../data/areas/freezeland.json';
+import factorialTownData from '../../data/areas/factorial-town.json';
+import mistyLakeData from '../../data/areas/misty-lake.json';
+import ancientRuinsData from '../../data/areas/ancient-ruins.json';
+import infinityMountainData from '../../data/areas/infinity-mountain.json';
 import type { AreaData, AreaPath } from '../types';
 
 // New areas are added by importing their JSON above and registering them
@@ -6,6 +13,13 @@ import type { AreaData, AreaPath } from '../types';
 // in this codebase, not auto-discovery.
 export const AREAS: Record<string, AreaData> = {
   'forest-sector': forestSectorData as unknown as AreaData,
+  'gear-savanna': gearSavannaData as unknown as AreaData,
+  'mt-miharashi': mtMiharashiData as unknown as AreaData,
+  'freezeland': freezelandData as unknown as AreaData,
+  'factorial-town': factorialTownData as unknown as AreaData,
+  'misty-lake': mistyLakeData as unknown as AreaData,
+  'ancient-ruins': ancientRuinsData as unknown as AreaData,
+  'infinity-mountain': infinityMountainData as unknown as AreaData,
 };
 
 export const STARTING_AREA_ID = 'forest-sector';

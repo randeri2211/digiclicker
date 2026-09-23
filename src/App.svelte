@@ -1,6 +1,8 @@
 <script lang="ts">
   import TopBar from './lib/components/hud/TopBar.svelte';
   import CombatPanel from './lib/components/combat/CombatPanel.svelte';
+  import VillageScreen from './lib/components/VillageScreen.svelte';
+  import OfflineReportScreen from './lib/components/OfflineReportScreen.svelte';
   import Sidebar from './lib/components/sidebar/Sidebar.svelte';
   import LoadingScreen from './lib/components/LoadingScreen.svelte';
   import MainMenu from './lib/components/MainMenu.svelte';
@@ -58,6 +60,7 @@
   let shopOpen = $state(false);
   let compendiumOpen = $state(false);
   let expeditionsOpen = $state(false);
+  let villageOpen = $state(false);
   let questsOpen = $state(false);
   // Boss prep screen target, or null when closed.
   let bossPrep: { areaId: string; pathId: string } | null = $state(null);
@@ -135,6 +138,7 @@
       onOpenCompendium={() => (compendiumOpen = true)}
       onOpenExpeditions={() => (expeditionsOpen = true)}
       onOpenQuests={() => (questsOpen = true)}
+      onOpenVillage={() => (villageOpen = true)}
     />
     <div class="main">
       <CombatPanel onChallengeBoss={(areaId, pathId) => (bossPrep = { areaId, pathId })} onOpenQuests={() => (questsOpen = true)} />
@@ -166,6 +170,10 @@
     <QuestLogScreen onClose={() => (questsOpen = false)} />
   {/if}
 
+  {#if villageOpen}
+    <VillageScreen onClose={() => (villageOpen = false)} />
+  {/if}
+
   {#if expeditionsOpen}
     <ExpeditionsScreen onClose={() => (expeditionsOpen = false)} />
   {/if}
@@ -180,6 +188,7 @@
 
   {#if screen === 'game'}
     <Toasts />
+    <OfflineReportScreen />
   {/if}
 </div>
 

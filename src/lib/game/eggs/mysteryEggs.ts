@@ -5,6 +5,7 @@ import { weightedPick } from '../util/random';
 import { MYSTERY_EGG_COST_BITS } from '../constants';
 import { spendBits } from '../state/currency.svelte';
 import { addEgg } from '../state/hatchery.svelte';
+import { isSystemUnlocked } from '../village/village';
 
 interface MysteryEggEntry {
   id: string;
@@ -34,7 +35,7 @@ export function rollEggOfType(eggType: EggType, isMystery: boolean): Egg {
  * (see GAMEPLAY_DESIGN.md's Digi-Eggs section). False and no-op if bits
  * are insufficient. */
 export function buyMysteryEgg(eggType: EggType): boolean {
-  if (!spendBits(MYSTERY_EGG_COST_BITS)) return false;
+  if (!isSystemUnlocked('mystery-eggs') || !spendBits(MYSTERY_EGG_COST_BITS)) return false;
   addEgg(rollMysteryEgg(eggType));
   return true;
 }

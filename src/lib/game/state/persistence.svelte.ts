@@ -8,12 +8,14 @@ import { automation } from './digivolveAutomation.svelte';
 import { expeditions, updateExpeditions } from './expeditions.svelte';
 import { progress } from './progress.svelte';
 import { resetQuestWatch } from '../quests/quests';
+import { resetResidentWatch } from '../village/village';
+import { catchUpSinceSave, dismissOfflineReport } from './offline.svelte';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
 import type { AreaProgressState, InventoryState, RosterState } from '../types';
 import { AUTOSAVE_INTERVAL_MS } from '../constants';
 import { ITEM_CATALOG } from '../items/itemCatalog';
-import { initialAreaProgress } from '../areas/areaProgress';
+import { initialAreaProgress, reapplyEarnedUnlocks } from '../areas/areaProgress';
 import { getPath } from '../areas/areaRegistry';
 
 export const activeSlot: { id: string | null } = $state({ id: null });
@@ -30,10 +32,13 @@ function normalizeInventory(loadedInventory: InventoryState): InventoryState {
 // activePathId no longer resolves against current area data (area
 // content can change between plays), rather than leaving the player on a
 // dangling reference. Saves made before bosses existed lack
-// bossesDefeated - nothing beaten.
+// bossesDefeated - nothing beaten. Earned unlocks are re-applied from the
+// current area data, so new content behind an old win still opens.
 function normalizeAreaProgress(loaded: AreaProgressState): AreaProgressState {
   if (!getPath(loaded.activeAreaId, loaded.activePathId)) return initialAreaProgress();
-  return { ...loaded, bossesDefeated: loaded.bossesDefeated ?? [] };
+  const normalized = { ...loaded, bossesDefeated: loaded.bossesDefeated ?? [] };
+  reapplyEarnedUnlocks(normalized);
+  return normalized;
 }
 
 // v2 saves made before inheritedFromLevel existed lack it - 0 means "never
@@ -100,6 +105,7 @@ function applySlotToLiveState(data: SaveSlotData): void {
   progress.completedQuests = data.progress?.completedQuests ?? [];
   // Quests already ready in this save shouldn't all announce themselves.
   resetQuestWatch();
+  resetResidentWatch();
 }
 
 export function loadSlotIntoLiveState(slotId: string): void {
@@ -107,12 +113,15 @@ export function loadSlotIntoLiveState(slotId: string): void {
   if (!slot) return;
   applySlotToLiveState(slot.data);
   activeSlot.id = slotId;
+  // The game was closed since this save was written - fight that time now.
+  catchUpSinceSave(slot.savedAt);
 }
 
 export function startNewGameInSlot(name?: string): void {
   const slot = createSlot(name);
   applySlotToLiveState(slot.data);
   activeSlot.id = slot.id;
+  dismissOfflineReport();
 }
 
 export function saveGame(): void {

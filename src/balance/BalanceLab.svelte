@@ -239,8 +239,19 @@
         { path: ['DUPLICATE_HATCH_XP'], label: 'Duplicate hatch XP', step: 50 },
         { path: ['HATCHERY_STARTING_CAPACITY'], label: 'Hatchery slots at start', step: 1 },
         { path: ['HATCHERY_MAX_CAPACITY'], label: 'Hatchery slots max', step: 1 },
+        { path: ['HATCHERY_SLOT_BASE_COST'], label: 'Extra slot: first cost (bits)', step: 100 },
+        { path: ['HATCHERY_SLOT_COST_GROWTH'], label: 'Extra slot: cost x per slot', step: 0.1 },
         { path: ['MYSTERY_EGG_COST_BITS'], label: 'Mystery egg price (bits)', step: 50 },
         { path: ['ABILITY_REROLL_COST_BITS'], label: 'Ability reroll price (bits)', step: 50 },
+      ],
+    },
+    {
+      id: 'offline',
+      title: 'Offline progress',
+      open: false,
+      fields: [
+        { path: ['OFFLINE_PROGRESS_CAP_HOURS'], label: 'Max hours counted', step: 1 },
+        { path: ['OFFLINE_PROGRESS_EFFICIENCY'], label: 'Efficiency (1 = full pace)', step: 0.05 },
       ],
     },
   ];

@@ -1,6 +1,7 @@
 <script lang="ts">
   interface Props {
-    variant: 'filled' | 'empty' | 'locked';
+    /** 'buy': a locked slot Elecmon can build - click to pay `readyLabel`. */
+    variant: 'filled' | 'empty' | 'locked' | 'buy';
     spriteUrl?: string | null;
     level?: number;
     /** True only for a Mystery Digi-Egg (bought from the Shop). */
@@ -12,9 +13,10 @@
     /** Whether the player can pay to hatch it right now. */
     affordable?: boolean;
     onHatch?: () => void;
+    onBuy?: () => void;
   }
 
-  const { variant, spriteUrl = null, level, isMystery = false, ready = false, readyLabel = '', affordable = false, onHatch }: Props =
+  const { variant, spriteUrl = null, level, isMystery = false, ready = false, readyLabel = '', affordable = false, onHatch, onBuy }: Props =
     $props();
 </script>
 
@@ -32,7 +34,17 @@
   {/if}
 {/snippet}
 
-{#if variant === 'filled' && ready}
+{#if variant === 'buy'}
+  <button
+    class="slot ready buy"
+    class:unaffordable={!affordable}
+    title={affordable ? `Build a slot for ${readyLabel}` : `Needs ${readyLabel} to build`}
+    onclick={onBuy}
+  >
+    +
+    <span class="slot-ready">Build · {readyLabel}</span>
+  </button>
+{:else if variant === 'filled' && ready}
   <button
     class="slot ready"
     class:unaffordable={!affordable}
@@ -112,6 +124,12 @@
     border-color: var(--panel-border-strong);
     box-shadow: none;
     cursor: not-allowed;
+  }
+  .slot.buy {
+    font-size: 20px;
+    color: var(--pos);
+    border-style: dashed;
+    box-shadow: none;
   }
   .slot.ready:focus-visible {
     outline: 1px solid var(--pos);

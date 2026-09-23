@@ -1,0 +1,112 @@
+{
+  "id": "freezeland",
+  "name": "FREEZELAND",
+  "label": "Digital World — File Island",
+  "startingPath": "frozen-shore",
+  "paths": {
+    "frozen-shore": {
+      "name": "Frozen Shore",
+      "levelRange": [
+        33,
+        37
+      ],
+      "digimonPool": [
+        {
+          "id": "snowagumon",
+          "weight": 3
+        },
+        {
+          "id": "penguinmon",
+          "weight": 3
+        },
+        {
+          "id": "gomamon",
+          "weight": 2
+        },
+        {
+          "id": "gesomon",
+          "weight": 1
+        }
+      ],
+      "mastery": {
+        "kills": 50
+      },
+      "unlocks": [
+        "snowfield"
+      ]
+    },
+    "snowfield": {
+      "name": "Snowfield",
+      "levelRange": [
+        36,
+        40
+      ],
+      "digimonPool": [
+        {
+          "id": "frigimon",
+          "weight": 3
+        },
+        {
+          "id": "mojyamon",
+          "weight": 3
+        },
+        {
+          "id": "ikkakumon",
+          "weight": 2
+        },
+        {
+          "id": "snowagumon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 70
+      },
+      "unlocks": [
+        "blizzards-eye"
+      ]
+    },
+    "blizzards-eye": {
+      "name": "Blizzard's Eye",
+      "levelRange": [
+        38,
+        42
+      ],
+      "digimonPool": [
+        {
+          "id": "mojyamon",
+          "weight": 3
+        },
+        {
+          "id": "gesomon",
+          "weight": 3
+        },
+        {
+          "id": "frigimon",
+          "weight": 2
+        },
+        {
+          "id": "unimon",
+          "weight": 1
+        }
+      ],
+      "mastery": {
+        "kills": 90
+      },
+      "unlocks": [],
+      "boss": {
+        "speciesId": "unimon",
+        "level": 44,
+        "squadSize": 3,
+        "hpMultiplier": 5,
+        "rewards": {
+          "bits": 1200,
+          "data": 80
+        },
+        "unlocks": [
+          "factorial-town:factory-gates"
+        ]
+      }
+    }
+  }
+}

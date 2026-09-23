@@ -30,7 +30,7 @@ As each feature ships, move its description into `GAMEPLAY_DESIGN.md`'s "Confirm
 | 6 | Crest requirement for Ultimate/Mega (how Crests are obtained: undecided) | 5 |
 | 7 | Special digivolutions: Armor (Armor Digi-Eggs) and DNA (unlock triggers: undecided) | 5, 3 |
 | 8 | Farming: Digi-Meat and other food (needs a design pass) | 3 |
-| 9 | Region travel + village residents gating systems (story Act 1) | 5 |
+| 9 | Region travel + village residents gating systems (story Act 1) **(done - Act 1 playable)** | 5 |
 | 10 | Limit Breaks: level cap above 100 (story post-game) | 5 |
 
 Features 1–4 are fully specified; 5–8 get a design pass (story, Crest sources/timing, farming details) before they're built.

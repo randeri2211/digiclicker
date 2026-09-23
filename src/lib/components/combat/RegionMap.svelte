@@ -13,6 +13,7 @@
     isAreaBuilt,
     isAreaUnlocked,
     isRegionUnlocked,
+    layoutPathNodes,
   } from '../../game/state/game.svelte';
   import type { PathNodeState } from '../../game/state/game.svelte';
   import type { AreaPath, RegionMapArea } from '../../game/types';
@@ -33,11 +34,15 @@
     areaId: string;
     pathId: string;
     path: AreaPath;
+    x: number;
+    y: number;
     state: PathNodeState;
     active: boolean;
   }
 
   const areaCenters = $derived(new Map(region.areas.map((area) => [area.id, area])));
+
+  const nodePoints = $derived(layoutPathNodes(region));
 
   const nodes = $derived.by((): PathNode[] =>
     region.areas.flatMap((mapArea) => {
@@ -47,6 +52,7 @@
         areaId: mapArea.id,
         pathId,
         path,
+        ...(nodePoints.get(`${mapArea.id}:${pathId}`) ?? { x: mapArea.x, y: mapArea.y }),
         state: pathNodeState(areaProgress, mapArea.id, pathId),
         active: mapArea.id === areaProgress.activeAreaId && pathId === areaProgress.activePathId,
       }));
@@ -207,14 +213,14 @@
 
     {#each pathLinks as link (link.from.pathId + link.to.pathId)}
       <line
-        x1={link.from.path.map.x} y1={link.from.path.map.y} x2={link.to.path.map.x} y2={link.to.path.map.y}
+        x1={link.from.x} y1={link.from.y} x2={link.to.x} y2={link.to.y}
         class="path-link"
         class:open={link.open}
       />
     {/each}
 
     {#each nodes as node (node.areaId + node.pathId)}
-      {@const { x, y } = node.path.map}
+      {@const { x, y } = node}
       <g
         class="node {node.state}"
         class:active={node.active}

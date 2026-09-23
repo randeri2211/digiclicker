@@ -266,6 +266,27 @@ on total XP earned per kill.
 - The four quests in the file now are **placeholders** to exercise the
   system, to be replaced by the storyline.
 
+### The village: NPCs, residents and gated systems (confirmed, built)
+- **NPCs are data** (`src/lib/data/npcs.json`): name, species (sprite),
+  home area, a one-line role. Quests name their giver by NPC id.
+- A **resident** (`resident: true`) can move into the village. It joins
+  when the flag `resident:<id>` is set - normally a quest reward - or from
+  the start (`startsInVillage`, Jijimon). A resident's `systems` open once
+  it has joined: `isSystemUnlocked(system)` in `village/village.ts` is the
+  only check gated code makes (a system no NPC provides is always open).
+  **Gating something new = add the SystemId, list it on an NPC, write the
+  quest that rewards their flag.** `validate_quests.py` fails if a
+  resident can never join (no quest rewards its flag).
+- Gates now: **Expeditions** (Tentomon), **Hatchery upgrades** - buy extra
+  incubation slots, `HATCHERY_SLOT_BASE_COST` x `HATCHERY_SLOT_COST_GROWTH`
+  per slot (Elecmon), **Mystery Egg stall** (Yokomon Village), **Shop
+  items** (Andromon), **travel to another continent** (Whamon). Locked
+  top-bar buttons show a lock and say who unlocks them; the actions
+  themselves refuse too, not just the UI.
+- **Village screen** (top bar): every resident, joined or a silhouette
+  with its home area, and the systems it opens. A toast announces each
+  new resident.
+
 ### Elements & matchups (confirmed, built - used by boss fights, see ROADMAP.md)
 - Every species has an **attribute** (the wiki's Vaccine / Data / Virus;
   anything else - Free, None, Unknown - is neutral) and an **element**:
@@ -361,6 +382,28 @@ on total XP earned per kill.
   game's - change a formula in the game and change it there too. The
   page isn't part of the production build.
 
+### Offline progress (confirmed, built)
+- Time the game wasn't ticking is **fast-forwarded with the real combat
+  rules**: `fastForwardWildCombat` in `state/combat.svelte.ts` jumps kill
+  to kill (each wild takes ceil(HP / damage per hit) attacks at the
+  roster's attack rate, the same discrete hits as a live tick; a new wild
+  costs one tick to spawn) and resolves every kill through the normal
+  `resolveKill` - XP, bits, path mastery unlocks, egg drops,
+  auto-digivolve. Damage is recomputed after each kill, so levelling up
+  while away speeds it up. Tested to match real ticking exactly.
+- Two sources of lost time, one mechanism (`state/offline.svelte.ts`):
+  **game closed** - on load, the time since the save's `savedAt`;
+  **background tab** - browsers throttle hidden tabs (down to one timer a
+  minute), so a tick-loop gap over 5s is fast-forwarded instead of
+  landing as one oversized tick; gaps collect while hidden.
+- Counted time = min(away, `OFFLINE_PROGRESS_CAP_HOURS` 8h) x
+  `OFFLINE_PROGRESS_EFFICIENCY` (1). Both in the Balance Lab. No combat
+  during a boss fight (its timer is real time). Expeditions were already
+  time-based.
+- **Welcome back** screen when a minute or more was caught up: time away
+  (and the cap, if hit), kills, bits, eggs found, Digimon that digivolved,
+  level-ups, paths that opened.
+
 ### Idle production
 - Roster auto-attack (see Core click loop) *is* the idle/offline
   production mechanic for now — no separate farm/area-assignment system.
@@ -392,9 +435,14 @@ on total XP earned per kill.
   model. A **region** is one map per story act (`src/lib/data/regions.json`:
   File Island, Server Continent, Myotismon's Domain, Spiral Mountain,
   Beyond the Wall). It lists its **areas** as landmarks (position, radius,
-  terrain) and the **routes** drawn between them; each area's **paths**
-  are nodes placed by `map: {x, y}` in the area file (absolute map
-  coordinates, so future background art lines up). `RegionMap.svelte`,
+  terrain) and the **routes** drawn between them. Each area's **paths**
+  are nodes laid out automatically along the **road out of the area**
+  (`layoutPathNodes` in `areas/mapLayout.ts`): its first outgoing route,
+  from its own land to just before the next area's shore, ordered by
+  unlock step - so the last path (the boss) guards the way on. Forks
+  spread sideways; the map's last area lays its paths across its own
+  land. A path's optional `map: {x, y}` overrides the spot (e.g. to match
+  background art). `RegionMap.svelte`,
   below the arena, replaces the old PathTabs/AreaTabs: region tabs on top
   (locked acts show `???`), the map below, and a status line for the
   hovered or active path. Clicking any unlocked node travels there

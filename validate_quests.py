@@ -9,7 +9,11 @@ a quest that can never be completed:
   unlock);
 - every requirement / reward references something real: species, stage,
   element, area + path (+ its boss for defeat-boss), item ids (read from
-  src/lib/game/items/itemCatalog.ts), and positive counts.
+  src/lib/game/items/itemCatalog.ts), and positive counts;
+- givers are NPCs from src/lib/data/npcs.json, and npcs.json itself is
+  sound (species, home area on a region map, known systems) - with every
+  resident who doesn't start in the village joinable by some quest's
+  `resident:<id>` flag, or the systems they gate could never open.
 
 Exit code 1 on any error.
 """
@@ -25,12 +29,17 @@ QUESTS_PATH = ROOT / "src" / "lib" / "data" / "quests.json"
 SPECIES_PATH = ROOT / "src" / "lib" / "data" / "digimon-evolution.json"
 AREAS_DIR = ROOT / "src" / "lib" / "data" / "areas"
 ITEM_CATALOG_PATH = ROOT / "src" / "lib" / "game" / "items" / "itemCatalog.ts"
+NPCS_PATH = ROOT / "src" / "lib" / "data" / "npcs.json"
+REGIONS_PATH = ROOT / "src" / "lib" / "data" / "regions.json"
+
+# Mirrors SystemId in src/lib/game/types.ts.
+SYSTEMS = {"expeditions", "hatchery-upgrades", "mystery-eggs", "shop", "continent-travel"}
 
 # Mirrors IN_GAME_STAGES in src/lib/game/constants.ts.
 IN_GAME_STAGES = {"Fresh", "In-Training", "Rookie", "Champion", "Ultimate", "Mega"}
 REQUIREMENT_KINDS = {
     "own-species", "own-stage", "own-element", "reach-level",
-    "path-kills", "defeat-boss", "deliver-item", "has-flag",
+    "path-kills", "defeat-boss", "deliver-item", "has-flag", "roster-size",
 }
 
 
@@ -95,14 +104,46 @@ def check_requirement(prefix, req, species, areas, items):
             errors.append(f"{prefix}: unknown item {req.get('itemId')!r}")
         if not is_positive_int(req.get("count")):
             errors.append(f"{prefix}: count must be a positive integer")
+    elif kind == "roster-size":
+        if not is_positive_int(req.get("count")):
+            errors.append(f"{prefix}: count must be a positive integer")
     elif kind == "has-flag":
         if not isinstance(req.get("flag"), str) or not req.get("flag"):
             errors.append(f"{prefix}: flag must be a non-empty string")
     return errors
 
 
+def check_npcs(npcs, species, quests):
+    errors = []
+    map_areas = {
+        area["id"]
+        for region in json.loads(REGIONS_PATH.read_text(encoding="utf-8"))["regions"]
+        for area in region["areas"]
+    }
+    rewarded_flags = {flag for q in quests for flag in (q.get("rewards") or {}).get("flags", [])}
+    for npc_id, npc in npcs.items():
+        prefix = f"npc {npc_id!r}"
+        if npc.get("id") != npc_id:
+            errors.append(f"{prefix}: 'id' field doesn't match its key")
+        if not npc.get("name") or not npc.get("role"):
+            errors.append(f"{prefix}: needs a name and a role")
+        if npc.get("speciesId") not in species:
+            errors.append(f"{prefix}: unknown species {npc.get('speciesId')!r}")
+        if npc.get("homeAreaId") not in map_areas:
+            errors.append(f"{prefix}: home area {npc.get('homeAreaId')!r} isn't on any region map")
+        for system in npc.get("systems", []):
+            if system not in SYSTEMS:
+                errors.append(f"{prefix}: unknown system {system!r}")
+        if npc.get("systems") and not npc.get("resident"):
+            errors.append(f"{prefix}: only residents can unlock systems - add \"resident\": true")
+        if npc.get("resident") and not npc.get("startsInVillage") and f"resident:{npc_id}" not in rewarded_flags:
+            errors.append(f"{prefix}: no quest rewards 'resident:{npc_id}', so it can never join the village")
+    return errors
+
+
 def main():
     quests = json.loads(QUESTS_PATH.read_text(encoding="utf-8"))
+    npcs = json.loads(NPCS_PATH.read_text(encoding="utf-8"))
     species = json.loads(SPECIES_PATH.read_text(encoding="utf-8"))["species"]
     areas = load_areas()
     items = load_item_ids()
@@ -118,9 +159,8 @@ def main():
         for field in ("id", "title", "text", "requirements", "rewards"):
             if field not in quest:
                 errors.append(f"{prefix}: missing field '{field}'")
-        giver = quest.get("giver") or {}
-        if giver.get("speciesId") and giver["speciesId"] not in species:
-            errors.append(f"{prefix}: giver species {giver['speciesId']!r} unknown")
+        if quest.get("giver") is not None and quest["giver"] not in npcs:
+            errors.append(f"{prefix}: giver {quest['giver']!r} isn't an NPC in npcs.json")
         if quest.get("areaId") and quest["areaId"] not in areas:
             errors.append(f"{prefix}: unknown area {quest['areaId']!r}")
         for pre in (quest.get("prerequisites") or {}).get("quests", []):
@@ -134,6 +174,8 @@ def main():
                 errors.append(f"{prefix}: reward item {item.get('id')!r} unknown")
             if not is_positive_int(item.get("count")):
                 errors.append(f"{prefix}: reward item count must be a positive integer")
+
+    errors.extend(check_npcs(npcs, species, quests))
 
     # Prerequisite cycles - depth-first search with a "visiting" mark.
     state = {}
@@ -158,7 +200,7 @@ def main():
         for error in errors:
             print(f"  - {error}")
         sys.exit(1)
-    print(f"OK - {len(quests)} quest(s) validated, no problems found.")
+    print(f"OK - {len(quests)} quest(s) and {len(npcs)} NPC(s) validated, no problems found.")
 
 
 if __name__ == "__main__":

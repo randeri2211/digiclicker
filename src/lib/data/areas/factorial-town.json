@@ -1,0 +1,100 @@
+{
+  "id": "factorial-town",
+  "name": "FACTORIAL TOWN",
+  "label": "Digital World — File Island",
+  "startingPath": "factory-gates",
+  "paths": {
+    "factory-gates": {
+      "name": "Factory Gates",
+      "levelRange": [
+        36,
+        40
+      ],
+      "digimonPool": [
+        {
+          "id": "hagurumon",
+          "weight": 3
+        },
+        {
+          "id": "guardromon",
+          "weight": 3
+        },
+        {
+          "id": "tankmon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 50
+      },
+      "unlocks": [
+        "the-sewers"
+      ]
+    },
+    "the-sewers": {
+      "name": "The Sewers",
+      "levelRange": [
+        39,
+        43
+      ],
+      "digimonPool": [
+        {
+          "id": "numemon",
+          "weight": 4
+        },
+        {
+          "id": "hagurumon",
+          "weight": 2
+        },
+        {
+          "id": "mekanorimon",
+          "weight": 2
+        }
+      ],
+      "mastery": {
+        "kills": 70
+      },
+      "unlocks": [
+        "factory-core"
+      ]
+    },
+    "factory-core": {
+      "name": "Factory Core",
+      "levelRange": [
+        42,
+        46
+      ],
+      "digimonPool": [
+        {
+          "id": "mekanorimon",
+          "weight": 3
+        },
+        {
+          "id": "guardromon",
+          "weight": 3
+        },
+        {
+          "id": "tankmon",
+          "weight": 3
+        }
+      ],
+      "mastery": {
+        "kills": 90
+      },
+      "unlocks": [],
+      "boss": {
+        "speciesId": "andromon",
+        "level": 48,
+        "squadSize": 4,
+        "hpMultiplier": 6,
+        "rewards": {
+          "bits": 2000,
+          "data": 120
+        },
+        "unlocks": [
+          "misty-lake:lakeshore"
+        ]
+      }
+    }
+  }
+}

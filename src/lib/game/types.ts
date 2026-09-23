@@ -308,10 +308,10 @@ export interface BossDefinition {
 
 export interface AreaPath {
   name: string;
-  /** Where the path's node sits on its region's map, in map coordinates
-   * (see `mapSize` in data/regions.json) - absolute, not relative to the
-   * area, so it lines up with a background image drawn for the region. */
-  map: { x: number; y: number };
+  /** Optional manual spot for the path's node on its region's map, in map
+   * coordinates (see `mapSize` in data/regions.json). Normally omitted -
+   * layoutPathNodes lines an area's paths up along its route out. */
+  map?: { x: number; y: number };
   levelRange: [number, number];
   digimonPool: AreaSpawnEntry[];
   mastery: { kills: number };
@@ -465,7 +465,9 @@ export type QuestRequirement =
   | { kind: 'defeat-boss'; areaId: string; pathId: string }
   /** Consumed when the quest is turned in. */
   | { kind: 'deliver-item'; itemId: ItemId; count: number }
-  | { kind: 'has-flag'; flag: string };
+  | { kind: 'has-flag'; flag: string }
+  /** Own at least this many Digimon (roster entries). */
+  | { kind: 'roster-size'; count: number };
 
 export interface QuestReward {
   bits?: number;
@@ -481,8 +483,9 @@ export interface QuestReward {
 export interface QuestDefinition {
   id: string;
   title: string;
-  /** Who gives it - shown on the quest card and the area's NPC strip. */
-  giver?: { name: string; speciesId?: string };
+  /** Who gives it - an NPC id from data/npcs.json; shown on the quest
+   * card and the area's NPC strip. */
+  giver?: string;
   /** The area whose NPC strip shows it; omitted = only in the quest log. */
   areaId?: string;
   text: string;
@@ -492,6 +495,29 @@ export interface QuestDefinition {
   prerequisites?: { quests?: string[]; flags?: string[] };
   requirements: QuestRequirement[];
   rewards: QuestReward;
+}
+
+/** A game system a village resident can unlock - see data/npcs.json. A
+ * system no NPC provides is always open. */
+export type SystemId = 'expeditions' | 'hatchery-upgrades' | 'mystery-eggs' | 'shop' | 'continent-travel';
+
+/** A story character (src/lib/data/npcs.json) - quest giver and/or village
+ * resident. A resident joins the village when the flag `resident:<id>` is
+ * set (normally a quest reward) and from then on opens its `systems`. */
+export interface NpcDefinition {
+  id: string;
+  name: string;
+  speciesId: string;
+  /** Where they're met - the area whose NPC strip shows their quests. */
+  homeAreaId: string;
+  /** One line for the Village screen: who they are / what they do. */
+  role: string;
+  /** Can move into the village (shown on the Village screen). */
+  resident?: boolean;
+  /** In the village from the very start - no join flag needed. */
+  startsInVillage?: boolean;
+  /** Systems that open once they've joined. */
+  systems?: SystemId[];
 }
 
 /** Permanent story/progress state: named flags other systems check, and

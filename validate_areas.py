@@ -9,8 +9,8 @@ this script is that catch, run locally and in CI (see
 .github/workflows/validate-areas.yml).
 
 It also checks src/lib/data/regions.json, the travel maps: every built area
-sits on exactly one region's map, every path has a map position inside the
-map, and routes join areas of the same region.
+sits on exactly one region's map, a path's optional manual map position is
+inside the map, and routes join areas of the same region.
 
 Stdlib only, no pip install needed.
 """
@@ -170,12 +170,13 @@ def validate_area_file(path, species, map_size):
     for path_id, p in paths.items():
         prefix = f"{area_id}:{path_id}"
 
-        for field in ("name", "map", "levelRange", "digimonPool", "mastery", "unlocks"):
+        for field in ("name", "levelRange", "digimonPool", "mastery", "unlocks"):
             if field not in p:
                 errors.append(f"{prefix}: missing field '{field}'")
+        # "map" is an optional manual override of the auto layout.
         pos = p.get("map")
-        if isinstance(pos, dict) and map_size:
-            if not (is_number(pos.get("x")) and 0 <= pos["x"] <= map_size[0] and is_number(pos.get("y")) and 0 <= pos["y"] <= map_size[1]):
+        if pos is not None and map_size:
+            if not isinstance(pos, dict) or not (is_number(pos.get("x")) and 0 <= pos["x"] <= map_size[0] and is_number(pos.get("y")) and 0 <= pos["y"] <= map_size[1]):
                 errors.append(f"{prefix}: map position {pos!r} is not inside the {map_size[0]}x{map_size[1]} region map")
         if any(f not in p for f in ("levelRange", "digimonPool", "mastery", "unlocks")):
             continue
@@ -248,7 +249,10 @@ def validate_area_file(path, species, map_size):
             if node in seen:
                 continue
             seen.add(node)
-            for target in paths[node].get("unlocks", []):
+            # Mastery unlocks, and a boss's (a miniboss can gate the next path).
+            boss = paths[node].get("boss")
+            targets = paths[node].get("unlocks", []) + (boss.get("unlocks", []) if isinstance(boss, dict) else [])
+            for target in targets:
                 if ":" not in target and target in paths:
                     stack.append(target)
 
@@ -256,6 +260,28 @@ def validate_area_file(path, species, map_size):
         for orphan in sorted(orphans):
             errors.append(f"{area_id}:{orphan}: unreachable from startingPath '{starting_path}' - no path's unlocks leads here")
 
+    return errors
+
+
+def validate_cross_area_unlocks(area_files):
+    """Every "areaId:pathId" unlock (path or boss) must name a path in a
+    built area - otherwise the unlock silently does nothing."""
+    areas = {}
+    for path in area_files:
+        try:
+            areas[path.stem] = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            pass
+    errors = []
+    for area_id, area in areas.items():
+        for path_id, p in area.get("paths", {}).items():
+            boss = p.get("boss") if isinstance(p.get("boss"), dict) else {}
+            for target in (p.get("unlocks") or []) + (boss.get("unlocks") or []):
+                if ":" not in target:
+                    continue
+                target_area, target_path = target.split(":", 1)
+                if target_path not in areas.get(target_area, {}).get("paths", {}):
+                    errors.append(f"{area_id}:{path_id}: unlocks '{target}', which isn't a path in a built area")
     return errors
 
 
@@ -277,6 +303,7 @@ def main():
     all_errors = validate_regions(regions_data, {path.stem for path in area_files})
     for path in area_files:
         all_errors.extend(validate_area_file(path, species, map_size))
+    all_errors.extend(validate_cross_area_unlocks(area_files))
 
     if all_errors:
         print(f"FAILED - {len(all_errors)} problem(s) found across {len(area_files)} area file(s):\n")

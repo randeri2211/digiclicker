@@ -9,6 +9,7 @@
     combat,
     startExpedition,
     claimExpedition,
+    hasReturned,
     dismissHaul,
     ITEM_CATALOG,
   } from '../game/state/game.svelte';
@@ -140,7 +141,8 @@
         {#each expeditions.active as expedition (expedition.id)}
           {@const destination = getDestination(expedition.destinationId)}
           {@const total = expedition.endsAt - expedition.startedAt}
-          {@const left = expedition.returned ? 0 : expedition.endsAt - now}
+          {@const back = hasReturned(expedition, now)}
+          {@const left = back ? 0 : expedition.endsAt - now}
           <div class="active">
             <div class="active-party">
               {#each expedition.memberSpeciesIds as id (id)}
@@ -151,10 +153,10 @@
             <div class="active-info">
               <span class="active-name">{destination?.name ?? expedition.destinationId}</span>
               <div class="track"><div class="fill" style="width: {Math.round((1 - Math.max(0, left) / total) * 100)}%"></div></div>
-              <span class="active-time">{expedition.returned ? 'Back - the party is fighting again' : `${formatDuration(left)} left`}</span>
+              <span class="active-time">{back ? 'Back - the party is fighting again' : `${formatDuration(left)} left`}</span>
             </div>
-            <button class="claim" disabled={!expedition.returned} onclick={() => claimExpedition(expedition.id)}>
-              {expedition.returned ? 'Claim haul' : 'Exploring…'}
+            <button class="claim" disabled={!back} onclick={() => claimExpedition(expedition.id)}>
+              {back ? 'Claim haul' : 'Exploring…'}
             </button>
           </div>
         {/each}

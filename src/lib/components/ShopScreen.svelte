@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { EggType, ItemId } from '../game/types';
-  import { currency, buyItem, canAffordItem, ITEM_CATALOG, buyMysteryEgg } from '../game/state/game.svelte';
+  import { currency, buyItem, canAffordItem, ITEM_CATALOG, buyMysteryEgg, isSystemUnlocked, lockedHint } from '../game/state/game.svelte';
   import { MYSTERY_EGG_WEIGHTS } from '../game/eggs/mysteryEggs';
   import { getEggSpriteUrl } from '../game/images';
   import { MYSTERY_EGG_COST_BITS } from '../game/constants';
@@ -54,6 +54,9 @@
 
     <div class="section">
       <div class="section-title">Items</div>
+      {#if !isSystemUnlocked('shop')}
+        <div class="locked-note">🔒 {lockedHint('shop')}</div>
+      {:else}
       <div class="grid">
         {#each itemEntries as item (item.id)}
           {@const affordable = canAffordItem(item.id)}
@@ -72,10 +75,14 @@
           </div>
         {/each}
       </div>
+      {/if}
     </div>
 
     <div class="section">
       <div class="section-title">Digi-Eggs</div>
+      {#if !isSystemUnlocked('mystery-eggs')}
+        <div class="locked-note">🔒 {lockedHint('mystery-eggs')}</div>
+      {:else}
       <div class="grid">
         {#each eggTypes as eggType (eggType)}
           {@const affordable = currency.bits >= MYSTERY_EGG_COST_BITS}
@@ -98,6 +105,7 @@
           </div>
         {/each}
       </div>
+      {/if}
     </div>
   </div>
 </div>
@@ -161,6 +169,11 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  .locked-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    padding: 10px 0;
   }
   .section-title {
     font-size: 11px;

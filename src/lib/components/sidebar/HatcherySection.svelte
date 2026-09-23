@@ -1,12 +1,14 @@
 <script lang="ts">
   import HatcherySlot from './HatcherySlot.svelte';
-  import { hatchery, currency, hatchEgg, isEggReady } from '../../game/state/game.svelte';
+  import { hatchery, currency, hatchEgg, isEggReady, isSystemUnlocked, hatcherySlotCost, buyHatcherySlot } from '../../game/state/game.svelte';
   import { getEggSpriteUrl } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import { EGG_HATCH_LEVEL, HATCH_DATA_COST } from '../../game/constants';
 
   const emptyCount = $derived(Math.max(0, hatchery.capacity - hatchery.incubating.length));
   const lockedCount = $derived(Math.max(0, hatchery.maxCapacity - hatchery.capacity));
+  // Once Elecmon has joined, the first locked slot can be built.
+  const slotCost = $derived(isSystemUnlocked('hatchery-upgrades') ? hatcherySlotCost() : null);
 </script>
 
 <div class="side-section">
@@ -31,7 +33,11 @@
       <HatcherySlot variant="empty" />
     {/each}
     {#each Array.from({ length: lockedCount }) as _, i (i)}
-      <HatcherySlot variant="locked" />
+      {#if i === 0 && slotCost !== null}
+        <HatcherySlot variant="buy" readyLabel="{slotCost} bits" affordable={currency.bits >= slotCost} onBuy={buyHatcherySlot} />
+      {:else}
+        <HatcherySlot variant="locked" />
+      {/if}
     {/each}
   </div>
   <div class="xp-note">

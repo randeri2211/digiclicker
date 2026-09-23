@@ -2,6 +2,14 @@
   import type { Stage } from '../../game/types';
   import { IN_GAME_STAGES } from '../../game/constants';
   import { debugSpawn, applyDebugSpawn } from '../../game/state/game.svelte';
+  import { addItem } from '../../game/state/inventory.svelte';
+  import { BOSS_CHIP_STATS } from '../../game/state/combat.svelte';
+  import type { ItemId } from '../../game/types';
+
+  // Dev shortcut for testing quests / boss prep: one of every boss chip.
+  function grantChips() {
+    for (const id of Object.keys(BOSS_CHIP_STATS) as ItemId[]) addItem(id, 1);
+  }
 
   const STAGES = [...IN_GAME_STAGES] as Stage[];
 
@@ -26,6 +34,7 @@
     {/each}
   </select>
   <input type="number" min="1" bind:value={debugSpawn.level} disabled={!debugSpawn.enabled} />
+  <button class="debug-grant" onclick={grantChips}>+1 each chip</button>
 </div>
 
 <style>
@@ -51,8 +60,13 @@
     color: var(--danger, #ff5050);
     font-weight: 700;
   }
+  .debug-grant {
+    margin-left: auto;
+    cursor: pointer;
+  }
   select,
-  input {
+  input,
+  .debug-grant {
     font: inherit;
     font-family: var(--mono);
     background: var(--panel);
