@@ -254,6 +254,24 @@
         { path: ['OFFLINE_PROGRESS_EFFICIENCY'], label: 'Efficiency (1 = full pace)', step: 0.05 },
       ],
     },
+    {
+      id: 'crests',
+      title: 'Crests',
+      open: false,
+      fields: [{ path: ['CREST_GATING_ENABLED'], label: 'Crest gate on Ultimate/Mega (1 on, 0 off)', step: 1 }],
+    },
+    {
+      id: 'xp-split',
+      title: 'Roster scaling',
+      open: false,
+      fields: [
+        { path: ['KILL_XP_SPLIT_EXPONENT'], label: 'Kill XP split exponent (0 none, 0.5 sqrt, 1 even)', step: 0.05 },
+        { path: ['ROSTER_STAT_FALLOFF'], label: 'Wild-fight stat falloff per member (1 = plain sum)', step: 0.01 },
+        { path: ['XP_OVERLEVEL_GRACE'], label: 'Full XP up to N levels above the wild', step: 1 },
+        { path: ['XP_OVERLEVEL_PENALTY_PER_LEVEL'], label: 'XP lost per level beyond that', step: 0.01 },
+        { path: ['XP_OVERLEVEL_MIN_FACTOR'], label: 'XP floor when far over-levelled', step: 0.01 },
+      ],
+    },
   ];
 
   // ---- File state ------------------------------------------------------

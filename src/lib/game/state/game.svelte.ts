@@ -65,6 +65,7 @@ export {
   computeRosterStatTotal,
   computeAttacksPerSecond,
   computeRosterDamagePerHit,
+  computeRosterDamageShares,
 } from '../combat/damage';
 export {
   activeSlot,

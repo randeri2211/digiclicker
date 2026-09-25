@@ -1,24 +1,46 @@
 import { isEggReady } from '../eggs/eggs';
 import { tryAutoDigivolve } from '../evolution/digivolve';
 import { levelForXp } from './levelCurve';
-import { MAX_LEVEL } from '../constants';
+import {
+  MAX_LEVEL,
+  KILL_XP_SPLIT_EXPONENT,
+  XP_OVERLEVEL_GRACE,
+  XP_OVERLEVEL_PENALTY_PER_LEVEL,
+  XP_OVERLEVEL_MIN_FACTOR,
+} from '../constants';
 import { getFightingRoster } from '../state/expeditions.svelte';
 import { hatchery, fillIncubatingSlots } from '../state/hatchery.svelte';
 
+/** Kill XP multiplier for a Digimon at `level` beating a wild at
+ * `wildLevel`: 1 up to XP_OVERLEVEL_GRACE levels above it, then
+ * XP_OVERLEVEL_PENALTY_PER_LEVEL less per extra level, floored at
+ * XP_OVERLEVEL_MIN_FACTOR (grinding far below you still creeps along). */
+export function overlevelXpFactor(level: number, wildLevel: number): number {
+  const over = level - wildLevel - XP_OVERLEVEL_GRACE;
+  if (over <= 0) return 1;
+  return Math.max(XP_OVERLEVEL_MIN_FACTOR, 1 - over * XP_OVERLEVEL_PENALTY_PER_LEVEL);
+}
+
 /**
- * Flat-XP rule (GAMEPLAY_DESIGN.md, confirmed): do not divide by roster
- * size. Every roster entry AND every incubating egg receives the full kill
- * XP value - growing the roster is a pure multiplier on total XP earned,
- * never diluted. Digimon away on an expedition earn nothing.
+ * Kill XP is shared by the fighting roster: each gets
+ * xpValue / fighters^KILL_XP_SPLIT_EXPONENT (0 = no split, the old flat
+ * rule; see GAMEPLAY_DESIGN.md). Without a split, every new form added
+ * full-speed levelling on top of its extra damage and the roster
+ * snowballed (tools/simulate.mjs). Incubating eggs still get the full
+ * value - hatching doesn't snowball. Digimon away on an expedition earn
+ * nothing. With the wild's level, a Digimon well above it gets less
+ * (overlevelXpFactor), so levels settle near the area being played.
  */
-export function awardKillXp(xpValue: number): void {
+export function awardKillXp(xpValue: number, wildLevel?: number): void {
   // Snapshot first - an auto-digivolve adds a new entry mid-loop, which
   // shouldn't also receive this same kill's XP.
-  for (const entry of getFightingRoster()) {
+  const fighters = getFightingRoster();
+  const share = xpValue / Math.max(1, fighters.length) ** KILL_XP_SPLIT_EXPONENT;
+  for (const entry of fighters) {
     // Already capped - skip rather than accumulate xp levelForXp would
     // just clamp away anyway.
     if (levelForXp(entry.xp) >= MAX_LEVEL) continue;
-    entry.xp += xpValue;
+    entry.xp += wildLevel === undefined ? share : share * overlevelXpFactor(levelForXp(entry.xp), wildLevel);
     tryAutoDigivolve(entry);
   }
 
