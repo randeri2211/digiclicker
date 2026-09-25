@@ -7,6 +7,7 @@
 //   npm run simulate -- --set=KILL_XP_SPLIT_EXPONENT:1   # try a balance value
 //   npm run simulate -- --runs=10                        # 10 seeds, medians
 //   npm run simulate -- --runs=20 --workers=4            # parallel (default: cores - 1)
+//   npm run simulate -- --runs=20 --tune --boss-hours=1  # suggest boss HP multipliers
 //
 // Only the player's DECISIONS live here (where to fight, what to digivolve,
 // which squad to take); every formula, reward and unlock is the game's own:
@@ -31,6 +32,14 @@ const GRIND_KILL_SECONDS = Number(args.grind ?? 20);
 const CHUNK_MS = 5 * 60_000; // decisions are made every 5 simulated minutes
 const BOSS_RETRY_MS = 30 * 60_000;
 const STUCK_MS = 12 * 3_600_000; // no new unlock or quest for this long = stuck
+// --tune: instead of judging the bosses, find their HP multipliers. Each
+// boss is left alone for --boss-hours after it appears (the player farms),
+// then set to TUNE_MARGIN x the multiplier today's squad exactly beats, and
+// fought - so every later boss is tuned against the squad a player really
+// has by then. The report gives the median per boss across seeds.
+const TUNE = Boolean(args.tune);
+const TUNE_AFTER_MS = Number(args['boss-hours'] ?? 1) * 3_600_000;
+const TUNE_MARGIN = Number(args.margin ?? 0.95);
 
 // ---- Deterministic world: seeded randomness, simulated clock -------------
 let s = SEED >>> 0 || 1;
@@ -176,13 +185,33 @@ function housekeeping() {
 }
 
 /** Fights a boss with the real code; returns the attempt's outcome. */
-function fightBoss(areaId, pathId) {
-  const boss = g.getPath(areaId, pathId).boss;
-  const squad = fighters()
+// The strongest squad for this boss (matchup multipliers included), and
+// every kind of chip we own - what a sensible player brings.
+function pickSquad(boss) {
+  return fighters()
     .map((entry) => ({ entry, multiplier: C.squadMultiplier(entry.speciesId, boss.speciesId) }))
     .sort((a, b) => D.computeSquadDps([b]) - D.computeSquadDps([a]))
     .slice(0, boss.squadSize);
-  const chips = ['attack-chip', 'speed-chip', 'hp-disk'].filter((c) => (g.inventory[c] ?? 0) > 0);
+}
+const ownedChips = () => ['attack-chip', 'speed-chip', 'hp-disk'].filter((c) => (g.inventory[c] ?? 0) > 0);
+
+/** The HP multiplier at which today's best squad exactly wins: the damage
+ * it deals within the fight timer (idle DPS + clicking, with owned chips)
+ * over the boss's HP at multiplier 1. Pure - nothing is fought or spent. */
+function breakevenMultiplier(boss) {
+  const squad = pickSquad(boss);
+  const bonus = {};
+  for (const chip of ownedChips()) for (const stat of C.BOSS_CHIP_STATS[chip] ?? []) bonus[stat] = (bonus[stat] ?? 0) + K.BOSS_CHIP_BONUS;
+  const dps = D.computeSquadDps(squad, bonus) + BOSS_CLICKS_PER_SECOND * D.computeSquadClickDamage(squad, bonus);
+  const spawn = S.makeBossSpawn(now, { ...boss, hpMultiplier: 1 }, D.computeSquadStat(squad, 'hp', bonus));
+  const level = squad.reduce((sum, m) => sum + levelForXp(m.entry.xp), 0) / Math.max(1, squad.length);
+  return { multiplier: (dps * spawn.timeLimitMs) / 1000 / spawn.maxHp, squadLevel: level };
+}
+
+function fightBoss(areaId, pathId) {
+  const boss = g.getPath(areaId, pathId).boss;
+  const squad = pickSquad(boss);
+  const chips = ownedChips();
   if (!C.startBossFight(areaId, pathId, squad.map((m) => m.entry.speciesId), now, chips)) return null;
   const wild = C.combat.wild;
   const limit = wild.timeLimitMs;
@@ -206,11 +235,18 @@ function fightBoss(areaId, pathId) {
 // ---- Run --------------------------------------------------------------------
 // State the helpers above read; reset at the start of every run.
 let stats, joined, lastProgressAt;
+// Tuning edits boss data in memory; every run starts from the real values.
+const originalMultipliers = new Map(
+  orderedPaths().filter(([a, p]) => g.getPath(a, p).boss).map(([a, p]) => [`${a}:${p}`, g.getPath(a, p).boss.hpMultiplier]),
+);
 
 function runOnce(seed) {
   reseed(seed);
   now = START;
   log.length = 0;
+  for (const [key, multiplier] of originalMultipliers) g.getPath(...key.split(':')).boss.hpMultiplier = multiplier;
+  const bossSeenAt = {};
+  const tuned = {};
   g.startNewGameInSlot('simulation');
   stats = { digivolves: {}, expeditionData: 0 };
   joined = new Set(g.getResidents().filter(g.hasJoined).map((n) => n.id));
@@ -226,7 +262,22 @@ function runOnce(seed) {
 
     // Boss ready on an unlocked path? Fight it (with a cooldown after a loss).
     const bossPath = orderedPaths().find(([a, p]) => g.getPath(a, p).boss && g.isBossAvailable(P, a, p) && !g.isBossDefeated(P, a, p));
-    if (bossPath && (bossRetryAt[bossPath.join(':')] ?? 0) <= now) {
+    let tuneWait = false;
+    if (bossPath && TUNE) {
+      const key = bossPath.join(':');
+      const boss = g.getPath(...bossPath).boss;
+      bossSeenAt[key] ??= now;
+      if (!tuned[key]) {
+        if (now - bossSeenAt[key] < TUNE_AFTER_MS) tuneWait = true; // farm first, like a player would
+        else {
+          const { multiplier, squadLevel } = breakevenMultiplier(boss);
+          boss.hpMultiplier = Math.round(multiplier * TUNE_MARGIN * 100) / 100;
+          tuned[key] = { multiplier: boss.hpMultiplier, squadLevel, at: now - START };
+          note(`tuned ${getSpeciesName(boss.speciesId)}: hpMultiplier ${boss.hpMultiplier} (squad Lv ${squadLevel.toFixed(0)})`);
+        }
+      }
+    }
+    if (bossPath && !tuneWait && (bossRetryAt[bossPath.join(':')] ?? 0) <= now) {
       const [a, p] = bossPath;
       const boss = g.getPath(a, p).boss;
       const r = fightBoss(a, p);
@@ -276,6 +327,7 @@ function runOnce(seed) {
     bits: Math.round(g.currency.bits),
     data: g.currency.data,
     expeditionData: stats.expeditionData,
+    tuned,
     timeline: [...log],
   };
 }
@@ -387,6 +439,29 @@ if (RUNS === 1) {
   for (const r of results.filter((x) => !x.done)) {
     console.log(`  seed ${r.seed}: ${r.stuck ? `stuck at ${hms(r.endedAt)} - ${r.stuck}` : `not finished within ${MAX_HOURS}h`}`);
   }
+}
+
+if (TUNE) {
+  const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor((xs.length - 1) / 2)];
+  console.log(`\nBoss tuning · beatable ${args['boss-hours'] ?? 1}h after appearing · margin ${TUNE_MARGIN}\n`);
+  console.log(`${pad('Boss', 22)}${pad('Lv', 5)}${pad('now', 7)}${pad('tuned (median)', 16)}${pad('range', 14)}${pad('seeds', 7)}squad Lv`);
+  const suggestion = {};
+  for (const key of originalMultipliers.keys()) {
+    const boss = g.getPath(...key.split(':')).boss;
+    const samples = results.map((r) => r.tuned[key]).filter(Boolean);
+    const mults = samples.map((t) => t.multiplier);
+    const name = getSpeciesName(boss.speciesId);
+    if (!mults.length) {
+      console.log(`${pad(name, 22)}${pad(boss.level, 5)}${pad(originalMultipliers.get(key), 7)}not reached`);
+      continue;
+    }
+    suggestion[key] = median(mults);
+    console.log(
+      `${pad(name, 22)}${pad(boss.level, 5)}${pad(originalMultipliers.get(key), 7)}${pad(median(mults), 16)}` +
+        `${pad(`${Math.min(...mults)}-${Math.max(...mults)}`, 14)}${pad(`${mults.length}/${RUNS}`, 7)}${median(samples.map((t) => t.squadLevel)).toFixed(0)}`,
+    );
+  }
+  console.log(`\nSuggested hpMultiplier per boss (areaId:pathId):\n${JSON.stringify(suggestion, null, 2)}`);
 }
 
 await server.close();

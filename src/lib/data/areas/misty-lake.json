@@ -94,7 +94,7 @@
         "speciesId": "seadramon",
         "level": 49,
         "squadSize": 3,
-        "hpMultiplier": 5,
+        "hpMultiplier": 3.45,
         "rewards": {
           "bits": 1600,
           "data": 100

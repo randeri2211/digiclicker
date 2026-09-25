@@ -86,7 +86,7 @@
         "speciesId": "andromon",
         "level": 48,
         "squadSize": 4,
-        "hpMultiplier": 6,
+        "hpMultiplier": 0.9,
         "rewards": {
           "bits": 2000,
           "data": 120

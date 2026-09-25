@@ -94,7 +94,7 @@
         "speciesId": "centarumon",
         "level": 50,
         "squadSize": 3,
-        "hpMultiplier": 5,
+        "hpMultiplier": 2.48,
         "rewards": {
           "bits": 1800,
           "data": 110

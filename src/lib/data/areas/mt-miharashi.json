@@ -98,7 +98,7 @@
         "speciesId": "meramon",
         "level": 42,
         "squadSize": 3,
-        "hpMultiplier": 5,
+        "hpMultiplier": 1.62,
         "rewards": {
           "bits": 1000,
           "data": 70

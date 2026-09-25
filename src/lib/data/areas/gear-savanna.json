@@ -102,7 +102,7 @@
         "speciesId": "monochromon",
         "level": 40,
         "squadSize": 3,
-        "hpMultiplier": 5,
+        "hpMultiplier": 0.93,
         "rewards": {
           "bits": 800,
           "data": 60
