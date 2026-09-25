@@ -63,7 +63,7 @@
         "speciesId": "ogremon",
         "level": 49,
         "squadSize": 3,
-        "hpMultiplier": 5,
+        "hpMultiplier": 2.61,
         "rewards": {
           "bits": 1500,
           "data": 80
@@ -105,7 +105,7 @@
         "speciesId": "devimon",
         "level": 52,
         "squadSize": 4,
-        "hpMultiplier": 6,
+        "hpMultiplier": 3.45,
         "rewards": {
           "bits": 3000,
           "data": 150
