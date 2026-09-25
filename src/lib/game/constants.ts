@@ -48,6 +48,13 @@ export const KILL_XP_SPLIT_EXPONENT = balance.KILL_XP_SPLIT_EXPONENT;
  * (combat/rosterFalloff.ts): strongest first, the i-th counts FALLOFF^i -
  * the total tends to 1 / (1 - FALLOFF) members' worth. 1 = plain sum. */
 export const ROSTER_STAT_FALLOFF = balance.ROSTER_STAT_FALLOFF;
+/** Kill XP shrinks for a Digimon above the wild's level (combat/xp.ts
+ * overlevelXpFactor): full XP up to GRACE levels above, then
+ * -PENALTY_PER_LEVEL per extra level, never below MIN_FACTOR. Keeps
+ * levels near each area's range instead of grinding to the cap. */
+export const XP_OVERLEVEL_GRACE = balance.XP_OVERLEVEL_GRACE;
+export const XP_OVERLEVEL_PENALTY_PER_LEVEL = balance.XP_OVERLEVEL_PENALTY_PER_LEVEL;
+export const XP_OVERLEVEL_MIN_FACTOR = balance.XP_OVERLEVEL_MIN_FACTOR;
 
 // ---- Digivolution requirements & scope ----------------------------
 /** Level the source must reach before digivolving into a species at the

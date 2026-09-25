@@ -153,7 +153,7 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
   const xpValue = computeKillXp(wild.level);
   const bitsValue = computeKillBits(wild.level);
 
-  awardKillXp(xpValue);
+  awardKillXp(xpValue, wild.level);
   currency.bits += bitsValue;
   recordActivePathKill(areaProgress);
 
