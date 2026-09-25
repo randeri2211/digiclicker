@@ -1,0 +1,11 @@
+{
+  "courage": { "id": "courage", "name": "Crest of Courage", "eggTypes": ["Dinosaur", "Dragon"] },
+  "friendship": { "id": "friendship", "name": "Crest of Friendship", "eggTypes": ["Beast"] },
+  "love": { "id": "love", "name": "Crest of Love", "eggTypes": ["Bird"] },
+  "knowledge": { "id": "knowledge", "name": "Crest of Knowledge", "eggTypes": ["Insect", "Machine"] },
+  "sincerity": { "id": "sincerity", "name": "Crest of Sincerity", "eggTypes": ["Plant"] },
+  "reliability": { "id": "reliability", "name": "Crest of Reliability", "eggTypes": ["Aquatic", "Mineral"] },
+  "kindness": { "id": "kindness", "name": "Crest of Kindness", "eggTypes": ["Evil"] },
+  "light": { "id": "light", "name": "Crest of Light", "eggTypes": ["Holy"] },
+  "hope": { "id": "hope", "name": "Crest of Hope", "eggTypes": ["Holy"] }
+}

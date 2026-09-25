@@ -14,6 +14,7 @@ import type { StatAffinity, StatBlock } from '../lib/game/types';
 import { fightTimerSeconds as sharedFightTimerSeconds } from '../lib/game/combat/fightTimer';
 import type { FightTimerFormula, FightTimerParams } from '../lib/game/combat/fightTimer';
 import { curveValue, type CurveFormula, type CurveParams } from '../lib/game/combat/levelCurveFormulas';
+import { diminishedSum } from '../lib/game/combat/rosterFalloff';
 
 type BalanceModule = typeof import('../lib/game/balance.json');
 export type Balance = BalanceModule extends { default: infer D } ? D : BalanceModule;
@@ -176,15 +177,33 @@ export interface RosterSummary {
 // combat/damage.ts computeAttacksPerSecond / computeRosterDamagePerHit /
 // computeRosterDps / computeClickDamage, over the whole scenario roster.
 export function summarizeRoster(b: Balance, s: Scenario): RosterSummary {
-  const totals: StatBlock = { attack: 0, hp: 0, speed: 0, specialAttack: 0 };
+  // One value per member, then the game's diminishing-returns sum
+  // (combat/rosterFalloff.ts) - the same totals the game computes.
+  const perMember: Record<keyof StatBlock, number[]> = { attack: [], hp: [], speed: [], specialAttack: [] };
+  const damage: number[] = [];
   let size = 0;
   for (const stage of STAGES) {
     const count = s.counts[stage] ?? 0;
     size += count;
-    for (const stat of STAT_KEYS) totals[stat] += count * entryStat(b, stage, stat, s.level, s.inheritedFromLevel);
+    const values: StatBlock = {
+      attack: entryStat(b, stage, 'attack', s.level, s.inheritedFromLevel),
+      hp: entryStat(b, stage, 'hp', s.level, s.inheritedFromLevel),
+      speed: entryStat(b, stage, 'speed', s.level, s.inheritedFromLevel),
+      specialAttack: entryStat(b, stage, 'specialAttack', s.level, s.inheritedFromLevel),
+    };
+    for (let i = 0; i < count; i++) {
+      for (const stat of STAT_KEYS) perMember[stat].push(values[stat]);
+      damage.push(values.attack + values.specialAttack);
+    }
   }
+  const totals: StatBlock = {
+    attack: diminishedSum(perMember.attack, b.ROSTER_STAT_FALLOFF),
+    hp: diminishedSum(perMember.hp, b.ROSTER_STAT_FALLOFF),
+    speed: diminishedSum(perMember.speed, b.ROSTER_STAT_FALLOFF),
+    specialAttack: diminishedSum(perMember.specialAttack, b.ROSTER_STAT_FALLOFF),
+  };
   const attacksPerSecond = b.BASE_ATTACKS_PER_SECOND + totals.speed * b.SPEED_TO_APS_SCALE;
-  const damagePerHit = totals.attack + totals.specialAttack;
+  const damagePerHit = diminishedSum(damage, b.ROSTER_STAT_FALLOFF);
   const dps = attacksPerSecond * damagePerHit;
   const clickDamage = b.CLICK_DAMAGE_BASE + dps * b.CLICK_DAMAGE_DPS_FRACTION;
   return {

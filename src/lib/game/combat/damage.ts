@@ -1,7 +1,8 @@
 import type { RosterEntry, StatBlock } from '../types';
 import { levelForXp } from './levelCurve';
 import { getAbilityBonusFraction } from '../abilities/abilities';
-import { CLICK_DAMAGE_BASE, CLICK_DAMAGE_DPS_FRACTION, BASE_ATTACKS_PER_SECOND, SPEED_TO_APS_SCALE } from '../constants';
+import { CLICK_DAMAGE_BASE, CLICK_DAMAGE_DPS_FRACTION, BASE_ATTACKS_PER_SECOND, SPEED_TO_APS_SCALE, ROSTER_STAT_FALLOFF } from '../constants';
+import { diminishedSum, diminishedShares } from './rosterFalloff';
 
 // Scales with roster DPS (see CLICK_DAMAGE_BASE/CLICK_DAMAGE_DPS_FRACTION)
 // so clicking stays a proportional boost on top of idle damage instead of
@@ -22,8 +23,11 @@ export function computeEntryStatValue(entry: RosterEntry, statKey: keyof StatBlo
   return raw * (1 + getAbilityBonusFraction(entry, statKey));
 }
 
+// The roster's effective total of one stat in wild fights - with
+// diminishing returns per extra member (ROSTER_STAT_FALLOFF, see
+// rosterFalloff.ts), so collecting keeps helping without snowballing.
 export function computeRosterStatTotal(entries: RosterEntry[], statKey: keyof StatBlock): number {
-  return entries.reduce((total, entry) => total + computeEntryStatValue(entry, statKey), 0);
+  return diminishedSum(entries.map((entry) => computeEntryStatValue(entry, statKey)), ROSTER_STAT_FALLOFF);
 }
 
 // This entry's flat damage on a single attack tick - not an average, an
@@ -34,11 +38,17 @@ export function computeEntryDamagePerHit(entry: RosterEntry): number {
 }
 
 export function computeRosterDamagePerHit(entries: RosterEntry[]): number {
-  return entries.reduce((total, entry) => total + computeEntryDamagePerHit(entry), 0);
+  return diminishedSum(entries.map(computeEntryDamagePerHit), ROSTER_STAT_FALLOFF);
 }
 
-// Attack rate is a roster-wide number (driven by the whole roster's summed
-// Speed), not per-entry - there's one shared tick clock, not one per
+/** Each entry's weighted share of computeRosterDamagePerHit (same order as
+ * `entries`) - what it actually adds after the falloff. */
+export function computeRosterDamageShares(entries: RosterEntry[]): number[] {
+  return diminishedShares(entries.map(computeEntryDamagePerHit), ROSTER_STAT_FALLOFF);
+}
+
+// Attack rate is a roster-wide number (driven by the whole roster's
+// effective Speed total), not per-entry - there's one shared tick clock, not one per
 // Digimon.
 export function computeAttacksPerSecond(entries: RosterEntry[]): number {
   return BASE_ATTACKS_PER_SECOND + computeRosterStatTotal(entries, 'speed') * SPEED_TO_APS_SCALE;

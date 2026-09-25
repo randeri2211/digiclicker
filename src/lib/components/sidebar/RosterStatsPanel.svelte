@@ -5,10 +5,10 @@
     getFightingRoster,
     computeRosterDps,
     computeClickDamage,
-    computeEntryDps,
     computeRosterStatTotal,
     computeAttacksPerSecond,
     computeRosterDamagePerHit,
+    computeRosterDamageShares,
   } from '../../game/state/game.svelte';
 
   interface Props {
@@ -35,12 +35,15 @@
     hp: computeRosterStatTotal(entries, 'hp'),
   });
 
-  const topContributors = $derived(
-    entries
-      .map((entry) => ({ entry, dps: computeEntryDps(entry, attacksPerSecond) }))
+  // Each one's share after the roster falloff, so the list adds up to the
+  // total above.
+  const topContributors = $derived.by(() => {
+    const shares = computeRosterDamageShares(entries);
+    return entries
+      .map((entry, i) => ({ entry, dps: attacksPerSecond * shares[i] }))
       .sort((a, b) => b.dps - a.dps)
-      .slice(0, TOP_CONTRIBUTOR_COUNT)
-  );
+      .slice(0, TOP_CONTRIBUTOR_COUNT);
+  });
 
   const fmt = (n: number) => n.toFixed(1);
 </script>

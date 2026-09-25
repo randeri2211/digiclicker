@@ -33,6 +33,22 @@ export const OFFLINE_PROGRESS_CAP_HOURS = balance.OFFLINE_PROGRESS_CAP_HOURS;
  * same pace as playing. */
 export const OFFLINE_PROGRESS_EFFICIENCY = balance.OFFLINE_PROGRESS_EFFICIENCY;
 
+// ---- Crests ------------------------------------------------------------
+/** 1 = Ultimate needs its egg family's Crest and Mega the awakened Crest
+ * (evolution/crests.ts); 0 = off. A number, not a boolean, so the Balance
+ * Lab can toggle it like any other value. */
+export const CREST_GATING_ENABLED = balance.CREST_GATING_ENABLED === 1;
+
+// ---- Kill XP sharing ---------------------------------------------------
+/** Each fighting Digimon gets killXp / fighters^EXPONENT (combat/xp.ts):
+ * 0 = everyone gets the full amount (a bigger roster multiplies total XP),
+ * 0.5 = divided by the square root of the roster size, 1 = split evenly. */
+export const KILL_XP_SPLIT_EXPONENT = balance.KILL_XP_SPLIT_EXPONENT;
+/** Diminishing returns on the roster's summed stats in wild fights
+ * (combat/rosterFalloff.ts): strongest first, the i-th counts FALLOFF^i -
+ * the total tends to 1 / (1 - FALLOFF) members' worth. 1 = plain sum. */
+export const ROSTER_STAT_FALLOFF = balance.ROSTER_STAT_FALLOFF;
+
 // ---- Digivolution requirements & scope ----------------------------
 /** Level the source must reach before digivolving into a species at the
  * given target stage. A stage with no entry has no level requirement

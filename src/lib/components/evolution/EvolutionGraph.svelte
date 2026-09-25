@@ -13,6 +13,7 @@
   import type { DigivolutionOption } from '../../game/state/game.svelte';
   import { MAX_LEVEL } from '../../game/constants';
   import SpeciesTags from '../shared/SpeciesTags.svelte';
+  import { crestRequirementLabel, isCrestRequirementMet } from '../../game/evolution/crests';
 
   function formatStatBlock(block: StatBlock): string {
     return `ATK ${block.attack} · HP ${block.hp} · SPD ${block.speed} · SPA ${block.specialAttack}`;
@@ -160,7 +161,8 @@
     {/if}
     <div class="option-req">
       {#if option.requirement}
-        Requires Lv {option.requirement.minLevel}
+        Requires Lv {option.requirement.minLevel}{#if option.requirement.crest}
+          · <span class:crest-missing={!isCrestRequirementMet(option.requirement.crest)}>{crestRequirementLabel(option.requirement.crest)}</span>{/if}
       {:else}
         No requirements
       {/if}
@@ -228,6 +230,9 @@
 </div>
 
 <style>
+  .crest-missing {
+    color: var(--warn);
+  }
   .graph {
     display: flex;
     flex-direction: column;

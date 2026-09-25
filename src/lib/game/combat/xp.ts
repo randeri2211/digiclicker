@@ -1,24 +1,29 @@
 import { isEggReady } from '../eggs/eggs';
 import { tryAutoDigivolve } from '../evolution/digivolve';
 import { levelForXp } from './levelCurve';
-import { MAX_LEVEL } from '../constants';
+import { MAX_LEVEL, KILL_XP_SPLIT_EXPONENT } from '../constants';
 import { getFightingRoster } from '../state/expeditions.svelte';
 import { hatchery, fillIncubatingSlots } from '../state/hatchery.svelte';
 
 /**
- * Flat-XP rule (GAMEPLAY_DESIGN.md, confirmed): do not divide by roster
- * size. Every roster entry AND every incubating egg receives the full kill
- * XP value - growing the roster is a pure multiplier on total XP earned,
- * never diluted. Digimon away on an expedition earn nothing.
+ * Kill XP is shared by the fighting roster: each gets
+ * xpValue / fighters^KILL_XP_SPLIT_EXPONENT (0 = no split, the old flat
+ * rule; see GAMEPLAY_DESIGN.md). Without a split, every new form added
+ * full-speed levelling on top of its extra damage and the roster
+ * snowballed (tools/simulate.mjs). Incubating eggs still get the full
+ * value - hatching doesn't snowball. Digimon away on an expedition earn
+ * nothing.
  */
 export function awardKillXp(xpValue: number): void {
   // Snapshot first - an auto-digivolve adds a new entry mid-loop, which
   // shouldn't also receive this same kill's XP.
-  for (const entry of getFightingRoster()) {
+  const fighters = getFightingRoster();
+  const share = xpValue / Math.max(1, fighters.length) ** KILL_XP_SPLIT_EXPONENT;
+  for (const entry of fighters) {
     // Already capped - skip rather than accumulate xp levelForXp would
     // just clamp away anyway.
     if (levelForXp(entry.xp) >= MAX_LEVEL) continue;
-    entry.xp += xpValue;
+    entry.xp += share;
     tryAutoDigivolve(entry);
   }
 
