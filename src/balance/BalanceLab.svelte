@@ -277,6 +277,7 @@
         { path: ['PARTNER_BASE_SLOTS'], label: 'Partner slots at start', step: 1 },
         { path: ['PARTNER_EXTRA_GRACE'], label: 'Partner: extra levels of full XP', step: 1 },
         { path: ['PARTNER_XP_BONUS'], label: 'Partner: kill XP bonus', step: 0.05 },
+        { path: ['PARTNER_KILL_XP_SPLIT_EXPONENT'], label: 'Partner: kill XP split exponent (0 = whole kill)', step: 0.05 },
       ],
     },
   ];

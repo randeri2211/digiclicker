@@ -65,6 +65,11 @@ export const PARTNER_BASE_SLOTS = balance.PARTNER_BASE_SLOTS;
 export const PARTNER_EXTRA_GRACE = balance.PARTNER_EXTRA_GRACE;
 /** Extra share of kill XP for a partner (0.25 = +25%). */
 export const PARTNER_XP_BONUS = balance.PARTNER_XP_BONUS;
+/** Like KILL_XP_SPLIT_EXPONENT, but for partners' own share: 0 = every
+ * partner gets the whole kill's XP (x the bonus) however big the roster -
+ * the roster split made partners crawl (~11% of a kill at 130 Digimon).
+ * They still stop at the wilds' level + the (partner) grace. */
+export const PARTNER_KILL_XP_SPLIT_EXPONENT = balance.PARTNER_KILL_XP_SPLIT_EXPONENT;
 
 // ---- Saves -------------------------------------------------------------
 /** Hours between "export a backup?" popups (state/backupReminder.svelte.ts). */

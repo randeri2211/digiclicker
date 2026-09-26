@@ -10,6 +10,7 @@ import {
   XP_OVERLEVEL_MIN_FACTOR,
   PARTNER_EXTRA_GRACE,
   PARTNER_XP_BONUS,
+  PARTNER_KILL_XP_SPLIT_EXPONENT,
 } from '../constants';
 import { isPartner } from '../state/partners.svelte';
 import { getFightingRoster } from '../state/expeditions.svelte';
@@ -43,11 +44,13 @@ export function awardKillXp(xpValue: number, wildLevel?: number): void {
   const eggXp = xpValue * (1 + auraBonus(fighters, 'egg-xp'));
   xpValue *= 1 + auraBonus(fighters, 'kill-xp');
   const share = xpValue / Math.max(1, fighters.length) ** KILL_XP_SPLIT_EXPONENT;
+  const partnerShare = xpValue / Math.max(1, fighters.length) ** PARTNER_KILL_XP_SPLIT_EXPONENT;
   let levelledUp = false;
   for (const entry of fighters) {
-    // Partners: a bigger share, and more room above the wilds.
+    // Partners: their own (normally unsplit) share plus a bonus, and more
+    // room above the wilds.
     const partner = isPartner(entry.speciesId);
-    const base = partner ? share * (1 + PARTNER_XP_BONUS) : share;
+    const base = partner ? partnerShare * (1 + PARTNER_XP_BONUS) : share;
     const grace = partner ? PARTNER_EXTRA_GRACE : 0;
     const levelBefore = levelForXp(entry.xp);
     entry.xp += wildLevel === undefined ? base : base * overlevelXpFactor(levelBefore, wildLevel, grace);
