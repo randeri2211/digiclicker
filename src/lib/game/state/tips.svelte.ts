@@ -16,6 +16,9 @@ export interface Tip {
   id: string;
   title: string;
   text: string;
+  /** The UI it's about: an element marked data-tip="<target>" - spotlit,
+   * with the tip beside it (centred if it isn't on screen). */
+  target?: string;
   /** Show once this holds. */
   when: () => boolean;
 }
@@ -30,56 +33,65 @@ const anyBossAvailable = () =>
 export const TIPS: Tip[] = [
   {
     id: 'welcome',
+    target: 'arena',
     title: 'Welcome, Tamer!',
     text: 'Click the wild Digimon to attack. Your whole roster fights on its own too - even while the game is closed.',
     when: () => true,
   },
   {
     id: 'quests',
+    target: 'quests',
     title: 'Quests',
-    text: 'Jijimon has a quest for you (above the arena). Quests tell the story and bring new residents - each one opens something new.',
+    text: 'Jijimon has a quest for you. Quests tell the story and bring new residents - each one opens something new.',
     when: () => true,
   },
   {
     id: 'map',
+    target: 'map',
     title: 'A new path is open',
-    text: 'Paths unlock as you defeat enough Digimon. Click a path on the map below the arena to travel there.',
+    text: 'Paths unlock as you defeat enough Digimon. Click a path on the map to travel there.',
     when: () => unlockedPathCount() >= 2,
   },
   {
     id: 'digivolve',
+    target: 'evolve',
     title: 'Ready to digivolve',
-    text: 'One of your Digimon can digivolve! Open Evolution (top of the right panel). The new form joins your roster - the old one stays and starts over at Lv 1.',
+    text: 'One of your Digimon can digivolve! Open Evolution here. The new form joins your roster - the old one stays and starts over at Lv 1.',
     when: () => getRosterList().some(isReadyToDigivolve),
   },
   {
     id: 'eggs',
+    target: 'hatchery',
     title: 'A Digi-Egg!',
     text: 'Eggs in the hatchery grow as you defeat Digimon. When one is ready, hatch it with Data to meet a new Digimon.',
     when: () => hatchery.incubating.length + hatchery.stored.length > 0,
   },
   {
     id: 'expeditions',
+    target: 'expeditions',
     title: 'Expeditions',
-    text: 'Send a few Digimon exploring (compass button, top bar). They bring back Data, eggs and boss chips - but miss the fighting while away.',
+    text: 'Send a few Digimon exploring from here. They bring back Data, eggs and boss chips - but miss the fighting while away.',
     when: () => isSystemUnlocked('expeditions'),
   },
   {
     id: 'partners',
+    target: 'roster',
     title: 'Partners',
-    text: 'Click a Digimon (roster or right panel) and choose "Make partner". Partners level faster and a little higher - train the squad you will take to bosses.',
+    text: 'Click a Digimon here (or in the Roster) and choose "Make partner". Partners level faster and a little higher - train the squad you will take to bosses.',
     when: () => Object.keys(roster).length >= 4,
   },
   {
     id: 'boss',
+    target: 'boss',
     title: 'A boss appeared',
-    text: 'Challenge it from the bar above the arena. Pick a squad with good matchups - attribute and element - and bring boss chips if you have any.',
+    text: 'Challenge it here. Pick a squad with good matchups - attribute and element - and bring boss chips if you have any.',
     when: anyBossAvailable,
   },
   {
     id: 'backup',
+    target: 'settings',
     title: 'Keep your progress safe',
-    text: 'Your save lives only in this browser. Settings -> Export Save makes a backup file you can import anywhere.',
+    text: 'Your save lives only in this browser. Settings (here) -> Export Save makes a backup file you can import anywhere.',
     when: () => playStats.onlineMs >= 30 * 60_000,
   },
 ];

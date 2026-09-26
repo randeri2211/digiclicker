@@ -55,7 +55,7 @@
       <button class="close-btn" onclick={onClose}>Close</button>
     </div>
 
-    <div class="tags-row"><SpeciesTags speciesId={entry.speciesId} /></div>
+    <div class="tags-row"><SpeciesTags speciesId={entry.speciesId} showStage /></div>
 
     <XpBar xp={entry.xp} showNumbers />
 

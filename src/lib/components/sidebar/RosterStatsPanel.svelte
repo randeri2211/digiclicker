@@ -3,6 +3,7 @@
   import { getSpeciesName, getSpriteUrl, getSpecies } from '../../game/images';
   import RosterFilterControls from '../shared/RosterFilterControls.svelte';
   import ElementIcon from '../shared/ElementIcon.svelte';
+  import AttributeIcon from '../shared/AttributeIcon.svelte';
   import { loadRosterFilter, saveRosterFilter, applyRosterFilter, isFilterActive, describeFilter, SORT_KEYS } from '../../game/roster/rosterFilter';
   import { levelForXp } from '../../game/combat/levelCurve';
   import {
@@ -101,7 +102,7 @@
   }
 </script>
 
-<div class="stats-panel">
+<div class="stats-panel" data-tip="roster">
   <div class="stats-head">
     <div class="stats-title">Roster DPS</div>
     <div class="stats-total">{fmt(totalDps)}</div>
@@ -185,6 +186,9 @@
             Lv {levelForXp(row.entry.xp)}
             {#if species?.element}
               · <ElementIcon element={species.element} size={14} />{species.element}
+            {/if}
+            {#if species?.attribute}
+              · <AttributeIcon attribute={species.attribute} size={14} />{species.attribute}
             {/if}
           </span>
         </span>

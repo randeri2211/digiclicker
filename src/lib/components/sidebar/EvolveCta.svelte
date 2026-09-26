@@ -10,7 +10,7 @@
   const readyCount = $derived(getRosterList().filter(isReadyToDigivolve).length);
 </script>
 
-<button class="evolve-btn" class:inactive={readyCount === 0} onclick={onClick}>
+<button class="evolve-btn" class:inactive={readyCount === 0} onclick={onClick} data-tip="evolve">
   <span class="evolve-icon">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="2.3" r="1" stroke="currentColor" stroke-width="1.4" />

@@ -26,7 +26,7 @@
 
 {#if boss && path && !combat.boss}
   {@const sprite = getSpriteUrl(boss.speciesId)}
-  <div class="boss-bar" class:ready={available && !defeated} class:locked={!available}>
+  <div class="boss-bar" class:ready={available && !defeated} class:locked={!available} data-tip="boss">
     <div class="boss-sprite">
       {#if sprite && available}<img src={sprite} alt="" />{:else}<span class="unknown">?</span>{/if}
     </div>

@@ -10,13 +10,15 @@
     badge?: number;
     /** A system not unlocked yet: dimmed with a lock, `title` explains. */
     locked?: boolean;
+    /** Onboarding tip target id (data-tip), if a tip points at this button. */
+    tip?: string;
     children: Snippet;
   }
 
-  const { title, onClick, badge = 0, locked = false, children }: Props = $props();
+  const { title, onClick, badge = 0, locked = false, tip, children }: Props = $props();
 </script>
 
-<button class="icon-btn" class:locked {title} aria-label={badge > 0 ? `${title} (${badge})` : title} onclick={onClick}>
+<button class="icon-btn" class:locked data-tip={tip} {title} aria-label={badge > 0 ? `${title} (${badge})` : title} onclick={onClick}>
   {@render children()}
   {#if locked}
     <svg class="lock" width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">

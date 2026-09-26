@@ -22,6 +22,8 @@
   import Toasts from './lib/components/shared/Toasts.svelte';
   import {
     startCombatTickLoop,
+    actScreen,
+    offline,
     stopCombatTickLoop,
     startAutosave,
     stopAutosave,
@@ -68,6 +70,12 @@
   let questsOpen = $state(false);
   // Boss prep screen target, or null when closed.
   let bossPrep: { areaId: string; pathId: string } | null = $state(null);
+  // Onboarding tips wait while any menu screen is up (their spotlight would
+  // point at something underneath it).
+  const menuOpen = $derived(
+    settingsOpen || evolutionOpen || rosterOpen || inventoryOpen || shopOpen || compendiumOpen ||
+      expeditionsOpen || villageOpen || questsOpen || bossPrep !== null || actScreen.actId !== null || offline.report !== null,
+  );
 
   $effect(() => {
     const urls = PRELOAD_SPECIES_IDS.map(getSpriteUrl).filter((url): url is string => url !== null);
@@ -194,7 +202,7 @@
     <Toasts />
     <OfflineReportScreen />
     <BackupReminder />
-    <TipCard />
+    {#if !menuOpen}<TipCard />{/if}
     <ActCompleteScreen />
     {#if saveSession.takenOver}
       <div class="taken-over" role="alert">

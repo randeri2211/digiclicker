@@ -13,15 +13,18 @@
 
   interface Props {
     speciesId: string;
+    /** Also show the stage, as the first chip (the Stats window). */
+    showStage?: boolean;
   }
 
-  const { speciesId }: Props = $props();
+  const { speciesId, showStage = false }: Props = $props();
 
   const species = $derived(getSpecies(speciesId));
 </script>
 
 {#if species}
   <span class="tags">
+    {#if showStage}<span class="tag stage" title="Stage">{species.stage}</span>{/if}
     <span
       class="tag"
       title={MATCHUP_ATTRIBUTES.has(species.attribute)
@@ -42,6 +45,10 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 4px;
+  }
+  .tag.stage {
+    color: var(--text-h);
+    border-color: var(--panel-border-strong);
   }
   .tag {
     display: inline-flex;

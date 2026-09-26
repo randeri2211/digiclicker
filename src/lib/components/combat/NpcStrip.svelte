@@ -27,7 +27,7 @@
 </script>
 
 {#if open.length}
-  <div class="npc-strip" aria-label="Quests in this area">
+  <div class="npc-strip" aria-label="Quests in this area" data-tip="quests">
     {#each open as { quest, status } (quest.id)}
       {@const giver = getNpc(quest.giver)}
       {@const sprite = giver ? getSpriteUrl(giver.speciesId) : null}

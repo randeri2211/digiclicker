@@ -111,7 +111,7 @@
   }
 </script>
 
-<div class="region-map">
+<div class="region-map" data-tip="map">
   <div class="region-tabs">
     {#each REGIONS as tabRegion (tabRegion.id)}
       {@const unlocked = isRegionUnlocked(areaProgress, tabRegion)}

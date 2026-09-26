@@ -11,7 +11,7 @@
   const slotCost = $derived(isSystemUnlocked('hatchery-upgrades') ? hatcherySlotCost() : null);
 </script>
 
-<div class="side-section">
+<div class="side-section" data-tip="hatchery">
   <div class="side-head">
     <div class="side-title">Hatchery</div>
     <div class="side-count">{hatchery.incubating.length} / {hatchery.capacity}</div>
