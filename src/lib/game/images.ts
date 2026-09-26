@@ -22,21 +22,16 @@ export function getSpeciesIdsByStage(stage: Stage): string[] {
 export function getSpriteUrl(speciesId: string): string | null {
   const species = getSpecies(speciesId);
   if (!species?.spriteUrl) return null;
-  // Filenames contain spaces/parentheses (e.g. "Agumon dl.png") - encode each
-  // path segment so they survive as <img src> values. spriteUrl is relative
-  // to public/, so it's served from the site root.
-  const encoded = species.spriteUrl
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/');
-  return `/${encoded}`;
+  // The shipped, optimized copy (optimize_sprites.py builds public/sprites/
+  // from the scraped original at spriteUrl). BASE_URL keeps it working when
+  // the game is served from a sub-path (e.g. GitHub Pages /digiclicker/).
+  return `${import.meta.env.BASE_URL}sprites/${species.id}.webp`;
 }
 
-// Recolored per-type Digi-Egg art (see EggImageGenerator.py) - egg types
-// have no spaces/special characters, so no encoding needed unlike
-// getSpriteUrl above.
+// Recolored per-type Digi-Egg art (see EggImageGenerator.py), optimized
+// into public/sprites/eggs/ by optimize_sprites.py.
 export function getEggSpriteUrl(eggType: EggType): string {
-  return `/digimon/eggs/${eggType}/egg-base.png`;
+  return `${import.meta.env.BASE_URL}sprites/eggs/${eggType}.webp`;
 }
 
 /** Kill-drop and Mystery eggs share the same per-type sprite - callers

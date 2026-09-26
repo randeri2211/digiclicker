@@ -23,7 +23,9 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parent
 BASE_IMAGE = ROOT / "egg_assets" / "base_egg_zurumon.jpg"
 COLORS_JSON = ROOT / "egg_assets" / "egg_type_colors.json"
-OUTPUT_DIR = ROOT / "public" / "digimon" / "eggs"
+# Source art lives outside public/ (never shipped as-is) - optimize_sprites.py
+# builds the shipped copies into public/sprites/.
+OUTPUT_DIR = ROOT / "art" / "digimon" / "eggs"
 MONTAGE_PATH = ROOT / "egg_assets" / "montage.png"
 
 # Montage layout - a dark backdrop matches the game's actual UI, so

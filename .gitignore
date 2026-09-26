@@ -17,11 +17,12 @@ venv/
 __pycache__/
 *.pyc
 
-# Scraped Digimon sprites/art (~170MB+) - regenerate with Importer.py
-public/digimon/images/
-
-# Digi-Egg images, sourced by hand per egg type (see egg_type_mapping.py)
-public/digimon/eggs/
+# Source art, never shipped as-is (optimize_sprites.py builds the committed
+# public/sprites/ from it): scraped Digimon art (~340MB, regenerate with
+# Importer.py) and hand-sourced Digi-Egg images.
+art/
+# Old location, in case an older checkout still has it.
+public/digimon/
 
 # Editor directories and files
 .vscode/*

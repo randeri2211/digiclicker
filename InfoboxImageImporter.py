@@ -13,7 +13,7 @@ labels like "Agumon (Black)" are usually just a section on the base
 page, not their own page, and are correctly skipped (no-page).
 
 Run this, then rerun EvolutionGraphConverter.py to pick up the newly
-downloaded images (find_sprite() re-scans public/digimon/images/ fresh
+downloaded images (find_sprite() re-scans art/digimon/images/ fresh
 each time it runs).
 """
 import json
@@ -26,7 +26,7 @@ import requests
 
 API_URL = "https://digimon.fandom.com/api.php"
 ROOT = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(ROOT, "public", "digimon", "images")
+OUTPUT_DIR = os.path.join(ROOT, "art", "digimon", "images")
 EVOLUTION_JSON = os.path.join(ROOT, "src", "lib", "data", "digimon-evolution.json")
 HEADERS = {"User-Agent": "DigiClicker-ImageImporter/1.0 (randerikatom@gmail.com)"}
 # Gentler than Importer.py's 16 - this hits individual pages one at a time

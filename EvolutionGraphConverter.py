@@ -4,7 +4,7 @@ EvolutionImporter.py) into a clean, game-usable JSON file at
 src/lib/data/digimon-evolution.json.
 
 Filters out non-Digimon nodes that leaked in from inline item/location links,
-cross-references each surviving node against public/digimon/images/ to
+cross-references each surviving node against art/digimon/images/ to
 resolve a representative sprite, and reshapes the graph into a
 speciesId-keyed lookup with precomputed evolvesTo/evolvesFrom/lateralTo edges.
 viz:position (Gephi layout jitter) is discarded entirely - it carries no
@@ -38,7 +38,7 @@ EGG_TYPES = (
 
 ROOT = Path(__file__).resolve().parent
 GEXF_PATH = ROOT / "data" / "evolution_graph.gexf"
-IMAGES_DIR = ROOT / "public" / "digimon" / "images"
+IMAGES_DIR = ROOT / "art" / "digimon" / "images"
 OUTPUT_PATH = ROOT / "src" / "lib" / "data" / "digimon-evolution.json"
 ATTACKS_PATH = ROOT / "data" / "species_attacks.json"
 
@@ -176,7 +176,8 @@ def sprite_url(label):
     path = find_sprite(label)
     if path is None:
         return None
-    return path.relative_to(ROOT / "public").as_posix()
+    # spriteUrl is relative to art/ (the scraped source; see optimize_sprites.py).
+    return path.relative_to(ROOT / "art").as_posix()
 
 
 def _resolve_curated(mapping, fallback_values, raw_type, slug, salt):

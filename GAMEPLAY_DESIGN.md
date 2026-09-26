@@ -510,8 +510,9 @@ on total XP earned per kill.
   and knocking out the background to transparent. Also writes
   `egg_assets/montage.png` (all 11 side by side on a dark backdrop) for
   quick comparison when retuning colors. Output lives at
-  `public/digimon/eggs/<Type>/egg-base.png` (gitignored, regenerate with
-  the script - same convention as `public/digimon/images/<Name>/`).
+  `art/digimon/eggs/<Type>/egg-base.png` (gitignored source art, same
+  convention as `art/digimon/images/<Name>/`); `optimize_sprites.py`
+  ships them as `public/sprites/eggs/<Type>.webp`.
 - **Hatchery (confirmed, built):** eggs never sit in the roster - they
   live in a separate **hatchery** (`HatcheryState` in `types.ts`,
   `state/hatchery.svelte.ts`). An `Egg` already has its `speciesId`

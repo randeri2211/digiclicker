@@ -1,0 +1,73 @@
+name: CI
+
+# Every push and pull request: type check, build, every data validator, and
+# a short Act 1 pacing simulation. Problems show up as annotations (on the
+# run and on a PR's changed files) and everything lands on the run's
+# Summary page.
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+
+      - name: Type check
+        run: |
+          if npm run check; then echo "### ✅ Type check" >> "$GITHUB_STEP_SUMMARY";
+          else echo "### ❌ Type check failed - see the log" >> "$GITHUB_STEP_SUMMARY"; exit 1; fi
+      - name: Build
+        if: always()
+        run: |
+          if npx vite build; then echo "### ✅ Build ($(du -sh dist | cut -f1))" >> "$GITHUB_STEP_SUMMARY";
+          else echo "### ❌ Build failed - see the log" >> "$GITHUB_STEP_SUMMARY"; exit 1; fi
+
+      # Each validator annotates its problems and adds its own summary
+      # section (ci_report.py); `always()` so one failure doesn't hide others.
+      - name: Areas & region maps
+        if: always()
+        run: python validate_areas.py
+      - name: Quests & NPCs
+        if: always()
+        run: python validate_quests.py
+      - name: Elements
+        if: always()
+        run: python validate_elements.py
+      - name: Mystery eggs
+        if: always()
+        run: python validate_mystery_eggs.py
+      - name: Sprites
+        if: always()
+        run: python optimize_sprites.py --check
+
+  pacing:
+    # Informational: how the current balance plays out (tools/simulate.mjs).
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Act 1 pacing (6 seeds)
+        run: |
+          npm run --silent simulate -- --runs=6 --hours=100 > pacing.txt 2> pacing.err || true
+          {
+            echo "### 🎮 Act 1 pacing (simulator, 6 seeds)"
+            echo '```'
+            cat pacing.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat pacing.txt pacing.err

@@ -23,6 +23,7 @@ import sys
 from pathlib import Path
 
 from element_mapping import ELEMENTS
+from ci_report import report
 
 ROOT = Path(__file__).resolve().parent
 QUESTS_PATH = ROOT / "src" / "lib" / "data" / "quests.json"
@@ -198,6 +199,12 @@ def main():
     for quest_id in by_id:
         visit(quest_id, [])
 
+    report(
+        "Quests & NPCs",
+        errors,
+        f"{len(quests)} quest(s) and {len(npcs)} NPC(s) validated.",
+        lambda e: "src/lib/data/npcs.json" if e.startswith("npc ") else "src/lib/data/quests.json",
+    )
     if errors:
         print(f"{len(errors)} problem(s) in quests.json:")
         for error in errors:

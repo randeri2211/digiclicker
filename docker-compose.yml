@@ -25,6 +25,8 @@ services:
       context: .
       dockerfile: Dockerfile.importer
     volumes:
-      - ./public/digimon/images:/app/public/digimon/images
+      # Source art only (git-ignored); optimize_sprites.py builds the
+      # shipped public/sprites/ from it.
+      - ./art/digimon/images:/app/art/digimon/images
     profiles:
       - tools

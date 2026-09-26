@@ -1,5 +1,5 @@
 """
-Many downloaded Digimon images (public/digimon/images/) carry a solid
+Many downloaded Digimon images (art/digimon/images/) carry a solid
 white background baked in rather than being transparent, which looks
 broken against the game's dark UI. This flood-fills near-white pixels
 connected to each image's border to transparent, leaving any enclosed
@@ -18,7 +18,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent
-IMAGES_DIR = ROOT / "public" / "digimon" / "images"
+IMAGES_DIR = ROOT / "art" / "digimon" / "images"
 THRESHOLD = 24  # per-channel color-distance tolerance for the flood fill
 
 

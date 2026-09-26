@@ -67,6 +67,9 @@ function balanceFilePlugin(): Plugin {
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Where the site is served from: '/' by default (dev, Docker); the GitHub
+  // Pages workflow sets VITE_BASE=/<repo>/ since Pages serves a sub-path.
+  base: process.env.VITE_BASE ?? '/',
   plugins: [svelte(), balanceFilePlugin()],
   server: {
     host: true,
