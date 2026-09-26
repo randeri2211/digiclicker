@@ -54,12 +54,14 @@ function normalizeAreaProgress(loaded: AreaProgressState): AreaProgressState {
   return normalized;
 }
 
+// XP that isn't a finite number (a corrupted entry - JSON turns Infinity
+// into null) restarts at 0 rather than breaking every level lookup.
 // v2 saves made before inheritedFromLevel existed lack it - 0 means "never
 // digivolved into", which is exactly right for them (any upgrade shows as
 // an improvement over "no level recorded").
 function normalizeRoster(loaded: RosterState): RosterState {
   return Object.fromEntries(
-    Object.entries(loaded).map(([id, entry]) => [id, { ...entry, inheritedFromLevel: entry.inheritedFromLevel ?? 0 }])
+    Object.entries(loaded).map(([id, entry]) => [id, { ...entry, xp: Number.isFinite(entry.xp) ? entry.xp : 0, inheritedFromLevel: entry.inheritedFromLevel ?? 0 }])
   );
 }
 

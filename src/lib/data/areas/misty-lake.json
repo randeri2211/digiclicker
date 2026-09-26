@@ -3,6 +3,7 @@
   "name": "MISTY LAKE",
   "label": "Digital World — File Island",
   "startingPath": "lakeshore",
+  "wildHpMultiplier": 1.14,
   "paths": {
     "lakeshore": {
       "name": "Lakeshore",
@@ -94,7 +95,7 @@
         "speciesId": "seadramon",
         "level": 49,
         "squadSize": 3,
-        "hpMultiplier": 2.9,
+        "hpMultiplier": 4.06,
         "rewards": {
           "bits": 1600,
           "data": 100

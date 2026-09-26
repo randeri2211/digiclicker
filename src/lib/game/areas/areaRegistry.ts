@@ -32,6 +32,11 @@ export function getPath(areaId: string, pathId: string): AreaPath | undefined {
   return getArea(areaId)?.paths[pathId];
 }
 
+/** The area's and the path's wild HP multipliers combined (1 if unset). */
+export function wildHpMultiplier(areaId: string, pathId: string): number {
+  return (getArea(areaId)?.wildHpMultiplier ?? 1) * (getPath(areaId, pathId)?.wildHpMultiplier ?? 1);
+}
+
 // Every species referenced across every area's spawn pools - used to
 // preload sprites before showing the game (see PRELOAD_SPECIES_IDS in
 // starterRoster.ts), same rationale as the old WILD_SPAWN_POOL it replaces.

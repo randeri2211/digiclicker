@@ -95,6 +95,7 @@ const K = await load('/src/lib/game/constants.ts');
 const { levelForXp } = await load('/src/lib/game/combat/levelCurve.ts');
 const { getSpecies, getSpeciesName } = await load('/src/lib/game/images.ts');
 const X = await load('/src/lib/game/expeditions/expeditions.ts');
+const A = await load('/src/lib/game/areas/areaRegistry.ts');
 // The simulated clock takes over only now - Vite's own startup uses
 // Date.now (e.g. for temp file names) and must see the real time.
 Date.now = () => now;
@@ -122,7 +123,8 @@ function killSeconds(areaId, pathId) {
   if (aps <= 0 || dph <= 0) return Infinity;
   const saved = Math.random; // sampling spawns mustn't disturb the run's randomness
   let hp = 0;
-  for (let i = 0; i < 20; i++) hp += S.pickNextWildSpawn(now, path).maxHp;
+  const hpMultiplier = A.wildHpMultiplier(areaId, pathId);
+  for (let i = 0; i < 20; i++) hp += S.pickNextWildSpawn(now, path, hpMultiplier).maxHp;
   Math.random = saved;
   return Math.ceil(hp / 20 / dph) / aps + K.COMBAT_TICK_INTERVAL_MS / 1000;
 }

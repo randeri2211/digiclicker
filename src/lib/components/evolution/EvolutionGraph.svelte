@@ -11,7 +11,6 @@
     clearPreference,
   } from '../../game/state/game.svelte';
   import type { DigivolutionOption } from '../../game/state/game.svelte';
-  import { MAX_LEVEL } from '../../game/constants';
   import SpeciesTags from '../shared/SpeciesTags.svelte';
   import { crestRequirementLabel, isCrestRequirementMet } from '../../game/evolution/crests';
 
@@ -95,8 +94,8 @@
     pendingPinTargetId = null;
   }
 
-  // Confirm is the only moment a preference actually gets written - caps
-  // the entered level to MAX_LEVEL, then checks eligibility right away
+  // Confirm is the only moment a preference actually gets written - rounds
+  // the entered level (never below 0), then checks eligibility right away
   // rather than silently waiting for the next kill: if this entry already
   // meets the level just confirmed, try digivolving immediately
   // (digivolve() itself re-checks the real requirement and ownership). A
@@ -104,7 +103,7 @@
   // custom level survives.
   function confirmPin(option: DigivolutionOption, event: Event) {
     event.stopPropagation();
-    const clampedLevel = Math.min(Math.max(0, Math.round(pendingMinLevel) || 0), MAX_LEVEL);
+    const clampedLevel = Math.max(0, Math.round(pendingMinLevel) || 0);
     setPreference(entry.speciesId, option.species.id, clampedLevel);
     pendingPinTargetId = null;
 
@@ -175,7 +174,6 @@
             <input
               type="number"
               min="0"
-              max={MAX_LEVEL}
               bind:value={pendingMinLevel}
               onclick={(e) => e.stopPropagation()}
             />

@@ -3,6 +3,7 @@
   "name": "ANCIENT RUINS",
   "label": "Digital World — File Island",
   "startingPath": "outer-ruins",
+  "wildHpMultiplier": 1.17,
   "paths": {
     "outer-ruins": {
       "name": "Outer Ruins",
@@ -94,7 +95,7 @@
         "speciesId": "centarumon",
         "level": 50,
         "squadSize": 3,
-        "hpMultiplier": 2.48,
+        "hpMultiplier": 3.63,
         "rewards": {
           "bits": 1800,
           "data": 110

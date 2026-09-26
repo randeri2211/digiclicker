@@ -182,19 +182,22 @@ export const KILL_XP_LAST = balance.KILL_XP_LAST;
 export const KILL_XP_EXPONENT = balance.KILL_XP_EXPONENT;
 export const KILL_XP_GROWTH = balance.KILL_XP_GROWTH;
 
-/** Hard cap - levelForXp never returns above this, no matter how much xp
- * accumulates. Placeholder for now. */
-export const MAX_LEVEL = balance.MAX_LEVEL;
+/** NOT a level cap - levels are uncapped (soft-capped by the wilds' levels
+ * through the overlevel XP penalty). The level the "parabola" curves reach
+ * their "last" value at (they hold it past there), and how far the Balance
+ * Lab charts go. The XP table starts this long and grows on demand. */
+export const CURVE_REFERENCE_LEVEL = balance.CURVE_REFERENCE_LEVEL;
 
 // ---- Wild spawns & rewards --------------------------------------------
-/** maxHp = WILD_HP_BASE * WILD_HP_STAGE_MULTIPLIER[stage] * WILD_HP_LEVEL_GROWTH_FACTOR^level
- * - exponential (compounding) in level rather than linear, so even a small
- * growth factor snowballs into huge HP at high levels. */
+/** maxHp = WILD_HP_BASE * WILD_HP_STAGE_MULTIPLIER[stage]
+ *   * ((level + WILD_HP_LEVEL_OFFSET) / (1 + WILD_HP_LEVEL_OFFSET)) ^ WILD_HP_LEVEL_EXPONENT
+ * - a power of the level, like the roster's damage, so levels can go on
+ * uncapped (combat/wildHp.ts). Offset/exponent and the stage multipliers
+ * were fitted to Act 1's old 1.1^level curve. */
 export const WILD_HP_BASE = balance.WILD_HP_BASE;
 export const WILD_HP_STAGE_MULTIPLIER: Record<Stage, number> = balance.WILD_HP_STAGE_MULTIPLIER as Record<Stage, number>;
-/** Per-level compounding growth rate - e.g. 1.08 = +8%/level, which still
- * balloons into a massive multiplier by level 50-100+. */
-export const WILD_HP_LEVEL_GROWTH_FACTOR = balance.WILD_HP_LEVEL_GROWTH_FACTOR;
+export const WILD_HP_LEVEL_OFFSET = balance.WILD_HP_LEVEL_OFFSET;
+export const WILD_HP_LEVEL_EXPONENT = balance.WILD_HP_LEVEL_EXPONENT;
 export const KILL_BITS_BASE = balance.KILL_BITS_BASE;
 export const KILL_BITS_PER_LEVEL = balance.KILL_BITS_PER_LEVEL;
 

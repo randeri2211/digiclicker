@@ -3,6 +3,7 @@
   "name": "FACTORIAL TOWN",
   "label": "Digital World — File Island",
   "startingPath": "factory-gates",
+  "wildHpMultiplier": 1.06,
   "paths": {
     "factory-gates": {
       "name": "Factory Gates",
@@ -86,7 +87,7 @@
         "speciesId": "andromon",
         "level": 48,
         "squadSize": 4,
-        "hpMultiplier": 0.9,
+        "hpMultiplier": 1.21,
         "rewards": {
           "bits": 2000,
           "data": 120

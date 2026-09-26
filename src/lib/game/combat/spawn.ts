@@ -4,8 +4,9 @@ import { weightedPick } from '../util/random';
 import {
   WILD_HP_BASE,
   WILD_HP_STAGE_MULTIPLIER,
-  WILD_HP_LEVEL_GROWTH_FACTOR,
-  MAX_LEVEL,
+  WILD_HP_LEVEL_OFFSET,
+  WILD_HP_LEVEL_EXPONENT,
+  CURVE_REFERENCE_LEVEL,
   KILL_BITS_BASE,
   KILL_BITS_PER_LEVEL,
   FIGHT_TIMER_FORMULA,
@@ -16,13 +17,14 @@ import {
   FIGHT_TIMER_POWER_EXPONENT,
 } from '../constants';
 import { fightTimerSeconds } from './fightTimer';
+import { wildHpLevelMultiplier } from './wildHp';
 import { curveValue } from './levelCurveFormulas';
 import { KILL_XP_CURVE } from './levelCurveParams';
 
 export function computeWildMaxHp(speciesId: string, level: number): number {
   const stage = getSpecies(speciesId)?.stage ?? 'Unknown';
   const stageMultiplier = WILD_HP_STAGE_MULTIPLIER[stage] ?? 1;
-  const levelMultiplier = Math.pow(WILD_HP_LEVEL_GROWTH_FACTOR, level);
+  const levelMultiplier = wildHpLevelMultiplier(level, { offset: WILD_HP_LEVEL_OFFSET, exponent: WILD_HP_LEVEL_EXPONENT });
   return Math.round(WILD_HP_BASE * stageMultiplier * levelMultiplier);
 }
 
@@ -59,8 +61,9 @@ function makeSpawn(now: number, speciesId: string, level: number, maxHp: number,
 }
 
 // Normal wild fights are untimed - the wild stays until it falls.
-function makeWildSpawn(now: number, speciesId: string, level: number): WildSpawnState {
-  return makeSpawn(now, speciesId, level, computeWildMaxHp(speciesId, level), null);
+// hpMultiplier: the area/path's wildHpMultiplier (areaRegistry).
+function makeWildSpawn(now: number, speciesId: string, level: number, hpMultiplier = 1): WildSpawnState {
+  return makeSpawn(now, speciesId, level, Math.round(computeWildMaxHp(speciesId, level) * hpMultiplier), null);
 }
 
 // A boss: the species' normal wild HP at the boss level times its
@@ -73,13 +76,14 @@ export function makeBossSpawn(now: number, boss: BossDefinition, squadHp: number
 // Weighted-random species pick within the active path's pool, then a
 // uniform level roll in whichever range applies - the entry's own
 // levelRange if it set one (e.g. a weaker regional variant capped lower
-// than the rest of the path), else the path's overall levelRange.
-export function pickNextWildSpawn(now: number, path: AreaPath): WildSpawnState {
+// than the rest of the path), else the path's overall levelRange. HP is
+// scaled by `hpMultiplier` - wildHpMultiplier(areaId, pathId).
+export function pickNextWildSpawn(now: number, path: AreaPath, hpMultiplier = 1): WildSpawnState {
   const chosen = weightedPick(path.digimonPool, (entry) => entry.weight);
   const [min, max] = chosen.levelRange ?? path.levelRange;
   const level = min + Math.floor(Math.random() * (max - min + 1));
 
-  return makeWildSpawn(now, chosen.id, level);
+  return makeWildSpawn(now, chosen.id, level, hpMultiplier);
 }
 
 // DEBUG: spawns a specific stage+level wild on demand, bypassing the
@@ -95,7 +99,7 @@ export function spawnDebugWild(now: number, stage: Stage, level: number): WildSp
 // XP for defeating a wild of this level, from the kill XP curve in
 // constants.ts (never negative, even for a misconfigured curve).
 export function computeKillXp(wildLevel: number): number {
-  return Math.max(0, curveValue(KILL_XP_CURVE, Math.max(1, wildLevel), MAX_LEVEL));
+  return Math.max(0, curveValue(KILL_XP_CURVE, Math.max(1, wildLevel), CURVE_REFERENCE_LEVEL));
 }
 
 export function computeKillBits(wildLevel: number): number {

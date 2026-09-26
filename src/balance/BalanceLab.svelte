@@ -175,11 +175,12 @@
     {
       id: 'wild',
       title: 'Wild HP',
-      note: 'HP = base × stage multiplier × growth ^ level',
+      note: 'HP = base × stage multiplier × ((level + offset) / (1 + offset)) ^ exponent',
       open: true,
       fields: [
         { path: ['WILD_HP_BASE'], label: 'Base HP', step: 10 },
-        { path: ['WILD_HP_LEVEL_GROWTH_FACTOR'], label: 'Growth per level', step: 0.005 },
+        { path: ['WILD_HP_LEVEL_OFFSET'], label: 'Level offset', step: 1 },
+        { path: ['WILD_HP_LEVEL_EXPONENT'], label: 'Level exponent', step: 0.1 },
         ...perStage('WILD_HP_STAGE_MULTIPLIER', 1),
       ],
     },
@@ -219,7 +220,7 @@
       title: 'Levels & digivolving',
       open: false,
       fields: [
-        { path: ['MAX_LEVEL'], label: 'Max level', step: 1 },
+        { path: ['CURVE_REFERENCE_LEVEL'], label: 'Curve reference level (charts, parabola "last")', step: 1 },
         ...perStage('DIGIVOLVE_MIN_LEVEL_BY_TARGET_STAGE', 1, ['Rookie', 'Champion', 'Ultimate', 'Mega']).map((f) => ({
           ...f,
           label: `Digivolve to ${f.label} at Lv`,
@@ -418,7 +419,7 @@
       : []
   );
 
-  const levels = $derived(model ? Array.from({ length: Math.max(2, Math.round(model.MAX_LEVEL)) }, (_, i) => i + 1) : []);
+  const levels = $derived(model ? Array.from({ length: Math.max(2, Math.round(model.CURVE_REFERENCE_LEVEL)) }, (_, i) => i + 1) : []);
 
   // Axis scale toggles, remembered per browser like the example roster.
   // Win chart y: log keeps every stage readable (Mega is ~400x Fresh),
