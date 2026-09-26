@@ -26,7 +26,8 @@ import urllib.request
 from collections import deque
 from pathlib import Path
 
-from PIL import Image
+# Pillow is imported where images are processed, so --check (CI) runs
+# without it.
 
 ROOT = Path(__file__).resolve().parent
 RAW = ROOT / "art" / "icons"
@@ -74,6 +75,8 @@ def _dist(a, b):
 
 
 def remove_background(image):
+    from PIL import Image
+
     """Flood-fills the tile from the border (following its gradient), adds
     enclosed pockets of the same colour, then un-blends edge pixels so no
     dark fringe is left."""
@@ -127,6 +130,8 @@ def remove_background(image):
 
 
 def build(source, has_background, target):
+    from PIL import Image
+
     image = Image.open(source)
     image = remove_background(image) if has_background else image.convert("RGBA")
     bbox = image.getchannel("A").getbbox()
