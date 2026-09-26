@@ -31,7 +31,7 @@ As each feature ships, move its description into `GAMEPLAY_DESIGN.md`'s "Confirm
 | 7 | Special digivolutions: Armor (Armor Digi-Eggs) and DNA (unlock triggers: undecided) | 5, 3 |
 | 8 | Farming: Digi-Meat and other food (needs a design pass) | 3 |
 | 9 | Region travel + village residents gating systems (story Act 1) **(done - Act 1 playable)** | 5 |
-| 10 | Limit Breaks: level cap above 100 (story post-game) | 5 |
+| 10 | Limit Breaks: level cap above 100 (story post-game) **(needs a rethink - levels are now uncapped)** | 5 |
 
 Features 1–4 are fully specified; 5–8 get a design pass (story, Crest sources/timing, farming details) before they're built.
 
@@ -144,6 +144,8 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - Act 1's seven new regions, bosses and quest chain, built from STORY.md.
 
 ## 10. Limit Breaks (level cap above 100)
+> **Superseded mechanism (2026-09-26):** levels are now uncapped - the wilds' levels soft-cap them (GAMEPLAY_DESIGN.md "No level cap"). The post-game still needs a progression beat; Limit Breaks need a new meaning (e.g. raising the overlevel XP grace, or unlocking higher-level areas) when the post-game is designed.
+
 **Goal:** the post-game's progression. See STORY.md section 8.
 - `MAX_LEVEL` rises in steps (100 → 150) as Limit Breaks are earned from post-game bosses; the XP curves (feature: leveling curves) continue past Lv 100.
 - One global cap for the whole roster (decided); the XP curve stays as is - XP-gain boosts come through the story instead (STORY.md 8.1b).

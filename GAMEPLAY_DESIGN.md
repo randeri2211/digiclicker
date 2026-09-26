@@ -97,8 +97,8 @@ on total XP earned per kill.
   Digimon "cook" longer before auto-firing (relevant since the source's
   pre-digivolve level feeds the new entry's inherited bonus). Pinning is explicit two-step
   (Pin -> edit the level -> **Confirm**) rather than live-as-you-type -
-  nothing is written until Confirm, and the entered level is capped to
-  `MAX_LEVEL`. Confirm also checks eligibility immediately: if the
+  nothing is written until Confirm (levels are uncapped, so the entered
+  level is only rounded and kept >= 0). Confirm also checks eligibility immediately: if the
   Digimon already meets both the normal requirement and the level just
   confirmed, it digivolves right then instead of silently waiting for the
   next kill to notice. Checked on every xp award (`tryAutoDigivolve` in
@@ -708,11 +708,29 @@ on total XP earned per kill.
   running totals. (Before this, one `power` XP curve plus linear kill XP
   made kills per level *fall* at high levels - ≈3.3 at Lv 10, ≈1.4 at
   Lv 99, ~212 kills to Lv 100 in total.)
-- **Level cap (confirmed):** `levelForXp` never returns above
-  `MAX_LEVEL` (100, placeholder, `src/lib/game/constants.ts`), and
-  `awardKillXp` skips an entry entirely once it's already at the cap -
-  xp stops accumulating rather than piling up uselessly past the point
-  `levelForXp` would clamp it anyway.
+- **No level cap (confirmed, replaces the old `MAX_LEVEL` 100):** levels
+  go on forever; the wilds' levels are the soft cap - past
+  `XP_OVERLEVEL_GRACE` levels above a wild, XP drops 15% per level down to
+  a 5% floor, and each level-up costs more, so over-levelling crawls.
+  Later acts raise power by raising wild levels (and stages). The XP
+  table (`combat/levelCurve.ts`) starts at `CURVE_REFERENCE_LEVEL` (100 -
+  now only where "parabola" curves reach their "last" value, and the
+  Balance Lab chart range) and grows on demand; it ends early only if the
+  XP curve stops rising or overflows, or at a 1,000,000-level safety
+  limit. XP is a double: exact to ~9e15 (≈ Lv 64,000), nothing wraps.
+  A save whose XP isn't a finite number restarts that entry at 0 XP.
+- **Wild HP curve (confirmed):** `HP = WILD_HP_BASE × stage multiplier ×
+  ((L + WILD_HP_LEVEL_OFFSET) / (1 + offset)) ^ WILD_HP_LEVEL_EXPONENT`
+  (20 and 3.5; `combat/wildHp.ts`, shared with the Balance Lab). A power
+  of the level like the roster's damage, so an equal-level fight gets only
+  gently harder as levels climb (≈1.7× at Lv 100, ≈3.5× at Lv 200 vs.
+  Lv 52) - the old compounding `1.1 ^ level` outran the roster ≈26× by
+  Lv 100 and ≈10⁸× by Lv 200. Offset, exponent and the stage multipliers
+  were fitted to Act 1's old HP; boss `hpMultiplier`s were rescaled so
+  every boss kept its HP. **Per-area tuning:** an area file - or a single
+  path - can set `wildHpMultiplier` (multiplied together, default 1;
+  bosses excluded) to correct one area without touching the global curve.
+  Simulator: Act 1 median 12h52 (was 12h02).
 
 - **Save format v2 (confirmed):** the roster rework changed the save
   shape (`roster` + `hatchery` instead of `team`, no compendium field),

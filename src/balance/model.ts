@@ -8,13 +8,14 @@
 // combat/fightTimer.ts and combat/levelCurveFormulas.ts directly. Deliberately never
 // imports constants.ts: that module imports balance.json, so the lab would
 // hot-reload itself every time it saves.
-import { AREAS } from '../lib/game/areas/areaRegistry';
+import { AREAS, wildHpMultiplier } from '../lib/game/areas/areaRegistry';
 import { getSpecies, getSpeciesIdsByStage } from '../lib/game/images';
 import type { StatAffinity, StatBlock } from '../lib/game/types';
 import { fightTimerSeconds as sharedFightTimerSeconds } from '../lib/game/combat/fightTimer';
 import type { FightTimerFormula, FightTimerParams } from '../lib/game/combat/fightTimer';
 import { curveValue, type CurveFormula, type CurveParams } from '../lib/game/combat/levelCurveFormulas';
 import { diminishedSum } from '../lib/game/combat/rosterFalloff';
+import { wildHpLevelMultiplier } from '../lib/game/combat/wildHp';
 
 type BalanceModule = typeof import('../lib/game/balance.json');
 export type Balance = BalanceModule extends { default: infer D } ? D : BalanceModule;
@@ -109,9 +110,10 @@ export function fightTimerSeconds(b: Balance, rosterHp: number, formula?: FightT
   return sharedFightTimerSeconds(fightTimerParams(b, formula), rosterHp);
 }
 
-// combat/spawn.ts computeWildMaxHp.
+// combat/spawn.ts computeWildMaxHp - the same shared level curve.
 export function wildHp(b: Balance, stage: InGameStage, level: number): number {
-  return Math.round(b.WILD_HP_BASE * b.WILD_HP_STAGE_MULTIPLIER[stage] * Math.pow(b.WILD_HP_LEVEL_GROWTH_FACTOR, level));
+  const levelMultiplier = wildHpLevelMultiplier(level, { offset: b.WILD_HP_LEVEL_OFFSET, exponent: b.WILD_HP_LEVEL_EXPONENT });
+  return Math.round(b.WILD_HP_BASE * b.WILD_HP_STAGE_MULTIPLIER[stage] * levelMultiplier);
 }
 
 // Not mirrors - the lab builds its leveling curves through the game's own
@@ -137,16 +139,16 @@ export function killXpCurve(b: Balance, formula = b.KILL_XP_FORMULA as CurveForm
   };
 }
 
-/** [level, value] for every level from 1 to MAX_LEVEL - 1. */
+/** [level, value] for every level from 1 to CURVE_REFERENCE_LEVEL - 1. */
 export function curvePoints(b: Balance, curve: CurveParams): [number, number][] {
   const out: [number, number][] = [];
-  for (let level = 1; level < b.MAX_LEVEL; level++) out.push([level, curveValue(curve, level, b.MAX_LEVEL)]);
+  for (let level = 1; level < b.CURVE_REFERENCE_LEVEL; level++) out.push([level, curveValue(curve, level, b.CURVE_REFERENCE_LEVEL)]);
   return out;
 }
 
 // combat/spawn.ts computeKillXp - the same shared curve, not a mirror.
 export function killXp(b: Balance, wildLevel: number): number {
-  return Math.max(0, curveValue(killXpCurve(b), Math.max(1, wildLevel), b.MAX_LEVEL));
+  return Math.max(0, curveValue(killXpCurve(b), Math.max(1, wildLevel), b.CURVE_REFERENCE_LEVEL));
 }
 
 /** [level, kills] for every level-up - calculated, not a setting: XP cost
@@ -223,7 +225,7 @@ export function summarizeRoster(b: Balance, s: Scenario): RosterSummary {
  * time (i.e. `damagePerFight` covers its HP), or 0 if not even level 1. */
 export function maxWinnableLevel(b: Balance, stage: InGameStage, damagePerFight: number): number {
   let best = 0;
-  for (let level = 1; level <= b.MAX_LEVEL; level++) {
+  for (let level = 1; level <= b.CURVE_REFERENCE_LEVEL; level++) {
     if (wildHp(b, stage, level) <= damagePerFight) best = level;
     else break;
   }
@@ -252,14 +254,15 @@ export interface PathCheck {
 // means slow, not unwinnable).
 export function checkPaths(b: Balance, summary: RosterSummary): PathCheck[] {
   return Object.values(AREAS).flatMap((area) =>
-    Object.values(area.paths).map((path) => {
+    Object.entries(area.paths).map(([pathId, path]) => {
+      const hpMultiplier = wildHpMultiplier(area.id, pathId);
       let toughest = { name: '', level: 0, hp: 0 };
       for (const entry of path.digimonPool) {
         const species = getSpecies(entry.id);
         const stage = species?.stage as InGameStage | undefined;
         if (!species || !stage || !STAGES.includes(stage)) continue;
         const topLevel = (entry.levelRange ?? path.levelRange)[1];
-        const hp = wildHp(b, stage, topLevel);
+        const hp = Math.round(wildHp(b, stage, topLevel) * hpMultiplier);
         if (hp > toughest.hp) toughest = { name: species.name, level: topLevel, hp };
       }
       const verdict: Verdict =

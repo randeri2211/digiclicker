@@ -24,7 +24,7 @@ import { rollEggDrop } from '../eggs/eggs';
 import { getSpecies } from '../images';
 import { areaProgress } from './areaProgress.svelte';
 import { getActivePath, recordActivePathKill, isBossAvailable, recordBossVictory } from '../areas/areaProgress';
-import { getPath } from '../areas/areaRegistry';
+import { getPath, wildHpMultiplier } from '../areas/areaRegistry';
 import { ADVANTAGE_BONUS, DISADVANTAGE_PENALTY, BOSS_CHIP_BONUS, COMBAT_TICK_INTERVAL_MS } from '../constants';
 
 /** Boss chip item -> the squad stats it boosts for one boss fight. */
@@ -192,7 +192,7 @@ export function fastForwardWildCombat(durationMs: number, now: number): number {
     if (!combat.wild) {
       const path = getActivePath(areaProgress);
       if (!path) break;
-      combat.wild = pickNextWildSpawn(now, path);
+      combat.wild = pickNextWildSpawn(now, path, activeWildHpMultiplier());
       remaining -= COMBAT_TICK_INTERVAL_MS / 1000;
       continue;
     }
@@ -249,13 +249,17 @@ export function applyDebugSpawn(now: number = Date.now()): void {
   if (wild) combat.wild = wild;
 }
 
+function activeWildHpMultiplier(): number {
+  return wildHpMultiplier(areaProgress.activeAreaId, areaProgress.activePathId);
+}
+
 export function tick(now: number) {
   const wild = combat.wild;
   if (!wild) {
     combat.wild = debugSpawn.enabled ? spawnDebugWild(now, debugSpawn.stage, debugSpawn.level) : null;
     if (!combat.wild) {
       const activePath = getActivePath(areaProgress);
-      if (activePath) combat.wild = pickNextWildSpawn(now, activePath);
+      if (activePath) combat.wild = pickNextWildSpawn(now, activePath, activeWildHpMultiplier());
     }
     return;
   }

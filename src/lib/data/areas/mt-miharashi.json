@@ -3,6 +3,7 @@
   "name": "MT. MIHARASHI",
   "label": "Digital World — File Island",
   "startingPath": "miharashi-foothills",
+  "wildHpMultiplier": 0.88,
   "paths": {
     "miharashi-foothills": {
       "name": "Foothills",
@@ -98,7 +99,7 @@
         "speciesId": "meramon",
         "level": 42,
         "squadSize": 3,
-        "hpMultiplier": 1.62,
+        "hpMultiplier": 1.69,
         "rewards": {
           "bits": 1000,
           "data": 70

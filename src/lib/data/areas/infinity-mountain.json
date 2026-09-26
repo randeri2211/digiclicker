@@ -3,6 +3,7 @@
   "name": "INFINITY MOUNTAIN",
   "label": "Digital World — File Island",
   "startingPath": "mountain-base",
+  "wildHpMultiplier": 1.3,
   "paths": {
     "mountain-base": {
       "name": "Mountain Base",
@@ -63,7 +64,7 @@
         "speciesId": "ogremon",
         "level": 49,
         "squadSize": 3,
-        "hpMultiplier": 2.61,
+        "hpMultiplier": 3.65,
         "rewards": {
           "bits": 1500,
           "data": 80
@@ -105,7 +106,7 @@
         "speciesId": "devimon",
         "level": 52,
         "squadSize": 4,
-        "hpMultiplier": 3.45,
+        "hpMultiplier": 5.53,
         "rewards": {
           "bits": 3000,
           "data": 150

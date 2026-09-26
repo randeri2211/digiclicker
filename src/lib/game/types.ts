@@ -313,6 +313,9 @@ export interface AreaPath {
    * layoutPathNodes lines an area's paths up along its route out. */
   map?: { x: number; y: number };
   levelRange: [number, number];
+  /** Optional: scales this path's wild HP (on top of its area's). Bosses
+   * aren't affected - they have their own hpMultiplier. */
+  wildHpMultiplier?: number;
   digimonPool: AreaSpawnEntry[];
   mastery: { kills: number };
   boss?: BossDefinition;
@@ -326,6 +329,9 @@ export interface AreaData {
   name: string;
   label: string;
   startingPath: string;
+  /** Optional: scales every wild's HP in this area (default 1) - a per-area
+   * knob on top of the global HP curve (balance.json). Not bosses. */
+  wildHpMultiplier?: number;
   paths: Record<string, AreaPath>;
 }
 

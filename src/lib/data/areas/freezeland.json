@@ -98,7 +98,7 @@
         "speciesId": "unimon",
         "level": 44,
         "squadSize": 3,
-        "hpMultiplier": 2.03,
+        "hpMultiplier": 2.29,
         "rewards": {
           "bits": 1200,
           "data": 80

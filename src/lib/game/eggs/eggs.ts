@@ -98,8 +98,7 @@ export function hatchEgg(eggId: string): boolean {
   if (addToRoster(createRosterEntry(egg.speciesId))) return true;
 
   // Already owned - the roster holds one entry per species, so the egg
-  // becomes a flat XP bonus for the existing entry instead of a copy
-  // (levelForXp clamps at MAX_LEVEL, so a maxed entry just keeps it).
+  // becomes a flat XP bonus for the existing entry instead of a copy.
   roster[egg.speciesId].xp += DUPLICATE_HATCH_XP;
   return true;
 }

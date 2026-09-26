@@ -3,6 +3,7 @@
   "name": "GEAR SAVANNA",
   "label": "Digital World — File Island",
   "startingPath": "savanna-plains",
+  "wildHpMultiplier": 0.8,
   "paths": {
     "savanna-plains": {
       "name": "Savanna Plains",
@@ -102,7 +103,7 @@
         "speciesId": "monochromon",
         "level": 40,
         "squadSize": 3,
-        "hpMultiplier": 0.93,
+        "hpMultiplier": 0.9,
         "rewards": {
           "bits": 800,
           "data": 60

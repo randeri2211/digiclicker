@@ -45,6 +45,7 @@
     },
     "forest-depths": {
       "name": "Forest Depths",
+      "wildHpMultiplier": 0.75,
       "levelRange": [
         8,
         20
@@ -92,6 +93,7 @@
     },
     "forest-heart": {
       "name": "Forest Heart",
+      "wildHpMultiplier": 0.66,
       "levelRange": [
         18,
         30
@@ -122,7 +124,7 @@
         "speciesId": "leomon",
         "level": 32,
         "squadSize": 3,
-        "hpMultiplier": 1,
+        "hpMultiplier": 0.74,
         "rewards": {
           "bits": 500,
           "data": 50

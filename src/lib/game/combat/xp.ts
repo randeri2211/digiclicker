@@ -3,7 +3,6 @@ import { isEggReady } from '../eggs/eggs';
 import { tryAutoDigivolve } from '../evolution/digivolve';
 import { levelForXp } from './levelCurve';
 import {
-  MAX_LEVEL,
   KILL_XP_SPLIT_EXPONENT,
   XP_OVERLEVEL_GRACE,
   XP_OVERLEVEL_PENALTY_PER_LEVEL,
@@ -42,9 +41,6 @@ export function awardKillXp(xpValue: number, wildLevel?: number): void {
   const share = xpValue / Math.max(1, fighters.length) ** KILL_XP_SPLIT_EXPONENT;
   let levelledUp = false;
   for (const entry of fighters) {
-    // Already capped - skip rather than accumulate xp levelForXp would
-    // just clamp away anyway.
-    if (levelForXp(entry.xp) >= MAX_LEVEL) continue;
     // Partners: a bigger share, and more room above the wilds.
     const partner = isPartner(entry.speciesId);
     const base = partner ? share * (1 + PARTNER_XP_BONUS) : share;

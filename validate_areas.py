@@ -165,12 +165,20 @@ def validate_area_file(path, species, map_size):
     if not isinstance(paths, dict) or not paths:
         return errors + [f"{area_id}: 'paths' must be a non-empty object"]
 
+    # Optional per-area / per-path wild HP scaling (not bosses).
+    def check_hp_multiplier(owner, prefix):
+        m = owner.get("wildHpMultiplier")
+        if m is not None and not (is_number(m) and m > 0):
+            errors.append(f"{prefix}: wildHpMultiplier {m!r} must be a positive number")
+
+    check_hp_multiplier(area, area_id)
     starting_path = area["startingPath"]
     if starting_path not in paths:
         errors.append(f"{area_id}: startingPath '{starting_path}' is not a path in this file")
 
     for path_id, p in paths.items():
         prefix = f"{area_id}:{path_id}"
+        check_hp_multiplier(p, prefix)
 
         for field in ("name", "levelRange", "digimonPool", "mastery", "unlocks"):
             if field not in p:
