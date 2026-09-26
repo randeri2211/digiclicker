@@ -413,10 +413,15 @@ on total XP earned per kill.
 ### Partners (confirmed, built)
 - The player marks up to N roster Digimon as **partners** (a Digimon's
   menu, "Make partner"; ★ on roster cards and in the sidebar). Partners
-  get `PARTNER_XP_BONUS` (+25%) more kill XP and `PARTNER_EXTRA_GRACE` (+5)
-  more levels above the wild before the over-level XP penalty - so the
-  squad being trained for bosses levels faster and settles a few levels
-  above the rest of the roster.
+  **skip the roster's XP split**: each gets the whole kill's XP
+  (`PARTNER_KILL_XP_SPLIT_EXPONENT` 0, vs the roster's 0.5) plus
+  `PARTNER_XP_BONUS` (+25%), and `PARTNER_EXTRA_GRACE` (+5) more levels
+  above the wild before the over-level XP penalty - so the squad being
+  trained for bosses catches up to the wilds fast and settles a few levels
+  above the rest of the roster. (With the old split a partner got ~11% of
+  a kill at 130 Digimon - ~900 kills for Lv 25 -> 28 in Factorial Town;
+  now ~80. Simulator, 60 runs: Act 1 median 9h32 vs 9h52, worst run
+  15h38 vs 20h03, best level at the end 68 vs 60.)
 - **Slots:** `PARTNER_BASE_SLOTS` (1) at the start; residents with
   `partnerSlots` in npcs.json add more - Leomon +1, Andromon +1 (3 by the
   end of Act 1; Piximon's training in Act 2 is the natural 4th).
