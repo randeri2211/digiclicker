@@ -11,6 +11,7 @@ import { resetQuestWatch } from '../quests/quests';
 import { resetResidentWatch } from '../village/village';
 import { catchUpSinceSave, dismissOfflineReport } from './offline.svelte';
 import { partners } from './partners.svelte';
+import { shop, initialShopState } from './shop.svelte';
 import { applyBackupReminder, snapshotBackupReminder, markExported } from './backupReminder.svelte';
 import { applyPlayStats, snapshotPlayStats } from './playStats.svelte';
 import { actScreen } from './actScreen.svelte';
@@ -115,6 +116,7 @@ function snapshotLiveState(): SaveSlotData {
       partners: partners.ids,
       backupReminder: snapshotBackupReminder(),
       playStats: snapshotPlayStats(),
+      shop,
     })
   );
 }
@@ -145,6 +147,13 @@ function applySlotToLiveState(data: SaveSlotData): void {
   partners.ids = (data.partners ?? []).filter((id) => roster[id]);
   applyBackupReminder(data.backupReminder);
   applyPlayStats(data.playStats, false);
+  // Missing fields (older saves) fall back to nothing bought.
+  const freshShop = initialShopState();
+  Object.assign(shop, freshShop, data.shop ?? {}, {
+    boostEndsAt: { ...freshShop.boostEndsAt, ...data.shop?.boostEndsAt },
+    boostPurchases: { ...freshShop.boostPurchases, ...data.shop?.boostPurchases },
+    upgrades: { ...freshShop.upgrades, ...data.shop?.upgrades },
+  });
   actScreen.actId = null;
   // Quests already ready in this save shouldn't all announce themselves.
   resetQuestWatch();

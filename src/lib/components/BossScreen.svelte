@@ -9,7 +9,8 @@
     inventory,
     ITEM_CATALOG,
   } from '../game/state/game.svelte';
-  import { BOSS_CHIP_STATS } from '../game/state/combat.svelte';
+  import { BOSS_CHIP_STATS, bossFightBonus } from '../game/state/combat.svelte';
+  import { clickPowerFactor } from '../game/state/shop.svelte';
   import { BOSS_CHIP_BONUS } from '../game/constants';
   import { getSpecies, getSpriteUrl, getSpeciesName } from '../game/images';
   import { levelForXp } from '../game/combat/levelCurve';
@@ -19,7 +20,6 @@
     computeSquadStat,
     computeSquadClickDamage,
     type WeightedEntry,
-    type SquadStatBonus,
   } from '../game/combat/damage';
   import { computeWildMaxHp, computeFightTimeLimitMs } from '../game/combat/spawn';
   import SpeciesTags from './shared/SpeciesTags.svelte';
@@ -87,19 +87,17 @@
   function toggleChip(id: ItemId) {
     chips = chips.includes(id) ? chips.filter((c) => c !== id) : [...chips, id];
   }
-  const chipBonus = $derived.by(() => {
-    const bonus: SquadStatBonus = {};
-    for (const chip of chips) for (const stat of BOSS_CHIP_STATS[chip] ?? []) bonus[stat] = (bonus[stat] ?? 0) + BOSS_CHIP_BONUS;
-    return bonus;
-  });
-
   const squad = $derived<WeightedEntry[]>(
     candidates.filter((c) => selected.includes(c.entry.speciesId)).map((c) => ({ entry: c.entry, multiplier: c.multiplier }))
   );
+  // Chips plus the squad's Rallying Leader / Iron Will - the same numbers
+  // startBossFight will lock in.
+  const fightBonus = $derived(bossFightBonus(squad.map((m) => m.entry), chips));
+  const chipBonus = $derived(fightBonus.statBonus);
   const estimate = $derived.by(() => {
     const dps = computeSquadDps(squad, chipBonus);
-    const timerSeconds = computeFightTimeLimitMs(computeSquadStat(squad, 'hp', chipBonus)) / 1000;
-    const activeDps = dps + ESTIMATE_CLICKS_PER_SECOND * computeSquadClickDamage(squad, chipBonus);
+    const timerSeconds = (computeFightTimeLimitMs(computeSquadStat(squad, 'hp', chipBonus)) * fightBonus.timerFactor) / 1000;
+    const activeDps = dps + ESTIMATE_CLICKS_PER_SECOND * computeSquadClickDamage(squad, chipBonus) * clickPowerFactor();
     const idleSeconds = dps > 0 ? bossHp / dps : Infinity;
     const activeSeconds = activeDps > 0 ? bossHp / activeDps : Infinity;
     const verdict: 'idle' | 'clicking' | 'lose' =
@@ -195,7 +193,7 @@
       </div>
 
       <div class="chips">
-        <span class="section-title">Boss chips <span class="dim">- +{Math.round(BOSS_CHIP_BONUS * 100)}% for this fight, found on expeditions</span></span>
+        <span class="section-title">Boss chips <span class="dim">- +{Math.round(BOSS_CHIP_BONUS * 100)}% for this fight, found on expeditions (or a rare Shop deal)</span></span>
         <div class="chip-row">
           {#each CHIP_IDS as id (id)}
             {@const owned = inventory[id]}

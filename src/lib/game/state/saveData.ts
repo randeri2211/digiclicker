@@ -8,6 +8,7 @@ import type {
   HatcheryState,
   InventoryState,
   RosterState,
+  ShopState,
   WildSpawnState,
 } from '../types';
 
@@ -42,6 +43,8 @@ export interface SaveSlotData {
   backupReminder?: { lastExportAt: number; snoozedUntil: number; off: boolean };
   /** Optional for saves made before play stats existed - counted from load. */
   playStats?: PlayStats;
+  /** Optional for saves made before the Shop rework - nothing bought. */
+  shop?: ShopState;
 }
 
 export interface SaveSlot {

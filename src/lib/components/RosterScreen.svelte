@@ -7,6 +7,7 @@
     isAway,
     getRosterEntryMenuItems,
     openAbilityReroll,
+    feedMeat,
     computeAttacksPerSecond,
     computeRosterDamageShares,
     partners,
@@ -123,6 +124,7 @@
     items={getRosterEntryMenuItems({
       onOpenStats: () => (statsFor = entry),
       onRerollAbility: () => openAbilityReroll(entry.speciesId),
+      onFeed: (meatId) => feedMeat(entry, meatId),
       onOpenDigivolve: () => onOpenEvolution(entry.speciesId),
       partner: {
         isPartner: isPartner(entry.speciesId),

@@ -47,6 +47,26 @@ export {
 export { automation, setAutomationEnabled, setPreference, clearPreference } from './digivolveAutomation.svelte';
 export { abilityRerollCost, startAbilityReroll, chooseRerolledAbility, currentActNumber } from '../abilities/abilities';
 export { abilityRerollDialog, openAbilityReroll, closeAbilityReroll } from './abilityReroll.svelte';
+export {
+  shop,
+  feedMeat,
+  MEAT_IDS,
+  BOOSTS,
+  boostFactor,
+  boostRemainingMs,
+  boostCost,
+  canExtendBoost,
+  buyBoost,
+  UPGRADES,
+  upgradeCost,
+  buyUpgrade,
+  expeditionSlots,
+  clickPowerFactor,
+  getDeals,
+  isDealBought,
+  buyDeal,
+  dealWindowEndsAt,
+} from './shop.svelte';
 export { ABILITY_CATALOG, ABILITY_FAMILIES, getAbility } from '../abilities/abilityCatalog';
 export {
   combat,

@@ -20,6 +20,7 @@ import {
 import { pickNextWildSpawn, spawnDebugWild, makeBossSpawn, computeKillXp, computeKillBits } from '../combat/spawn';
 import { advantageMultiplier } from '../combat/advantage';
 import { auraBonus, matchupBonus, partyBonus } from '../abilities/abilityEffects';
+import { boostFactor, clickPowerFactor } from './shop.svelte';
 import { awardKillXp } from '../combat/xp';
 import { rollEggDrop } from '../eggs/eggs';
 import { getSpecies } from '../images';
@@ -164,7 +165,9 @@ export function dismissBossResult(): void {
 // Both a tick and a click can independently bring HP to 0, so this is the
 // single shared kill-resolution path - clearing combat.wild first prevents
 // a click landing alongside a tick from double-awarding the same kill.
-function resolveKill(wild: NonNullable<CombatState['wild']>) {
+// `at`: when the kill happens - now, or a replayed kill's own moment during
+// the offline catch-up (so a Shop boost only covers the time it ran).
+function resolveKill(wild: NonNullable<CombatState['wild']>, at: number = Date.now()) {
   if (combat.boss) {
     endBossFight(true);
     return;
@@ -175,11 +178,12 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
   // second later on) stay silent.
   if (performance.now() - lastClickAt < ACTIVE_CLICK_MS) playSound('kill');
 
-  const xpValue = computeKillXp(wild.level);
-  // Treasure Nose auras (Mentor's kill-XP aura is applied in awardKillXp).
-  const bitsValue = Math.round(computeKillBits(wild.level) * (1 + auraBonus(getFightingRoster(), 'kill-bits')));
+  // Shop boosts; Treasure Nose auras (Mentor's kill-XP aura and Warm Heart
+  // are applied in awardKillXp).
+  const xpValue = computeKillXp(wild.level) * boostFactor('xp', at);
+  const bitsValue = Math.round(computeKillBits(wild.level) * (1 + auraBonus(getFightingRoster(), 'kill-bits')) * boostFactor('bits', at));
 
-  awardKillXp(xpValue, wild.level);
+  awardKillXp(xpValue, wild.level, boostFactor('egg', at));
   currency.bits += bitsValue;
   recordActivePathKill(areaProgress);
 
@@ -227,7 +231,7 @@ export function fastForwardWildCombat(durationMs: number, now: number): number {
       break;
     }
     remaining -= secondsToKill;
-    resolveKill(wild);
+    resolveKill(wild, now - remaining * 1000);
     kills += 1;
   }
   if (combat.wild) {
@@ -246,9 +250,10 @@ export function handleClick() {
   const wild = combat.wild;
   if (!wild) return;
 
-  const damage = combat.boss
-    ? computeSquadClickDamage(squadEntries(combat.boss.squad), combat.boss.statBonus)
-    : computeClickDamage(getFightingRoster());
+  const damage =
+    (combat.boss
+      ? computeSquadClickDamage(squadEntries(combat.boss.squad), combat.boss.statBonus)
+      : computeClickDamage(getFightingRoster())) * clickPowerFactor();
   wild.currentHp = Math.max(0, wild.currentHp - damage);
   playSound('hit');
   showDamagePopup(damage);

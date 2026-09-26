@@ -261,3 +261,32 @@ export const EXPEDITION_STAGE_BONUS = balance.EXPEDITION_STAGE_BONUS;
 
 // ---- Persistence -------------------------------------------------------
 export const AUTOSAVE_INTERVAL_MS = 15000;
+
+// ---- Shop (state/shop.svelte.ts) ------------------------------------
+/** Digi-Meat: flat XP for the Digimon it's fed to, and its Shop price. */
+export const DIGI_MEAT = balance.DIGI_MEAT as Record<'meat-small' | 'meat' | 'meat-giant' | 'meat-prime', { xp: number; costBits: number }>;
+/** Timed boosts: +% while running (kill XP / kill Bits / egg XP). Buying one
+ * adds SHOP_BOOST_MINUTES, banked up to SHOP_BOOST_MAX_BANKED_MINUTES. Price
+ * = BASE x GROWTH ^ (times bought), capped per act like ability rerolls. */
+export const SHOP_BOOST_PERCENT = balance.SHOP_BOOST_PERCENT as Record<'xp' | 'bits' | 'egg', number>;
+export const SHOP_BOOST_MINUTES = balance.SHOP_BOOST_MINUTES;
+export const SHOP_BOOST_MAX_BANKED_MINUTES = balance.SHOP_BOOST_MAX_BANKED_MINUTES;
+export const SHOP_BOOST_BASE_COST = balance.SHOP_BOOST_BASE_COST;
+export const SHOP_BOOST_COST_GROWTH = balance.SHOP_BOOST_COST_GROWTH;
+export const SHOP_BOOST_COST_CAP_BY_ACT: number[] = balance.SHOP_BOOST_COST_CAP_BY_ACT;
+/** Permanent upgrades: one extra expedition slot; click power tiers
+ * (+PERCENT% click damage each, price BASE x GROWTH ^ tier). */
+export const SHOP_EXPEDITION_SLOT_COST = balance.SHOP_EXPEDITION_SLOT_COST;
+export const SHOP_CLICK_POWER_PERCENT = balance.SHOP_CLICK_POWER_PERCENT;
+export const SHOP_CLICK_POWER_MAX_TIER = balance.SHOP_CLICK_POWER_MAX_TIER;
+export const SHOP_CLICK_POWER_BASE_COST = balance.SHOP_CLICK_POWER_BASE_COST;
+export const SHOP_CLICK_POWER_COST_GROWTH = balance.SHOP_CLICK_POWER_COST_GROWTH;
+/** Rotating deals: SHOP_DEAL_COUNT offers per SHOP_DEAL_WINDOW_HOURS window,
+ * each bought once per window. Meat/boost/egg deals are SHOP_DEAL_DISCOUNT
+ * off (meat comes in bundles of SHOP_DEAL_MEAT_QUANTITY); a boss chip deal
+ * costs SHOP_DEAL_CHIP_PRICE (chips are otherwise expedition-only). */
+export const SHOP_DEAL_WINDOW_HOURS = balance.SHOP_DEAL_WINDOW_HOURS;
+export const SHOP_DEAL_COUNT = balance.SHOP_DEAL_COUNT;
+export const SHOP_DEAL_DISCOUNT = balance.SHOP_DEAL_DISCOUNT;
+export const SHOP_DEAL_MEAT_QUANTITY = balance.SHOP_DEAL_MEAT_QUANTITY;
+export const SHOP_DEAL_CHIP_PRICE = balance.SHOP_DEAL_CHIP_PRICE;

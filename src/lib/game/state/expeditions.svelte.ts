@@ -13,7 +13,8 @@ import {
   rollHaul,
   expeditionEggFactor,
 } from '../expeditions/expeditions';
-import { EXPEDITION_MAX_CONCURRENT, EXPEDITION_MAX_PARTY } from '../constants';
+import { EXPEDITION_MAX_PARTY } from '../constants';
+import { expeditionSlots } from './shop.svelte';
 import { isSystemUnlocked } from '../village/village';
 
 export const expeditions: ExpeditionState = $state({ active: [], lastHaul: null });
@@ -45,7 +46,7 @@ export function startExpedition(destinationId: string, memberSpeciesIds: string[
   const destination = getDestination(destinationId);
   if (!isSystemUnlocked('expeditions')) return false;
   if (!destination || !isDestinationUnlocked(areaProgress, destination)) return false;
-  if (expeditions.active.length >= EXPEDITION_MAX_CONCURRENT) return false;
+  if (expeditions.active.length >= expeditionSlots()) return false;
   const party = [...new Set(memberSpeciesIds)];
   const inBossSquad = new Set(combat.boss?.squad.map((m) => m.speciesId) ?? []);
   if (party.length === 0 || party.length > EXPEDITION_MAX_PARTY) return false;

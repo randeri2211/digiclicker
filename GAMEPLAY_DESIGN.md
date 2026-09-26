@@ -214,8 +214,8 @@ on total XP earned per kill.
   act]` (later acts raise the cap - rerolls slow down, never stop).
   Placeholders: 1,000 Bits, x1.5, cap 100,000 in Act 1.
 - **The Ability Reroll Crystal is gone**; saves holding some are refunded
-  400 Bits each. The Shop sells nothing for now (boss chips stay
-  expedition finds) - it says so and points to the reroll service.
+  400 Bits each. (The Shop now sells Digi-Meat, boosts and upgrades -
+  see "Shop".)
 - **UI:** an ability chip (context icon + name, tier III highlighted) on
   roster cards, the Stats window (with its description), and the boss /
   expedition pickers (dimmed where it doesn't apply). The roster filters
@@ -271,8 +271,9 @@ on total XP earned per kill.
   is rolled on claim: **Data** (the game's first real Data source), maybe
   an **egg** of the destination's families (non-Mystery, straight to the
   hatchery), and **boss chips**.
-- **Boss chips** (Attack Chip, Speed Chip, HP Disk - not sold in the
-  Shop): slotted in on the boss prep screen, each adds `BOSS_CHIP_BONUS`
+- **Boss chips** (Attack Chip, Speed Chip, HP Disk - not on the Shop's
+  shelf, only now and then as a single rotating deal): slotted in on the
+  boss prep screen, each adds `BOSS_CHIP_BONUS`
   (+25%) to its stat(s) for the whole squad for that one fight.
 
 ### Quests & progress flags (confirmed, built - story content still to be written)
@@ -409,6 +410,33 @@ on total XP earned per kill.
   The lab's formulas live in `src/balance/model.ts` and **mirror** the
   game's - change a formula in the game and change it there too. The
   page isn't part of the production build.
+
+### Shop (confirmed, built)
+Andromon's Shop (the `shop` system, `state/shop.svelte.ts`) - a Bits sink
+whose prices grow with use so it stays relevant late in an act. All
+numbers in `balance.json` (`DIGI_MEAT`, `SHOP_*`).
+- **Digi-Meat** (flat XP, tiers): Small Meat +2,500 XP (1,000 Bits), Meat
+  +25,000 (8,000), Giant Meat +250,000 (60,000), Prime Sirloin +2,500,000
+  (500,000). Inventory items, fed from a Digimon's menu ("Feed …", only
+  meats you own are listed); auto-digivolve gets its chance after. Flat
+  amounts mean the small tiers naturally fall out of use as levels rise.
+- **Timed boosts** (30 min each): XP Booster +50% kill XP, Bit Magnet +50%
+  kill Bits, Incubator Heat +100% egg XP. Buying one that's running adds
+  30 min (up to 4h banked). Price = 5,000 x 1.25 ^ (times bought), capped
+  per act (250,000 in Act 1). Boosts are clock-based, so they work during
+  the offline catch-up - each replayed kill is checked at its own moment,
+  so a boost that ran out half-way through the time away covers only that
+  half. Running boosts show in the top bar (⚡ XP 23m).
+- **Permanent upgrades:** Second Expedition Slot (300,000 - two parties at
+  once); Click Power, 5 tiers of +25% click damage (20,000 x 3 ^ tier).
+- **Rotating deals:** 3 offers per 4-hour window, each buyable once:
+  3x meat bundles and boosts at 40% off (a boost deal doesn't raise the
+  boost's price), a Mystery Egg of one family at 40% off, or - rarely, at
+  most one per window (~1 window in 7) - a single boss chip for 25,000.
+  Deals come from a seeded random of the window number, so reloads and
+  offline time show the same offers; the save only remembers which were
+  bought this window.
+- The Mystery Egg stall (Yokomon Village) shares the screen.
 
 ### Partners (confirmed, built)
 - The player marks up to N roster Digimon as **partners** (a Digimon's
