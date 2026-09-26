@@ -1,7 +1,7 @@
 {
   "meta": {
     "droppedNodeCount": 38,
-    "generatedAt": "2026-09-23T15:28:12.784227+00:00",
+    "generatedAt": "2026-09-26T16:45:51.969242+00:00",
     "keptNodeCount": 1660,
     "sourceNodeCount": 1698
   },
@@ -13745,7 +13745,7 @@
       "id": "gomamon",
       "lateralTo": [],
       "name": "Gomamon",
-      "spriteUrl": "digimon/images/Gomamon/Gomamon asr.png",
+      "spriteUrl": "digimon/images/Gomamon/Gomamon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
       "statAffinity": "Attack",
@@ -13763,7 +13763,7 @@
       "id": "gomamon-x",
       "lateralTo": [],
       "name": "Gomamon X",
-      "spriteUrl": "digimon/images/Gomamon/Gomamon asr.png",
+      "spriteUrl": "digimon/images/Gomamon/Gomamon dl.png",
       "stage": "Rookie",
       "stageOrder": 2,
       "statAffinity": "Attack",

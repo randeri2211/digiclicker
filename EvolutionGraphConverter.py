@@ -43,6 +43,13 @@ OUTPUT_PATH = ROOT / "src" / "lib" / "data" / "digimon-evolution.json"
 ATTACKS_PATH = ROOT / "data" / "species_attacks.json"
 
 NS = {"g": "http://www.gexf.net/1.3"}
+# Scraped images whose background cut-out also erased parts of the Digimon
+# (white areas turned transparent) - never picked, so the next file wins.
+# Found by eye: the magenta contact sheets show holes that dark UI hides.
+BROKEN_SPRITES = {
+    "Gomamon asr.png",  # snout, head and paw cut away
+}
+
 INVALID_FS_CHARS = re.compile(r'[<>:"/\\|?*]')
 SLUG_STRIP = re.compile(r"[^a-z0-9]+")
 
@@ -133,7 +140,9 @@ def find_sprite(label):
     # InfoboxImageImporter.py's per-page fallback downloads whatever format
     # the wiki actually serves (commonly .jpg) - glob every format either
     # importer can produce, not just .png.
-    files = sorted(f for ext in ("*.png", "*.jpg", "*.jpeg", "*.gif") for f in folder.glob(ext))
+    files = sorted(
+        f for ext in ("*.png", "*.jpg", "*.jpeg", "*.gif") for f in folder.glob(ext) if f.name not in BROKEN_SPRITES
+    )
     if not files:
         return None
 

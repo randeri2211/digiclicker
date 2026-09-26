@@ -22,7 +22,9 @@
   .toasts {
     position: absolute;
     right: 16px;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    /* Just under the top bar (64px, hud/TopBar.svelte), near the buttons
+       a toast usually points to (Quests, Expeditions, Village). */
+    top: 80px;
     z-index: 30;
     display: flex;
     flex-direction: column;

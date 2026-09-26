@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { RosterEntry, StatBlock } from '../../game/types';
-  import { getSpeciesName } from '../../game/images';
+  import { getSpeciesName, getSpriteUrl } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
   import { computeEntryStatValue, ABILITY_CATALOG } from '../../game/state/game.svelte';
   import XpBar from './XpBar.svelte';
@@ -15,6 +15,7 @@
 
   const level = $derived(levelForXp(entry.xp));
   const displayName = $derived(getSpeciesName(entry.speciesId));
+  const sprite = $derived(getSpriteUrl(entry.speciesId));
   const ability = $derived(entry.abilityId ? ABILITY_CATALOG[entry.abilityId] : null);
 
   const ROWS: { label: string; key: keyof StatBlock }[] = [
@@ -48,14 +49,16 @@
     tabindex="-1"
   >
     <div class="panel-header">
-      <div class="panel-title">
-        {displayName}
-        <span class="level">Lv {level}</span>
+      <div class="portrait">{#if sprite}<img src={sprite} alt="" />{/if}</div>
+      <div class="identity">
+        <div class="panel-title">
+          {displayName}
+          <span class="level">Lv {level}</span>
+        </div>
+        <div class="tags-row"><SpeciesTags speciesId={entry.speciesId} showStage /></div>
       </div>
       <button class="close-btn" onclick={onClose}>Close</button>
     </div>
-
-    <div class="tags-row"><SpeciesTags speciesId={entry.speciesId} showStage /></div>
 
     <XpBar xp={entry.xp} showNumbers />
 
@@ -120,7 +123,32 @@
   .panel-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 14px;
+  }
+  .portrait {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    background: var(--panel-2);
+    border: 1px solid var(--panel-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .portrait img {
+    width: 84%;
+    height: 84%;
+    object-fit: contain;
+  }
+  .identity {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .close-btn {
+    align-self: flex-start;
   }
   .panel-title {
     font-family: var(--head);
