@@ -4,7 +4,8 @@ import { newlyReadyQuests } from '../quests/quests';
 import { pushToast } from '../state/notifications.svelte';
 import { newlyJoinedResidents } from '../village/village';
 import { catchUpGap, flushPendingReport } from '../state/offline.svelte';
-import { checkBackupReminder } from '../state/backupReminder.svelte';
+import { checkBackupReminder, backupReminder } from '../state/backupReminder.svelte';
+import { checkTips, tips } from '../state/tips.svelte';
 import { playStats } from '../state/playStats.svelte';
 import { checkActCompletion } from '../state/actScreen.svelte';
 import { COMBAT_TICK_INTERVAL_MS } from '../constants';
@@ -28,7 +29,9 @@ export function startCombatTickLoop() {
     lastLoopAt = now;
     if (typeof document === 'undefined' || document.visibilityState !== 'hidden') flushPendingReport();
     updateExpeditions(now);
-    checkBackupReminder(now);
+    // Tips and the backup reminder share a corner - one at a time.
+    if (!backupReminder.showing) checkTips();
+    if (!tips.current) checkBackupReminder(now);
     checkActCompletion();
     tick(now);
     for (const quest of newlyReadyQuests()) pushToast('Quest ready', quest.title);

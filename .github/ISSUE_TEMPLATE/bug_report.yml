@@ -1,0 +1,34 @@
+name: Bug report
+description: Something in the game isn't working right
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for playing and taking the time to report this! The game fills in its own details below when you use its "Report a bug" button.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can it be reproduced?
+      description: The steps that led to it, if you know them.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+  - type: textarea
+    id: game-info
+    attributes:
+      label: Game info
+      description: Filled in by the game - build, browser, where you were.
+      render: text
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots help a lot (you can paste them here). If it's save-related, an exported save file is gold.

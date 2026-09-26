@@ -4,6 +4,7 @@
   import VillageScreen from './lib/components/VillageScreen.svelte';
   import OfflineReportScreen from './lib/components/OfflineReportScreen.svelte';
   import BackupReminder from './lib/components/BackupReminder.svelte';
+  import TipCard from './lib/components/TipCard.svelte';
   import ActCompleteScreen from './lib/components/ActCompleteScreen.svelte';
   import { saveSession } from './lib/game/state/game.svelte';
   import Sidebar from './lib/components/sidebar/Sidebar.svelte';
@@ -193,6 +194,7 @@
     <Toasts />
     <OfflineReportScreen />
     <BackupReminder />
+    <TipCard />
     <ActCompleteScreen />
     {#if saveSession.takenOver}
       <div class="taken-over" role="alert">

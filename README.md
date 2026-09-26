@@ -98,6 +98,18 @@ The source art isn't committed to git (~340MB) - run step 1 to populate
 `art/` locally if you need to re-import; the shipped sprites, evolution
 graph JSON and code are version-controlled as normal.
 
+## Bug reports
+
+The in-game **Report a bug** button (top bar and Settings) opens a form with
+the game's details pre-filled (build, browser, location, progress):
+
+- **Google Form** (no account needed) once `src/lib/data/bugReport.json` is
+  set up: run `tools/create-bug-report-form.gs` at
+  [script.google.com](https://script.google.com) - it creates the form and
+  prints the `googleForm` values to paste into that file.
+- Otherwise a **GitHub issue** from `.github/ISSUE_TEMPLATE/bug_report.yml`
+  (needs a GitHub account).
+
 ## Project structure
 
 ```
