@@ -4,6 +4,7 @@ import { getSpecies } from '../images';
 import { levelForXp } from '../combat/levelCurve';
 import { isPathUnlocked } from '../areas/areaProgress';
 import { rollEggOfType } from '../eggs/mysteryEggs';
+import { partyBonus } from '../abilities/abilityEffects';
 import {
   EXPEDITION_LEVEL_SPEED_SCALE,
   EXPEDITION_ELEMENT_MATCH_BONUS,
@@ -27,10 +28,11 @@ function average(values: number[]): number {
   return values.length ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
 }
 
-/** Higher-level parties come back sooner. */
+/** Higher-level parties come back sooner, and Pathfinders sooner still
+ * (their % adds to the speed-up). */
 export function expeditionDurationMs(destination: ExpeditionDestination, party: RosterEntry[]): number {
   const avgLevel = average(party.map((entry) => levelForXp(entry.xp)));
-  return (destination.durationMinutes * 60_000) / (1 + EXPEDITION_LEVEL_SPEED_SCALE * avgLevel);
+  return (destination.durationMinutes * 60_000) / (1 + EXPEDITION_LEVEL_SPEED_SCALE * avgLevel + partyBonus(party, 'expedition-speed'));
 }
 
 /** Members of a favored element and later stages bring back more. */
@@ -40,7 +42,13 @@ export function expeditionHaulMultiplier(destination: ExpeditionDestination, par
     return element !== undefined && destination.favoredElements.includes(element);
   }).length;
   const avgStageOrder = average(party.map((entry) => getSpecies(entry.speciesId)?.stageOrder ?? 0));
-  return 1 + EXPEDITION_ELEMENT_MATCH_BONUS * matching + EXPEDITION_STAGE_BONUS * avgStageOrder;
+  const haul = 1 + EXPEDITION_ELEMENT_MATCH_BONUS * matching + EXPEDITION_STAGE_BONUS * avgStageOrder;
+  return haul * (1 + partyBonus(party, 'expedition-haul'));
+}
+
+/** Egg Seekers' extra egg chance, as a factor on the haul-scaled chance. */
+export function expeditionEggFactor(party: RosterEntry[]): number {
+  return 1 + partyBonus(party, 'expedition-eggs');
 }
 
 function randomInt([min, max]: [number, number]): number {
@@ -49,11 +57,11 @@ function randomInt([min, max]: [number, number]): number {
 
 /** The loot, rolled once at claim time: Data scaled by the multiplier, at
  * most one egg and each item with chances scaled by it (capped at 100%). */
-export function rollHaul(destination: ExpeditionDestination, multiplier: number): { haul: ExpeditionHaul; eggs: Egg[] } {
+export function rollHaul(destination: ExpeditionDestination, multiplier: number, eggFactor = 1): { haul: ExpeditionHaul; eggs: Egg[] } {
   const { loot } = destination;
   const data = Math.round(randomInt(loot.data) * multiplier);
   const eggs: Egg[] = [];
-  if (loot.eggTypes.length && Math.random() * 100 < Math.min(100, loot.eggChancePercent * multiplier)) {
+  if (loot.eggTypes.length && Math.random() * 100 < Math.min(100, loot.eggChancePercent * multiplier * eggFactor)) {
     const eggType = loot.eggTypes[Math.floor(Math.random() * loot.eggTypes.length)];
     eggs.push(rollEggOfType(eggType, false));
   }

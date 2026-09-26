@@ -45,8 +45,9 @@ export {
   SYSTEM_NAMES,
 } from '../village/village';
 export { automation, setAutomationEnabled, setPreference, clearPreference } from './digivolveAutomation.svelte';
-export { useAbilityReroll } from '../abilities/abilities';
-export { ABILITY_CATALOG } from '../abilities/abilityCatalog';
+export { abilityRerollCost, startAbilityReroll, chooseRerolledAbility, currentActNumber } from '../abilities/abilities';
+export { abilityRerollDialog, openAbilityReroll, closeAbilityReroll } from './abilityReroll.svelte';
+export { ABILITY_CATALOG, ABILITY_FAMILIES, getAbility } from '../abilities/abilityCatalog';
 export {
   combat,
   handleClick,

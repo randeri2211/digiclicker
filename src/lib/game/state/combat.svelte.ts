@@ -1,6 +1,6 @@
 import { playSound } from '../audio/sfx.svelte';
 import { playStats } from './playStats.svelte';
-import type { CombatState, ItemId, Stage, SquadMember } from '../types';
+import type { CombatState, ItemId, RosterEntry, Stage, SquadMember } from '../types';
 import { roster } from './roster.svelte';
 import { getFightingRoster, isAway } from './expeditions.svelte';
 import { removeItem } from './inventory.svelte';
@@ -19,6 +19,7 @@ import {
 } from '../combat/damage';
 import { pickNextWildSpawn, spawnDebugWild, makeBossSpawn, computeKillXp, computeKillBits } from '../combat/spawn';
 import { advantageMultiplier } from '../combat/advantage';
+import { auraBonus, matchupBonus, partyBonus } from '../abilities/abilityEffects';
 import { awardKillXp } from '../combat/xp';
 import { rollEggDrop } from '../eggs/eggs';
 import { getSpecies } from '../images';
@@ -57,12 +58,31 @@ function showDamagePopup(amount: number) {
 // ---- Boss fights ------------------------------------------------------
 
 /** A roster species' matchup multiplier against a boss species - what the
- * boss prep screen shows and what a started fight locks in. */
+ * boss prep screen shows and what a started fight locks in: the
+ * attribute/element advantage, times its own Buster/Hunter ability if that
+ * matches the boss. */
 export function squadMultiplier(memberSpeciesId: string, bossSpeciesId: string): number {
   const member = getSpecies(memberSpeciesId);
   const boss = getSpecies(bossSpeciesId);
   if (!member || !boss) return 1;
-  return advantageMultiplier(member, boss, { bonus: ADVANTAGE_BONUS, penalty: DISADVANTAGE_PENALTY });
+  const advantage = advantageMultiplier(member, boss, { bonus: ADVANTAGE_BONUS, penalty: DISADVANTAGE_PENALTY });
+  const entry = roster[memberSpeciesId];
+  return advantage * (1 + (entry ? matchupBonus(entry, boss.attribute, boss.element) : 0));
+}
+
+/** Everything that boosts a squad for one fight besides matchups: the
+ * boss chips spent (their stats +BOSS_CHIP_BONUS each) and the squad's
+ * Rallying Leader (damage) and Iron Will (timer) abilities. The prep
+ * screen's estimate and startBossFight both use this. */
+export function bossFightBonus(squad: RosterEntry[], chips: ItemId[]): { statBonus: SquadStatBonus; timerFactor: number } {
+  const statBonus: SquadStatBonus = {};
+  for (const chip of new Set(chips)) {
+    for (const stat of BOSS_CHIP_STATS[chip] ?? []) statBonus[stat] = (statBonus[stat] ?? 0) + BOSS_CHIP_BONUS;
+  }
+  const leader = partyBonus(squad, 'squad-damage');
+  statBonus.attack = (statBonus.attack ?? 0) + leader;
+  statBonus.specialAttack = (statBonus.specialAttack ?? 0) + leader;
+  return { statBonus, timerFactor: 1 + partyBonus(squad, 'boss-timer') };
 }
 
 // The squad's roster entries with their locked-in multipliers. An entry
@@ -91,17 +111,14 @@ export function startBossFight(
   const unique = [...new Set(squadSpeciesIds)];
   if (unique.length === 0 || unique.length > boss.squadSize || unique.some((id) => !roster[id] || isAway(id))) return false;
 
-  const statBonus: SquadStatBonus = {};
-  for (const chip of new Set(chips)) {
-    const stats = BOSS_CHIP_STATS[chip];
-    if (!stats || !removeItem(chip, 1)) continue;
-    for (const stat of stats) statBonus[stat] = (statBonus[stat] ?? 0) + BOSS_CHIP_BONUS;
-  }
+  // Only chips actually owned (and now spent) count.
+  const spent = [...new Set(chips)].filter((chip) => BOSS_CHIP_STATS[chip] && removeItem(chip, 1));
+  const { statBonus, timerFactor } = bossFightBonus(unique.map((id) => roster[id]), spent);
 
   const squad = unique.map((speciesId) => ({ speciesId, multiplier: squadMultiplier(speciesId, boss.speciesId) }));
   combat.boss = { areaId, pathId, squad, statBonus };
   playSound('bossStart');
-  combat.wild = makeBossSpawn(now, boss, computeSquadStat(squadEntries(squad), 'hp', statBonus));
+  combat.wild = makeBossSpawn(now, boss, computeSquadStat(squadEntries(squad), 'hp', statBonus), timerFactor);
   combat.damagePopup = null;
   return true;
 }
@@ -159,7 +176,8 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
   if (performance.now() - lastClickAt < ACTIVE_CLICK_MS) playSound('kill');
 
   const xpValue = computeKillXp(wild.level);
-  const bitsValue = computeKillBits(wild.level);
+  // Treasure Nose auras (Mentor's kill-XP aura is applied in awardKillXp).
+  const bitsValue = Math.round(computeKillBits(wild.level) * (1 + auraBonus(getFightingRoster(), 'kill-bits')));
 
   awardKillXp(xpValue, wild.level);
   currency.bits += bitsValue;

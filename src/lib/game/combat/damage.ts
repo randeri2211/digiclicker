@@ -1,26 +1,25 @@
 import type { RosterEntry, StatBlock } from '../types';
 import { levelForXp } from './levelCurve';
-import { getAbilityBonusFraction } from '../abilities/abilities';
+import { auraBonus } from '../abilities/abilityEffects';
 import { CLICK_DAMAGE_BASE, CLICK_DAMAGE_DPS_FRACTION, BASE_ATTACKS_PER_SECOND, SPEED_TO_APS_SCALE, ROSTER_STAT_FALLOFF } from '../constants';
 import { diminishedSum, diminishedShares } from './rosterFalloff';
 
 // Scales with roster DPS (see CLICK_DAMAGE_BASE/CLICK_DAMAGE_DPS_FRACTION)
 // so clicking stays a proportional boost on top of idle damage instead of
-// fading into irrelevance as the roster grows.
+// fading into irrelevance as the roster grows. Tamer's Bond auras add %.
 export function computeClickDamage(entries: RosterEntry[]): number {
-  return CLICK_DAMAGE_BASE + computeRosterDps(entries) * CLICK_DAMAGE_DPS_FRACTION;
+  return (CLICK_DAMAGE_BASE + computeRosterDps(entries) * CLICK_DAMAGE_DPS_FRACTION) * (1 + auraBonus(entries, 'click-damage'));
 }
 
 // One entry's current effective value for a single stat - baseStats +
-// level*growthPerLevel + inheritedBonus, then a special ability's % bonus
-// applied on top if it targets this exact stat (see
-// getAbilityBonusFraction). The one place this formula lives - every
-// combat computation AND the Stat window's display both call this, so
-// they can never drift apart.
+// level*growthPerLevel + inheritedBonus. The one place this formula lives
+// - every combat computation AND the Stat window's display both call
+// this, so they can never drift apart. (Special abilities don't touch a
+// Digimon's own stats - they're roster/squad/party-wide, see
+// abilities/abilityEffects.ts.)
 export function computeEntryStatValue(entry: RosterEntry, statKey: keyof StatBlock): number {
   const level = levelForXp(entry.xp);
-  const raw = entry.baseStats[statKey] + level * entry.growthPerLevel[statKey] + entry.inheritedBonus[statKey];
-  return raw * (1 + getAbilityBonusFraction(entry, statKey));
+  return entry.baseStats[statKey] + level * entry.growthPerLevel[statKey] + entry.inheritedBonus[statKey];
 }
 
 // The roster's effective total of one stat in wild fights - with
@@ -37,21 +36,24 @@ export function computeEntryDamagePerHit(entry: RosterEntry): number {
   return computeEntryStatValue(entry, 'attack') + computeEntryStatValue(entry, 'specialAttack');
 }
 
+// Battle Cry auras scale the whole roster's damage.
 export function computeRosterDamagePerHit(entries: RosterEntry[]): number {
-  return diminishedSum(entries.map(computeEntryDamagePerHit), ROSTER_STAT_FALLOFF);
+  return diminishedSum(entries.map(computeEntryDamagePerHit), ROSTER_STAT_FALLOFF) * (1 + auraBonus(entries, 'roster-attack'));
 }
 
 /** Each entry's weighted share of computeRosterDamagePerHit (same order as
- * `entries`) - what it actually adds after the falloff. */
+ * `entries`) - what it actually adds after the falloff (and auras). */
 export function computeRosterDamageShares(entries: RosterEntry[]): number[] {
-  return diminishedShares(entries.map(computeEntryDamagePerHit), ROSTER_STAT_FALLOFF);
+  const aura = 1 + auraBonus(entries, 'roster-attack');
+  return diminishedShares(entries.map(computeEntryDamagePerHit), ROSTER_STAT_FALLOFF).map((share) => share * aura);
 }
 
 // Attack rate is a roster-wide number (driven by the whole roster's
 // effective Speed total), not per-entry - there's one shared tick clock, not one per
-// Digimon.
+// Digimon. Quickstep auras scale it.
 export function computeAttacksPerSecond(entries: RosterEntry[]): number {
-  return BASE_ATTACKS_PER_SECOND + computeRosterStatTotal(entries, 'speed') * SPEED_TO_APS_SCALE;
+  const base = BASE_ATTACKS_PER_SECOND + computeRosterStatTotal(entries, 'speed') * SPEED_TO_APS_SCALE;
+  return base * (1 + auraBonus(entries, 'roster-speed'));
 }
 
 // ---- Boss squads ----------------------------------------------------

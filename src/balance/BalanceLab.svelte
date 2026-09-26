@@ -243,7 +243,9 @@
         { path: ['HATCHERY_SLOT_BASE_COST'], label: 'Extra slot: first cost (bits)', step: 100 },
         { path: ['HATCHERY_SLOT_COST_GROWTH'], label: 'Extra slot: cost x per slot', step: 0.1 },
         { path: ['MYSTERY_EGG_COST_BITS'], label: 'Mystery egg price (bits)', step: 50 },
-        { path: ['ABILITY_REROLL_COST_BITS'], label: 'Ability reroll price (bits)', step: 50 },
+        { path: ['ABILITY_REROLL_BASE_COST'], label: 'Ability reroll: first cost (bits)', step: 100 },
+        { path: ['ABILITY_REROLL_COST_GROWTH'], label: 'Ability reroll: cost x per reroll', step: 0.1 },
+        { path: ['ABILITY_AURA_FALLOFF'], label: 'Ability auras: duplicate falloff', step: 0.05 },
       ],
     },
     {

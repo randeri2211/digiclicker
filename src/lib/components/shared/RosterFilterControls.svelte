@@ -11,6 +11,7 @@
   import type { RosterFilter, RosterSortKey } from '../../game/roster/rosterFilter';
   import type { Element } from '../../game/types';
   import IconSelect from './IconSelect.svelte';
+  import { ABILITY_FAMILIES } from '../../game/abilities/abilityCatalog';
   import ElementIcon from './ElementIcon.svelte';
   import AttributeIcon from './AttributeIcon.svelte';
 
@@ -28,6 +29,7 @@
   const stageOptions = [any, ...FILTER_STAGES.map((s) => ({ value: s, label: s }))];
   const elementOptions = [any, ...FILTER_ELEMENTS.map((e) => ({ value: e, label: e }))];
   const attributeOptions = [any, ...FILTER_ATTRIBUTES.map((a) => ({ value: a, label: ATTRIBUTE_LABEL[a] }))];
+  const abilityOptions = [any, ...ABILITY_FAMILIES.map((a) => ({ value: a, label: a }))];
   const sortOptions = sortKeys.map((k) => ({ value: k, label: SORT_KEYS[k] }));
 
   function reset() {
@@ -55,6 +57,10 @@
   <label>
     Attribute
     <IconSelect bind:value={filter.attribute} options={attributeOptions} icon={attributeIcon} label="Attribute" />
+  </label>
+  <label>
+    Ability
+    <IconSelect bind:value={filter.ability} options={abilityOptions} label="Special ability" />
   </label>
   <label>
     Sort by

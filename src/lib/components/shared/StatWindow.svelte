@@ -2,9 +2,10 @@
   import type { RosterEntry, StatBlock } from '../../game/types';
   import { getSpeciesName, getSpriteUrl } from '../../game/images';
   import { levelForXp } from '../../game/combat/levelCurve';
-  import { computeEntryStatValue, ABILITY_CATALOG } from '../../game/state/game.svelte';
+  import { computeEntryStatValue } from '../../game/state/game.svelte';
   import XpBar from './XpBar.svelte';
   import SpeciesTags from './SpeciesTags.svelte';
+  import AbilityChip from './AbilityChip.svelte';
 
   interface Props {
     entry: RosterEntry;
@@ -16,7 +17,6 @@
   const level = $derived(levelForXp(entry.xp));
   const displayName = $derived(getSpeciesName(entry.speciesId));
   const sprite = $derived(getSpriteUrl(entry.speciesId));
-  const ability = $derived(entry.abilityId ? ABILITY_CATALOG[entry.abilityId] : null);
 
   const ROWS: { label: string; key: keyof StatBlock }[] = [
     { label: 'Attack', key: 'attack' },
@@ -91,9 +91,8 @@
 
     <div class="ability-row">
       <span class="ability-label">Special Ability</span>
-      {#if ability}
-        <span class="ability-name">{ability.name}</span>
-        <span class="ability-desc">{ability.description}</span>
+      {#if entry.abilityId}
+        <AbilityChip abilityId={entry.abilityId} showDescription />
       {:else}
         <span class="ability-desc">No special ability</span>
       {/if}
@@ -230,10 +229,6 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--text-dim);
-  }
-  .ability-name {
-    font-weight: 600;
-    color: var(--accent);
   }
   .ability-desc {
     color: var(--text-dim);

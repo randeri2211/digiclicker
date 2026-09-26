@@ -26,6 +26,7 @@
   import { EXPEDITION_MAX_CONCURRENT, EXPEDITION_MAX_PARTY } from '../game/constants';
   import ElementIcon from './shared/ElementIcon.svelte';
   import SpeciesTags from './shared/SpeciesTags.svelte';
+  import AbilityChip from './shared/AbilityChip.svelte';
 
   interface Props {
     onClose: () => void;
@@ -230,6 +231,7 @@
               <div class="c-info">
                 <span class="c-name">{getSpeciesName(entry.speciesId)} <span class="dim">Lv {levelForXp(entry.xp)}</span></span>
                 <SpeciesTags speciesId={entry.speciesId} />
+                <AbilityChip abilityId={entry.abilityId} relevantIn="expedition" />
               </div>
             </button>
           {:else}

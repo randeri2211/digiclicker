@@ -2,6 +2,7 @@ import { playSound } from '../audio/sfx.svelte';
 import { isEggReady } from '../eggs/eggs';
 import { tryAutoDigivolve } from '../evolution/digivolve';
 import { levelForXp } from './levelCurve';
+import { auraBonus } from '../abilities/abilityEffects';
 import {
   KILL_XP_SPLIT_EXPONENT,
   XP_OVERLEVEL_GRACE,
@@ -38,6 +39,9 @@ export function awardKillXp(xpValue: number, wildLevel?: number): void {
   // Snapshot first - an auto-digivolve adds a new entry mid-loop, which
   // shouldn't also receive this same kill's XP.
   const fighters = getFightingRoster();
+  // Mentor auras boost the Digimon's XP, Warm Heart auras the eggs'.
+  const eggXp = xpValue * (1 + auraBonus(fighters, 'egg-xp'));
+  xpValue *= 1 + auraBonus(fighters, 'kill-xp');
   const share = xpValue / Math.max(1, fighters.length) ** KILL_XP_SPLIT_EXPONENT;
   let levelledUp = false;
   for (const entry of fighters) {
@@ -56,7 +60,7 @@ export function awardKillXp(xpValue: number, wildLevel?: number): void {
   // a ready egg stops at the hatch level until it's paid for (hatchEgg in
   // eggs/eggs.ts), holding its slot.
   for (const egg of hatchery.incubating) {
-    if (!isEggReady(egg)) egg.xp += xpValue;
+    if (!isEggReady(egg)) egg.xp += eggXp;
   }
   fillIncubatingSlots();
 }

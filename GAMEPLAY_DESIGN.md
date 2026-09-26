@@ -56,7 +56,8 @@ on total XP earned per kill.
   context menu (next to the cursor, closes on outside click/Escape) with
   **Open Stats** (Base / Per Level / Inherited / Current table),
   **Digivolve...** (opens the Evolution screen with that entry
-  selected), and **Use Ability Reroll**.
+  selected), **Make partner**, and **Reroll ability…** (see "Special
+  Abilities").
 - The Roster screen lists every owned Digimon with a stage filter and a
   sort (DPS / Level / Stage), each card showing that entry's DPS share.
 - Implementation stays generic: a single `ContextMenu.svelte` (pure
@@ -111,8 +112,9 @@ on total XP earned per kill.
     (Pokemon-IV-style individual variance).
   - **Inherited bonus** - a one-time bonus rolled when the entry is
     created *by a digivolve*; zero for starters and hatched entries.
-- Current stat = `base + level * growth + inheritedBonus`, then
-  `* (1 + ability%)` (see "Special Abilities").
+- Current stat = `base + level * growth + inheritedBonus`. Special
+  abilities never change a Digimon's own stats - they work on the whole
+  roster, squad or party (see "Special Abilities").
 - **Digivolving (confirmed, built):** creates the target species as a
   **new roster entry** at level 1 - the source stays in the roster. The
   source then **resets to level 1**: its levels are "spent" on the new
@@ -175,29 +177,55 @@ on total XP earned per kill.
   actually built. Re-enabling a stage later is a one-line change to
   `IN_GAME_STAGES`, no data regeneration needed.
 
-### Special Abilities (confirmed, built - stat-boost tier)
-- Each roster entry can hold one special ability
-  (`RosterEntry.abilityId`) - null until an **Ability Reroll Crystal**
-  (bought in the Shop) is used on it via the "Use Ability Reroll" action
-  in the roster entry menu (`getRosterEntryMenuItems`). The item is the
-  *only* source - nothing rolls an ability automatically at creation.
-- `ABILITY_CATALOG` (`src/lib/game/abilities/abilityCatalog.ts`) has 12
-  entries: 4 stats (Attack/HP/Speed/SpecialAttack) x 3 rarity tiers
-  (Minor +5%, Major +10%, Superior +20%, placeholders) - a weighted pool
-  (Minor common, Superior rare), same convention as area spawn weights
-  and Mystery Egg pools. Using the item re-rolls a fresh weighted pick,
-  can reroll into the same ability again (no dedup).
-- Belongs to that entry only - a new entry created by digivolving starts
-  with no ability, the source keeps its own.
-- The bonus applies via one shared `computeEntryStatValue(entry,
-  statKey)` (`combat/damage.ts`) - `base + level*growth +
-  inheritedBonus`, then `* (1 + ability%)` if the ability targets that
-  exact stat. Every combat formula (damage/hit, attack rate, the fight
-  timer's roster HP sum) *and* the Stat window's "Current" column call
-  this one function, so they can never drift apart.
+### Special Abilities (confirmed, built - effects rework)
+- **Every roster entry has one**, rolled when it's created (starters,
+  hatches). Digivolving **passes it on**: the new form inherits the
+  source's ability, and the source keeps its own. Loading a save rolls
+  one for any entry without a known ability (older saves, the old
+  stat-boost ids).
+- **Catalog** (`abilities/abilityCatalog.ts`, generated): 24 families x
+  tiers I-III = 72 abilities. Sizes per effect and tier in `balance.json`
+  (`ABILITY_PERCENT`); rarity by tier (`ABILITY_TIER_WEIGHTS`, 10/4/1).
+  A family's roll weight is split across its targets, so each *effect* is
+  equally likely (the 10 element Hunters together = one Battle Cry).
+  - **Roster auras** (work while in the roster, not away): Battle Cry
+    (+roster damage), Quickstep (+attack speed), Mentor (+kill XP),
+    Treasure Nose (+kill Bits), Warm Heart (+egg incubation XP), Tamer's
+    Bond (+click damage). Duplicates stack as a **diminishing sum** -
+    strongest first, each next copy x`ABILITY_AURA_FALLOFF` (0.8) - so an
+    aura tops out at 5 copies' worth however big the roster.
+  - **Boss squad** (only when picked for a boss): <Attribute> Buster
+    (Vaccine/Data/Virus) and <Element> Hunter (one per element) - +% to
+    that member's matchup multiplier against a matching boss; Rallying
+    Leader (+damage for the whole squad); Iron Will (+boss fight time).
+    Squad effects sum (a squad is a handful). `bossFightBonus` in
+    `state/combat.svelte.ts` is shared by the fight and the prep screen's
+    estimate.
+  - **Expedition party** (only on an expedition): Pathfinder (faster
+    return), Scavenger (+haul), Egg Seeker (+egg chance); sums over the
+    party.
+- **Rerolls are a village service** (system `ability-rerolls`; Andromon
+  in Act 1 - STORY.md moves it to Piximon in Act 2, a one-line
+  `npcs.json` change). From a Digimon's menu: **Reroll ability…** pays
+  Bits and offers **3 different new abilities** - pick one or keep the
+  current. A paid offer is saved on the entry until settled. Cost =
+  `ABILITY_REROLL_BASE_COST x ABILITY_REROLL_COST_GROWTH ^ (rerolls paid
+  on that Digimon)`, capped at `ABILITY_REROLL_COST_CAP_BY_ACT[current
+  act]` (later acts raise the cap - rerolls slow down, never stop).
+  Placeholders: 1,000 Bits, x1.5, cap 100,000 in Act 1.
+- **The Ability Reroll Crystal is gone**; saves holding some are refunded
+  400 Bits each. The Shop sells nothing for now (boss chips stay
+  expedition finds) - it says so and points to the reroll service.
+- **UI:** an ability chip (context icon + name, tier III highlighted) on
+  roster cards, the Stats window (with its description), and the boss /
+  expedition pickers (dimmed where it doesn't apply). The roster filters
+  (Roster screen and top contributors) gained a **Special ability**
+  filter by family.
+- **Pacing:** simulator, 60 runs - Act 1 median 9h52 with abilities vs
+  11h47 with every ability at 0% (random rolls only, no rerolls): ~16%
+  faster.
 - Planned but explicitly deferred: farming/resource-gathering
-  specialization abilities, once a farming system exists to specialize
-  in (see "Idle production" above - still not built).
+  specialization abilities, once a farming system exists.
 
 ### Boss fights & squads (confirmed, built)
 - A region's final path can carry a **boss** (`boss` in the area JSON:
