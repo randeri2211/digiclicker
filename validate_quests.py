@@ -134,6 +134,9 @@ def check_npcs(npcs, species, quests):
         for system in npc.get("systems", []):
             if system not in SYSTEMS:
                 errors.append(f"{prefix}: unknown system {system!r}")
+        slots = npc.get("partnerSlots")
+        if slots is not None and not (is_positive_int(slots) and npc.get("resident")):
+            errors.append(f"{prefix}: partnerSlots must be a positive integer, on a resident")
         if npc.get("systems") and not npc.get("resident"):
             errors.append(f"{prefix}: only residents can unlock systems - add \"resident\": true")
         if npc.get("resident") and not npc.get("startsInVillage") and f"resident:{npc_id}" not in rewarded_flags:

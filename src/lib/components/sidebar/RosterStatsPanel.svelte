@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { RosterEntry } from '../../game/types';
   import { getSpeciesName } from '../../game/images';
+  import { levelForXp } from '../../game/combat/levelCurve';
   import {
     getFightingRoster,
     computeRosterDps,
@@ -9,6 +10,9 @@
     computeAttacksPerSecond,
     computeRosterDamagePerHit,
     computeRosterDamageShares,
+    partners,
+    partnerSlots,
+    roster,
   } from '../../game/state/game.svelte';
 
   interface Props {
@@ -74,6 +78,14 @@
   <div class="dmg-summary">
     Dmg/hit {fmt(damagePerHit)} &times; {fmt(attacksPerSecond)}/s · Click {fmt(clickDamage)} · {entries.length} Digimon
   </div>
+  <div class="stats-subtitle">★ Partners {partners.ids.length}/{partnerSlots()}</div>
+  <div class="partner-row">
+    {#each partners.ids as id (id)}
+      {#if roster[id]}<span class="partner-chip">{getSpeciesName(id)} {levelForXp(roster[id].xp)}</span>{/if}
+    {:else}
+      <span class="partner-empty">None yet - pick them from a Digimon's menu</span>
+    {/each}
+  </div>
   <div class="stats-subtitle">Top contributors</div>
   <div class="stats-rows">
     {#each topContributors as row (row.entry.speciesId)}
@@ -93,6 +105,22 @@
 </div>
 
 <style>
+  .partner-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .partner-chip {
+    font-size: 11px;
+    padding: 1px 6px;
+    color: var(--warn);
+    border: 1px solid var(--warn);
+  }
+  .partner-empty {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
   .stats-panel {
     margin-bottom: 24px;
     padding: 12px 14px;

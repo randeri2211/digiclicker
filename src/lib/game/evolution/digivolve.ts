@@ -1,3 +1,4 @@
+import { transferPartner } from '../state/partners.svelte';
 import type { DigimonSpecies, RosterEntry, StatRangeBlock } from '../types';
 import { getSpecies } from '../images';
 import { getRequirement, isRequirementMet } from './requirements';
@@ -139,6 +140,7 @@ export function digivolve(entry: RosterEntry, targetSpeciesId: string): boolean 
     addToRoster(createRosterEntry(target.id, inheritedBonus, sourceLevel));
   }
   entry.xp = 0;
+  transferPartner(entry.speciesId, target.id);
 
   if (automation.preferences[entry.speciesId]?.targetSpeciesId !== target.id) {
     setPreference(entry.speciesId, target.id, option.requirement?.minLevel ?? 0);

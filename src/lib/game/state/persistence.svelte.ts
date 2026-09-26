@@ -10,6 +10,7 @@ import { progress } from './progress.svelte';
 import { resetQuestWatch } from '../quests/quests';
 import { resetResidentWatch } from '../village/village';
 import { catchUpSinceSave, dismissOfflineReport } from './offline.svelte';
+import { partners } from './partners.svelte';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
 import type { AreaProgressState, InventoryState, RosterState } from '../types';
@@ -79,6 +80,7 @@ function snapshotLiveState(): SaveSlotData {
       automation,
       expeditions,
       progress,
+      partners: partners.ids,
     })
   );
 }
@@ -103,6 +105,8 @@ function applySlotToLiveState(data: SaveSlotData): void {
   updateExpeditions();
   replaceRecord(progress.flags, data.progress?.flags ?? {});
   progress.completedQuests = data.progress?.completedQuests ?? [];
+  // Only Digimon still owned (and within today's slot count).
+  partners.ids = (data.partners ?? []).filter((id) => roster[id]);
   // Quests already ready in this save shouldn't all announce themselves.
   resetQuestWatch();
   resetResidentWatch();

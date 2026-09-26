@@ -8,10 +8,22 @@ export function getRosterEntryMenuItems(callbacks: {
   onOpenStats: () => void;
   onUseAbilityReroll: () => void;
   onOpenDigivolve: () => void;
+  /** Partner toggle for this entry (omit to hide it). */
+  partner?: { isPartner: boolean; slotFree: boolean; onToggle: () => void };
 }): ContextMenuItem[] {
+  const partner = callbacks.partner;
   return [
     { label: 'Open Stats', onSelect: callbacks.onOpenStats },
     { label: 'Digivolve…', onSelect: callbacks.onOpenDigivolve },
+    ...(partner
+      ? [
+          {
+            label: partner.isPartner ? 'Remove partner' : partner.slotFree ? 'Make partner ★' : 'Make partner (slots full)',
+            onSelect: partner.onToggle,
+            disabled: !partner.isPartner && !partner.slotFree,
+          },
+        ]
+      : []),
     {
       label: 'Use Ability Reroll',
       onSelect: callbacks.onUseAbilityReroll,

@@ -270,6 +270,9 @@
         { path: ['XP_OVERLEVEL_GRACE'], label: 'Full XP up to N levels above the wild', step: 1 },
         { path: ['XP_OVERLEVEL_PENALTY_PER_LEVEL'], label: 'XP lost per level beyond that', step: 0.01 },
         { path: ['XP_OVERLEVEL_MIN_FACTOR'], label: 'XP floor when far over-levelled', step: 0.01 },
+        { path: ['PARTNER_BASE_SLOTS'], label: 'Partner slots at start', step: 1 },
+        { path: ['PARTNER_EXTRA_GRACE'], label: 'Partner: extra levels of full XP', step: 1 },
+        { path: ['PARTNER_XP_BONUS'], label: 'Partner: kill XP bonus', step: 0.05 },
       ],
     },
   ];

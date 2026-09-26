@@ -139,6 +139,9 @@ function choosePath() {
 // Collector: any new form as soon as it's allowed (the source resets to Lv 1).
 function digivolveWhatWeCan() {
   for (const entry of Object.values(g.roster)) {
+    // --hold-partners: a player preparing for bosses keeps partners as they
+    // are instead of resetting them to Lv 1 with a digivolve.
+    if (args['hold-partners'] && g.isPartner(entry.speciesId)) continue;
     const option = Ev.getDigivolveOptions(entry).find((o) => o.requirementMet && !o.owned);
     if (option && Ev.digivolve(entry, option.species.id)) {
       stats.digivolves[option.species.stage] = (stats.digivolves[option.species.stage] ?? 0) + 1;
@@ -164,6 +167,16 @@ function housekeeping() {
   }
   while (g.buyHatcherySlot()) note(`bought hatchery slot (${g.hatchery.capacity})`);
   digivolveWhatWeCan();
+
+  // Partners: the strongest boss candidates (switching is free, so re-pick).
+  if (!args['no-partners']) {
+    const best = Object.values(g.roster)
+      .sort((a, b) => D.computeSquadDps([{ entry: b, multiplier: 1 }]) - D.computeSquadDps([{ entry: a, multiplier: 1 }]))
+      .slice(0, g.partnerSlots())
+      .map((e) => e.speciesId);
+    for (const id of [...g.partners.ids]) if (!best.includes(id)) g.setPartner(id, false);
+    for (const id of best) g.setPartner(id, true);
+  }
 
   // Expeditions: claim, then send the three weakest to the newest destination.
   for (const exp of [...E.expeditions.active]) {

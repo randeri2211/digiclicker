@@ -87,3 +87,4 @@ export { buyMysteryEgg } from '../eggs/mysteryEggs';
 export { getRosterEntryMenuItems } from '../roster/rosterMenu';
 export { offline, dismissOfflineReport } from './offline.svelte';
 export type { OfflineReport } from './offline.svelte';
+export { partners, partnerSlots, isPartner, setPartner } from './partners.svelte';

@@ -518,6 +518,8 @@ export interface NpcDefinition {
   startsInVillage?: boolean;
   /** Systems that open once they've joined. */
   systems?: SystemId[];
+  /** Extra partner slots once they've joined (state/partners.svelte.ts). */
+  partnerSlots?: number;
 }
 
 /** Permanent story/progress state: named flags other systems check, and

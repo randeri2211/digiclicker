@@ -7,7 +7,10 @@ import {
   XP_OVERLEVEL_GRACE,
   XP_OVERLEVEL_PENALTY_PER_LEVEL,
   XP_OVERLEVEL_MIN_FACTOR,
+  PARTNER_EXTRA_GRACE,
+  PARTNER_XP_BONUS,
 } from '../constants';
+import { isPartner } from '../state/partners.svelte';
 import { getFightingRoster } from '../state/expeditions.svelte';
 import { hatchery, fillIncubatingSlots } from '../state/hatchery.svelte';
 
@@ -15,8 +18,8 @@ import { hatchery, fillIncubatingSlots } from '../state/hatchery.svelte';
  * `wildLevel`: 1 up to XP_OVERLEVEL_GRACE levels above it, then
  * XP_OVERLEVEL_PENALTY_PER_LEVEL less per extra level, floored at
  * XP_OVERLEVEL_MIN_FACTOR (grinding far below you still creeps along). */
-export function overlevelXpFactor(level: number, wildLevel: number): number {
-  const over = level - wildLevel - XP_OVERLEVEL_GRACE;
+export function overlevelXpFactor(level: number, wildLevel: number, extraGrace = 0): number {
+  const over = level - wildLevel - XP_OVERLEVEL_GRACE - extraGrace;
   if (over <= 0) return 1;
   return Math.max(XP_OVERLEVEL_MIN_FACTOR, 1 - over * XP_OVERLEVEL_PENALTY_PER_LEVEL);
 }
@@ -40,7 +43,11 @@ export function awardKillXp(xpValue: number, wildLevel?: number): void {
     // Already capped - skip rather than accumulate xp levelForXp would
     // just clamp away anyway.
     if (levelForXp(entry.xp) >= MAX_LEVEL) continue;
-    entry.xp += wildLevel === undefined ? share : share * overlevelXpFactor(levelForXp(entry.xp), wildLevel);
+    // Partners: a bigger share, and more room above the wilds.
+    const partner = isPartner(entry.speciesId);
+    const base = partner ? share * (1 + PARTNER_XP_BONUS) : share;
+    const grace = partner ? PARTNER_EXTRA_GRACE : 0;
+    entry.xp += wildLevel === undefined ? base : base * overlevelXpFactor(levelForXp(entry.xp), wildLevel, grace);
     tryAutoDigivolve(entry);
   }
 

@@ -15,6 +15,7 @@ function freshSlotData(): SaveSlotData {
     automation: { enabled: false, preferences: {} },
     expeditions: { active: [], lastHaul: null },
     progress: { flags: {}, completedQuests: [] },
+    partners: [],
   };
 }
 

@@ -10,6 +10,10 @@
     useAbilityReroll,
     computeAttacksPerSecond,
     computeEntryDps,
+    partners,
+    partnerSlots,
+    isPartner,
+    setPartner,
   } from '../game/state/game.svelte';
   import ContextMenu from './shared/ContextMenu.svelte';
   import StatWindow from './shared/StatWindow.svelte';
@@ -82,6 +86,7 @@
   >
     <div class="panel-header">
       <div class="panel-title">Roster</div>
+      <span class="partner-count" title="Partners level faster and a little higher - open a Digimon's menu to choose">★ Partners {partners.ids.length}/{partnerSlots()}</span>
       <button class="close-btn" onclick={onClose}>Close</button>
     </div>
 
@@ -111,7 +116,8 @@
       {:else}
         {#each entries as row (row.entry.speciesId)}
           {@const sprite = getSpriteUrl(row.entry.speciesId)}
-          <button class="card" onclick={(e) => openMenu(row.entry, e)}>
+          <button class="card" class:partner={isPartner(row.entry.speciesId)} onclick={(e) => openMenu(row.entry, e)}>
+            {#if isPartner(row.entry.speciesId)}<span class="partner-star" title="Partner">★</span>{/if}
             <div class="card-sprite">
               {#if sprite}
                 <img src={sprite} alt="" />
@@ -141,6 +147,11 @@
       onOpenStats: () => (statsFor = entry),
       onUseAbilityReroll: () => useAbilityReroll(entry),
       onOpenDigivolve: () => onOpenEvolution(entry.speciesId),
+      partner: {
+        isPartner: isPartner(entry.speciesId),
+        slotFree: partners.ids.length < partnerSlots(),
+        onToggle: () => setPartner(entry.speciesId, !isPartner(entry.speciesId)),
+      },
     })}
     onClose={() => (menuState = null)}
   />
@@ -151,6 +162,21 @@
 {/if}
 
 <style>
+  .partner-count {
+    flex: 1;
+    font-size: 12px;
+    color: var(--warn);
+  }
+  .card.partner {
+    border-color: var(--warn);
+  }
+  .partner-star {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    color: var(--warn);
+    font-size: 14px;
+  }
   .backdrop {
     position: absolute;
     inset: 0;
