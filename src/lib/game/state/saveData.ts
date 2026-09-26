@@ -35,6 +35,8 @@ export interface SaveSlotData {
   /** Optional for saves made before quests existed - no flags, nothing
    * completed. */
   progress?: ProgressState;
+  /** Optional for saves made before partners existed - none. */
+  partners?: string[];
 }
 
 export interface SaveSlot {

@@ -382,6 +382,23 @@ on total XP earned per kill.
   game's - change a formula in the game and change it there too. The
   page isn't part of the production build.
 
+### Partners (confirmed, built)
+- The player marks up to N roster Digimon as **partners** (a Digimon's
+  menu, "Make partner"; ★ on roster cards and in the sidebar). Partners
+  get `PARTNER_XP_BONUS` (+25%) more kill XP and `PARTNER_EXTRA_GRACE` (+5)
+  more levels above the wild before the over-level XP penalty - so the
+  squad being trained for bosses levels faster and settles a few levels
+  above the rest of the roster.
+- **Slots:** `PARTNER_BASE_SLOTS` (1) at the start; residents with
+  `partnerSlots` in npcs.json add more - Leomon +1, Andromon +1 (3 by the
+  end of Act 1; Piximon's training in Act 2 is the natural 4th).
+- **Free to reassign** any time. **Digivolving moves the slot** to the new
+  form ("my partner grew up"); if that form was already a partner, the
+  source's slot frees.
+- Simulator: partners are the strongest boss candidates (re-picked
+  freely); `--no-partners` / `--hold-partners` compare strategies. At
+  these values the effect is modest (+2-3 levels, some bosses faster).
+
 ### Offline progress (confirmed, built)
 - Time the game wasn't ticking is **fast-forwarded with the real combat
   rules**: `fastForwardWildCombat` in `state/combat.svelte.ts` jumps kill

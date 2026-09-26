@@ -22,8 +22,9 @@
     "name": "Leomon",
     "speciesId": "leomon",
     "homeAreaId": "forest-sector",
-    "role": "The forest's guardian, freed from a Black Gear. Escorts you across the island.",
-    "resident": true
+    "role": "The forest's guardian, freed from a Black Gear. Escorts you across the island - and trains a second partner with you.",
+    "resident": true,
+    "partnerSlots": 1
   },
   "elecmon": {
     "id": "elecmon",
@@ -62,9 +63,10 @@
     "name": "Andromon",
     "speciesId": "andromon",
     "homeAreaId": "factorial-town",
-    "role": "The factory's master, freed from its core - opens the Shop.",
+    "role": "The factory's master, freed from its core - opens the Shop, and tunes a third partner for you.",
     "resident": true,
-    "systems": ["shop"]
+    "systems": ["shop"],
+    "partnerSlots": 1
   },
   "whamon": {
     "id": "whamon",

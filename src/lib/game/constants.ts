@@ -56,6 +56,16 @@ export const XP_OVERLEVEL_GRACE = balance.XP_OVERLEVEL_GRACE;
 export const XP_OVERLEVEL_PENALTY_PER_LEVEL = balance.XP_OVERLEVEL_PENALTY_PER_LEVEL;
 export const XP_OVERLEVEL_MIN_FACTOR = balance.XP_OVERLEVEL_MIN_FACTOR;
 
+// ---- Partners -----------------------------------------------------------
+/** Partner slots at the start; residents with `partnerSlots` add more
+ * (state/partners.svelte.ts). */
+export const PARTNER_BASE_SLOTS = balance.PARTNER_BASE_SLOTS;
+/** Extra levels a partner can be above the wild before its XP shrinks -
+ * a slightly higher effective cap than the rest of the roster. */
+export const PARTNER_EXTRA_GRACE = balance.PARTNER_EXTRA_GRACE;
+/** Extra share of kill XP for a partner (0.25 = +25%). */
+export const PARTNER_XP_BONUS = balance.PARTNER_XP_BONUS;
+
 // ---- Digivolution requirements & scope ----------------------------
 /** Level the source must reach before digivolving into a species at the
  * given target stage. A stage with no entry has no level requirement
