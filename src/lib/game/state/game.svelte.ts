@@ -88,3 +88,7 @@ export { getRosterEntryMenuItems } from '../roster/rosterMenu';
 export { offline, dismissOfflineReport } from './offline.svelte';
 export type { OfflineReport } from './offline.svelte';
 export { partners, partnerSlots, isPartner, setPartner } from './partners.svelte';
+export { saveSession } from './persistence.svelte';
+export { getSaveFileProblem, dismissSaveFileProblem } from './saveData';
+export type { SaveFileProblem } from './saveData';
+export { backupReminder, snoozeBackupReminder, setBackupReminderOff } from './backupReminder.svelte';

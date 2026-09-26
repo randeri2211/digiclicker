@@ -3,6 +3,8 @@
   import CombatPanel from './lib/components/combat/CombatPanel.svelte';
   import VillageScreen from './lib/components/VillageScreen.svelte';
   import OfflineReportScreen from './lib/components/OfflineReportScreen.svelte';
+  import BackupReminder from './lib/components/BackupReminder.svelte';
+  import { saveSession } from './lib/game/state/game.svelte';
   import Sidebar from './lib/components/sidebar/Sidebar.svelte';
   import LoadingScreen from './lib/components/LoadingScreen.svelte';
   import MainMenu from './lib/components/MainMenu.svelte';
@@ -189,10 +191,42 @@
   {#if screen === 'game'}
     <Toasts />
     <OfflineReportScreen />
+    <BackupReminder />
+    {#if saveSession.takenOver}
+      <div class="taken-over" role="alert">
+        This save was continued in another tab, so this tab has stopped saving (it would overwrite the newer progress).
+        <button onclick={() => location.reload()}>Reload to play here</button>
+      </div>
+    {/if}
   {/if}
 </div>
 
 <style>
+  .taken-over {
+    position: absolute;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 25;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--text-h);
+    background: var(--panel);
+    border: 1px solid var(--danger);
+  }
+  .taken-over button {
+    appearance: none;
+    font: inherit;
+    font-size: 11px;
+    padding: 4px 10px;
+    background: var(--panel-2);
+    border: 1px solid var(--danger);
+    color: var(--text-h);
+    cursor: pointer;
+  }
   .main {
     flex: 1;
     display: flex;

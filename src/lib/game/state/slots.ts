@@ -43,10 +43,11 @@ export function createSlot(name?: string, data: SaveSlotData = freshSlotData()):
   return slot;
 }
 
-export function updateSlot(id: string, data: SaveSlotData): void {
+/** False if the save couldn't be stored (see writeSaveFile). */
+export function updateSlot(id: string, data: SaveSlotData): boolean {
   const file = loadSaveFile();
   const slots = file.slots.map((slot) => (slot.id === id ? { ...slot, data, savedAt: Date.now() } : slot));
-  writeSaveFile({ ...file, slots });
+  return writeSaveFile({ ...file, slots });
 }
 
 export function deleteSlot(id: string): void {

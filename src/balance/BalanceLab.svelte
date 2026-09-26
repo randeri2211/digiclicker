@@ -252,6 +252,7 @@
       fields: [
         { path: ['OFFLINE_PROGRESS_CAP_HOURS'], label: 'Max hours counted', step: 1 },
         { path: ['OFFLINE_PROGRESS_EFFICIENCY'], label: 'Efficiency (1 = full pace)', step: 0.05 },
+        { path: ['EXPORT_REMINDER_HOURS'], label: 'Backup reminder every N hours', step: 1 },
       ],
     },
     {
