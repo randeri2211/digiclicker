@@ -18,6 +18,8 @@ import json
 import sys
 from pathlib import Path
 
+from ci_report import report
+
 ROOT = Path(__file__).resolve().parent
 AREAS_DIR = ROOT / "src" / "lib" / "data" / "areas"
 EVOLUTION_DATA_PATH = ROOT / "src" / "lib" / "data" / "digimon-evolution.json"
@@ -305,6 +307,13 @@ def main():
         all_errors.extend(validate_area_file(path, species, map_size))
     all_errors.extend(validate_cross_area_unlocks(area_files))
 
+    def file_for(error):
+        if error.startswith("region") or error.startswith("regions.json") or "region map" in error:
+            return "src/lib/data/regions.json"
+        area_id = error.split(":", 1)[0]
+        return f"src/lib/data/areas/{area_id}.json" if (AREAS_DIR / f"{area_id}.json").exists() else None
+
+    report("Areas & region maps", all_errors, f"{len(area_files)} area file(s) and the region maps validated.", file_for)
     if all_errors:
         print(f"FAILED - {len(all_errors)} problem(s) found across {len(area_files)} area file(s):\n")
         for error in all_errors:

@@ -7,6 +7,7 @@ catch validate_areas.py provides for area data. Stdlib only.
 """
 import json
 import sys
+from ci_report import report
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -79,6 +80,7 @@ def main():
             if not isinstance(weight, int) or isinstance(weight, bool) or weight <= 0:
                 errors.append(f"{egg_type}: entry '{entry_id}' has invalid weight {weight!r} (must be a positive integer)")
 
+    report("Mystery eggs", errors, f"{len(weights)} egg type(s) validated.", lambda e: "src/lib/data/mysteryEggWeights.json")
     if errors:
         print(f"FAILED - {len(errors)} problem(s) found:\n")
         for error in errors:

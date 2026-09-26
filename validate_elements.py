@@ -13,6 +13,7 @@ Exit code 1 on any error, so CI fails the push.
 import collections
 import json
 import sys
+from ci_report import report
 from pathlib import Path
 
 from element_mapping import ELEMENTS, NEUTRAL
@@ -59,6 +60,12 @@ def main():
         if element != NEUTRAL and counts.get(element, 0) < SPARSE_ELEMENT_WARNING:
             print(f"    warning: only {counts.get(element, 0)} in-game species")
 
+    report(
+        "Elements",
+        errors,
+        f"{len(in_game)} in-game species have valid elements; the element chart is consistent.",
+        lambda e: "src/lib/data/elementChart.json" if e.startswith("elementChart") else "src/lib/data/digimon-evolution.json",
+    )
     if errors:
         print(f"\n{len(errors)} error(s):")
         for error in errors:

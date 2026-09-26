@@ -1,6 +1,6 @@
 """
 Downloads every image from https://digimon.fandom.com/wiki/Category:Digimon_Images
-and saves it into digimon/images/<DigimonName>/<original filename>, grouping
+and saves it into art/digimon/images/<DigimonName>/<original filename>, grouping
 images by the Digimon name each file is prefixed with.
 """
 import os
@@ -12,7 +12,7 @@ import requests
 
 API_URL = "https://digimon.fandom.com/api.php"
 CATEGORY = "Category:Digimon Images"
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public", "digimon", "images")
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "art", "digimon", "images")
 HEADERS = {"User-Agent": "DigiClicker-ImageImporter/1.0 (randerikatom@gmail.com)"}
 MAX_WORKERS = 16
 

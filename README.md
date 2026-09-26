@@ -38,15 +38,17 @@ npm run check     # svelte-check + tsc, no emit
 
 ## Regenerating Digimon data
 
-The game's species/evolution data is pre-scraped and checked into
-`src/lib/data/` and `public/digimon/images/` (images are gitignored -
-see below) - you don't need to run the scrapers to play or develop the
-game. They're only needed to refresh the data from the wiki:
+The game's species/evolution data (`src/lib/data/`) and its optimized
+sprites (`public/sprites/`) are checked in - you don't need to run the
+scrapers to play or develop the game. They're only needed to refresh the
+data or art from the wiki. Scraped **source art** lives in `art/`
+(git-ignored, never shipped); the game only ships the WebP copies in
+`public/sprites/` built from it (step 5).
 
 1. **`Importer.py`** - downloads and sorts Digimon sprite/art images
-   into `public/digimon/images/<Name>/`.
+   into `art/digimon/images/<Name>/`.
    Docker: `./start.sh --importer` (one-shot, writes into the mounted
-   `public/digimon/images/` volume, then exits).
+   `art/digimon/images/` volume, then exits).
    Local: `python Importer.py` (needs `requirements.txt` in a venv).
 
 2. **`EvolutionImporter.py`** - scrapes the wiki's Digimon species
@@ -72,13 +74,22 @@ game. They're only needed to refresh the data from the wiki:
    resolved). **Run `EvolutionGraphConverter.py` again afterward** to
    pick up the newly downloaded images.
 
+5. **`optimize_sprites.py`** - builds what the game actually ships:
+   every in-game species' sprite (and each Digi-Egg) from `art/`,
+   trimmed, fitted to 256px and saved as WebP in `public/sprites/`
+   (~17MB, vs ~340MB of source art). Skips sprites that are already up
+   to date (`--force` rebuilds all). **Commit `public/sprites/`** - CI
+   checks every in-game species has one (`--check`).
+
 Run steps 1-3 in order after wiki content changes or to pick up new
 species; run 4 + a second pass of 3 whenever sprite coverage needs
-topping up.
+topping up; always finish with step 5. Optional art clean-up before
+step 5: `RemoveSpriteBackgrounds.py` (solid backgrounds to transparent),
+`EggImageGenerator.py` (per-type egg recolours into `art/digimon/eggs/`).
 
-Images aren't committed to git (~170MB+) - run step 1 to populate
-`public/digimon/images/` locally after cloning; everything else
-(evolution graph JSON, code) is version-controlled as normal.
+The source art isn't committed to git (~340MB) - run step 1 to populate
+`art/` locally if you need to re-import; the shipped sprites, evolution
+graph JSON and code are version-controlled as normal.
 
 ## Project structure
 
@@ -98,7 +109,8 @@ src/
       evolution/     the Evolution screen (digivolve/de-digivolve graph UI)
       hud/           top bar (currency, evolution badge)
 data/                data/evolution_graph.gexf (Gephi source graph)
-public/digimon/images/  scraped sprites (gitignored, see above)
+art/                 scraped source art (gitignored, never shipped - see above)
+public/sprites/      optimized WebP sprites the game ships (optimize_sprites.py)
 ```
 
 ## Tech notes
