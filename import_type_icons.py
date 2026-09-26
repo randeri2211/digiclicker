@@ -8,6 +8,10 @@ Sources (chosen from the comparison in art/icon-candidates/):
   set has no Light / Dark, so those two are the Frontier Spirit Marks.
   Neutral has no icon (the game shows a coloured dot).
 - Attributes: Wikimon's Digimon Story: Time Stranger attribute icons.
+Which data value uses which icon is src/lib/data/typeIcons.json (shared
+with the game). --check also verifies every shipped icon is used by at
+least one in-game Digimon - so Ice (not one of our elements) and Variable
+(no in-game Digimon has it) aren't shipped.
 
 Raw downloads go to art/icons/ (source art, git-ignored); the game ships
 public/sprites/icons/elements/<Element>.webp and
@@ -40,14 +44,18 @@ USER_AGENT = "DigiClicker asset import (personal project)"
 ICONS = {
     **{("elements", element): (FANDOM, wiki, True) for element, wiki in {
         "Fire": "Fire.png", "Water": "Water.png", "Plant": "Plant.png", "Electric": "Electricity.png",
-        "Earth": "Earth.png", "Wind": "Wind.png", "Metal": "Steel.png", "Ice": "Ice.png",
+        "Earth": "Earth.png", "Wind": "Wind.png", "Metal": "Steel.png",
     }.items()},
     ("elements", "Light"): (FANDOM, "Light_Spirit_Mark_dm.png", False),
     ("elements", "Dark"): (FANDOM, "Darkness_Spirit_Mark_dm.png", False),
     **{("attributes", attribute): (WIKIMON, f"DSTS_Icon_Attribute_{attribute}.png", False)
-       for attribute in ["Vaccine", "Data", "Virus", "Free", "Variable", "Unknown", "NoData"]},
+       for attribute in ["Vaccine", "Data", "Virus", "Free", "Unknown", "NoData"]},
 }
 MAX_SIZE = 64  # shown at ~16-24 CSS px; 64 covers high-DPI screens
+SPECIES_PATH = ROOT / "src" / "lib" / "data" / "digimon-evolution.json"
+MAPPING_PATH = ROOT / "src" / "lib" / "data" / "typeIcons.json"
+# Mirrors IN_GAME_STAGES in src/lib/game/constants.ts.
+IN_GAME_STAGES = {"Fresh", "In-Training", "Rookie", "Champion", "Ultimate", "Mega"}
 
 
 def fetch(api, wiki_name, target):
@@ -143,15 +151,34 @@ def build(source, has_background, target):
 
 
 def check():
-    """CI: every shipped icon exists (the wiki downloads aren't in git)."""
+    """CI: every icon exists, matches the shared mapping, and is used by at
+    least one in-game Digimon (a sanity check against shipping dead art)."""
     from ci_report import report
-    missing = [f"{kind}/{name}.webp" for kind, name in ICONS if not (OUT / kind / f"{name}.webp").exists()]
-    report("Type icons", [f"public/sprites/icons/{m} is missing - run import_type_icons.py" for m in missing],
-           f"All {len(ICONS)} element and attribute icons present.")
-    if missing:
-        print(f"{len(missing)} icon(s) missing: {', '.join(missing)}")
+    species = json.loads(SPECIES_PATH.read_text(encoding="utf-8"))["species"]
+    mapping = json.loads(MAPPING_PATH.read_text(encoding="utf-8"))
+    in_game = [s for s in species.values() if s["stage"] in IN_GAME_STAGES]
+    uses = {("elements", e): sum(s.get("element") == e for s in in_game) for e in mapping["elements"]}
+    for icon in set(mapping["attributes"].values()):
+        uses[("attributes", icon)] = sum(mapping["attributes"].get(s.get("attribute")) == icon for s in in_game)
+
+    errors = []
+    for kind, name in ICONS:
+        if not (OUT / kind / f"{name}.webp").exists():
+            errors.append(f"public/sprites/icons/{kind}/{name}.webp is missing - run import_type_icons.py")
+        if (kind, name) not in uses:
+            errors.append(f"{kind}/{name} is shipped but not in src/lib/data/typeIcons.json")
+        elif uses[(kind, name)] == 0:
+            errors.append(f"{kind}/{name}: no in-game Digimon uses this icon")
+    for kind, name in uses:
+        if (kind, name) not in ICONS:
+            errors.append(f"typeIcons.json maps to {kind}/{name}, but import_type_icons.py doesn't ship it")
+
+    counts = ", ".join(f"{name} {n}" for (kind, name), n in sorted(uses.items()))
+    report("Type icons", errors, f"All {len(ICONS)} icons present, each used by at least one in-game Digimon ({counts}).")
+    if errors:
+        print("\n".join(errors))
         return 1
-    print(f"OK - all {len(ICONS)} icons present.")
+    print(f"OK - all {len(ICONS)} icons present and used ({counts}).")
     return 0
 
 

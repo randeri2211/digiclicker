@@ -1,5 +1,5 @@
 import type { Element, RosterEntry, Stage } from '../types';
-import { getSpecies } from '../images';
+import { getSpecies, getAttributeIconName } from '../images';
 import { IN_GAME_STAGES } from '../constants';
 
 // One filter + sort model for every roster list (the Roster screen, the
@@ -9,9 +9,19 @@ import { IN_GAME_STAGES } from '../constants';
 
 export const FILTER_STAGES = [...IN_GAME_STAGES] as Stage[];
 export const FILTER_ELEMENTS: Element[] = ['Fire', 'Water', 'Plant', 'Electric', 'Earth', 'Wind', 'Metal', 'Light', 'Dark', 'Neutral'];
-/** "Other" groups the handful of non-standard attributes (None, Unknown...). */
-export const FILTER_ATTRIBUTES = ['Vaccine', 'Data', 'Virus', 'Free', 'Other'] as const;
+/** One option per attribute icon: the data's odd values are grouped the
+ * same way the icons are (Unidentified -> Unknown, None / NO DATA -> No
+ * Data), via data/typeIcons.json. */
+export const FILTER_ATTRIBUTES = ['Vaccine', 'Data', 'Virus', 'Free', 'Unknown', 'NoData'] as const;
 export type AttributeGroup = (typeof FILTER_ATTRIBUTES)[number];
+export const ATTRIBUTE_LABEL: Record<AttributeGroup, string> = {
+  Vaccine: 'Vaccine',
+  Data: 'Data',
+  Virus: 'Virus',
+  Free: 'Free',
+  Unknown: 'Unknown',
+  NoData: 'No Data',
+};
 export const SORT_KEYS = { dps: 'DPS', level: 'Level', stage: 'Stage', name: 'Name' } as const;
 export type RosterSortKey = keyof typeof SORT_KEYS;
 
@@ -23,11 +33,6 @@ export interface RosterFilter {
 }
 
 export const DEFAULT_ROSTER_FILTER: RosterFilter = { stage: 'Any', element: 'Any', attribute: 'Any', sort: 'dps' };
-
-export function attributeGroup(speciesId: string): AttributeGroup {
-  const attribute = getSpecies(speciesId)?.attribute ?? '';
-  return (FILTER_ATTRIBUTES as readonly string[]).includes(attribute) ? (attribute as AttributeGroup) : 'Other';
-}
 
 /** Any narrowing on (sort doesn't count - it hides nothing). */
 export function isFilterActive(filter: RosterFilter): boolean {
@@ -43,7 +48,7 @@ export function matchesRosterFilter(speciesId: string, filter: RosterFilter): bo
   const species = getSpecies(speciesId);
   if (filter.stage !== 'Any' && species?.stage !== filter.stage) return false;
   if (filter.element !== 'Any' && species?.element !== filter.element) return false;
-  if (filter.attribute !== 'Any' && attributeGroup(speciesId) !== filter.attribute) return false;
+  if (filter.attribute !== 'Any' && getAttributeIconName(species?.attribute ?? '') !== filter.attribute) return false;
   return true;
 }
 

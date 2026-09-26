@@ -1,17 +1,20 @@
 <script lang="ts">
   import { getAttributeIconUrl } from '../../game/images';
 
-  // An attribute's icon (Vaccine, Data, Virus, Free, Variable, Unknown,
-  // No Data - the odd values in the data map to the last two).
+  // An attribute value's icon (data/typeIcons.json maps odd values, e.g.
+  // Unidentified -> Unknown, None -> No Data); nothing if it has none.
   interface Props {
     attribute: string;
     size?: number;
   }
 
   const { attribute, size = 14 }: Props = $props();
+  const url = $derived(getAttributeIconUrl(attribute));
 </script>
 
-<img class="icon" src={getAttributeIconUrl(attribute)} alt="" width={size} height={size} title={attribute} />
+{#if url}
+  <img class="icon" src={url} alt="" width={size} height={size} title={attribute} />
+{/if}
 
 <style>
   .icon {

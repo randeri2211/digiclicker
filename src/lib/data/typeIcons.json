@@ -1,0 +1,13 @@
+{
+  "elements": ["Fire", "Water", "Plant", "Electric", "Earth", "Wind", "Metal", "Light", "Dark"],
+  "attributes": {
+    "Vaccine": "Vaccine",
+    "Data": "Data",
+    "Virus": "Virus",
+    "Free": "Free",
+    "Unknown": "Unknown",
+    "Unidentified": "Unknown",
+    "None": "NoData",
+    "NO DATA": "NoData"
+  }
+}

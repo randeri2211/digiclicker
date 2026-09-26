@@ -8,6 +8,9 @@
   import ElementIcon from './ElementIcon.svelte';
   import AttributeIcon from './AttributeIcon.svelte';
 
+  // The matchup triangle; every other attribute is neutral in boss fights.
+  const MATCHUP_ATTRIBUTES = new Set(['Vaccine', 'Data', 'Virus']);
+
   interface Props {
     speciesId: string;
   }
@@ -19,7 +22,12 @@
 
 {#if species}
   <span class="tags">
-    <span class="tag" title="Attribute - Vaccine beats Virus, Virus beats Data, Data beats Vaccine">
+    <span
+      class="tag"
+      title={MATCHUP_ATTRIBUTES.has(species.attribute)
+        ? 'Attribute - Vaccine beats Virus, Virus beats Data, Data beats Vaccine'
+        : 'Attribute - neutral in matchups'}
+    >
       <AttributeIcon attribute={species.attribute} size={12} />{species.attribute}
     </span>
     <span class="tag" title="Element">
