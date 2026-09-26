@@ -1,12 +1,12 @@
 import type { ContextMenuItem } from '../../components/shared/ContextMenu.svelte';
-import { getItemCount } from '../state/inventory.svelte';
+import { isSystemUnlocked, lockedHint } from '../village/village';
 
 // One builder shared by every roster entry menu (the sidebar's top
 // contributors and the Roster screen's cards) - a new action is a line
 // here, never a new component.
 export function getRosterEntryMenuItems(callbacks: {
   onOpenStats: () => void;
-  onUseAbilityReroll: () => void;
+  onRerollAbility: () => void;
   onOpenDigivolve: () => void;
   /** Partner toggle for this entry (omit to hide it). */
   partner?: { isPartner: boolean; slotFree: boolean; onToggle: () => void };
@@ -24,10 +24,8 @@ export function getRosterEntryMenuItems(callbacks: {
           },
         ]
       : []),
-    {
-      label: 'Use Ability Reroll',
-      onSelect: callbacks.onUseAbilityReroll,
-      disabled: getItemCount('ability-reroll-crystal') === 0,
-    },
+    isSystemUnlocked('ability-rerolls')
+      ? { label: 'Reroll ability…', onSelect: callbacks.onRerollAbility }
+      : { label: `Reroll ability - ${lockedHint('ability-rerolls').toLowerCase()}`, onSelect: () => {}, disabled: true },
   ];
 }

@@ -6,7 +6,7 @@
     getRosterList,
     isAway,
     getRosterEntryMenuItems,
-    useAbilityReroll,
+    openAbilityReroll,
     computeAttacksPerSecond,
     computeRosterDamageShares,
     partners,
@@ -18,6 +18,7 @@
   import StatWindow from './shared/StatWindow.svelte';
   import XpBar from './shared/XpBar.svelte';
   import SpeciesTags from './shared/SpeciesTags.svelte';
+  import AbilityChip from './shared/AbilityChip.svelte';
   import RosterFilterControls from './shared/RosterFilterControls.svelte';
   import { loadRosterFilter, saveRosterFilter, applyRosterFilter } from '../game/roster/rosterFilter';
 
@@ -104,6 +105,7 @@
             </div>
             <div class="card-xp"><XpBar xp={row.entry.xp} /></div>
             <SpeciesTags speciesId={row.entry.speciesId} />
+            <AbilityChip abilityId={row.entry.abilityId} />
             {#if isAway(row.entry.speciesId)}<span class="away">On expedition</span>{/if}
             <div class="card-meta">{row.dps.toFixed(1)} DPS</div>
           </button>
@@ -120,7 +122,7 @@
     y={menuState.y}
     items={getRosterEntryMenuItems({
       onOpenStats: () => (statsFor = entry),
-      onUseAbilityReroll: () => useAbilityReroll(entry),
+      onRerollAbility: () => openAbilityReroll(entry.speciesId),
       onOpenDigivolve: () => onOpenEvolution(entry.speciesId),
       partner: {
         isPartner: isPartner(entry.speciesId),

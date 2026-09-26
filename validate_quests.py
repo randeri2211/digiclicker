@@ -34,7 +34,7 @@ NPCS_PATH = ROOT / "src" / "lib" / "data" / "npcs.json"
 REGIONS_PATH = ROOT / "src" / "lib" / "data" / "regions.json"
 
 # Mirrors SystemId in src/lib/game/types.ts.
-SYSTEMS = {"expeditions", "hatchery-upgrades", "mystery-eggs", "shop", "continent-travel"}
+SYSTEMS = {"expeditions", "hatchery-upgrades", "mystery-eggs", "shop", "ability-rerolls", "continent-travel"}
 
 # Mirrors IN_GAME_STAGES in src/lib/game/constants.ts.
 IN_GAME_STAGES = {"Fresh", "In-Training", "Rookie", "Champion", "Ultimate", "Mega"}

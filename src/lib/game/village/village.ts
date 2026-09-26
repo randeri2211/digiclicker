@@ -49,6 +49,7 @@ export const SYSTEM_NAMES: Record<SystemId, string> = {
   'hatchery-upgrades': 'Hatchery upgrades',
   'mystery-eggs': 'Mystery Egg stall',
   shop: 'Shop',
+  'ability-rerolls': 'Ability rerolls',
   'continent-travel': 'Travel across the sea',
 };
 

@@ -31,7 +31,7 @@ As each feature ships, move its description into `GAMEPLAY_DESIGN.md`'s "Confirm
 | 7 | Special digivolutions: Armor (Armor Digi-Eggs) and DNA (unlock triggers: undecided) | 5, 3 |
 | 8 | Farming: Digi-Meat and other food (needs a design pass) | 3 |
 | 9 | Region travel + village residents gating systems (story Act 1) **(done - Act 1 playable)** | 5 |
-| 10 | Limit Breaks: level cap above 100 (story post-game) **(needs a rethink - levels are now uncapped)** | 5 |
+| 10 | Post-game: higher-level areas past Act 8, up to Huanglongmon (levels uncapped - replaces Limit Breaks) | 5 |
 
 Features 1–4 are fully specified; 5–8 get a design pass (story, Crest sources/timing, farming details) before they're built.
 
@@ -144,7 +144,9 @@ Every new tunable goes into `src/lib/game/balance.json` (re-exported with docs i
 - Act 1's seven new regions, bosses and quest chain, built from STORY.md.
 
 ## 10. Limit Breaks (level cap above 100)
-> **Superseded mechanism (2026-09-26):** levels are now uncapped - the wilds' levels soft-cap them (GAMEPLAY_DESIGN.md "No level cap"). The post-game still needs a progression beat; Limit Breaks need a new meaning (e.g. raising the overlevel XP grace, or unlocking higher-level areas) when the post-game is designed.
+> **Superseded mechanism (2026-09-26):** levels are now uncapped - the wilds' levels soft-cap them (GAMEPLAY_DESIGN.md "No level cap").
+>
+> **Decided (2026-09-26):** the post-game's progression is **higher-level areas** past Act 8, climbing well above the Act 8 final boss's level, with **Huanglongmon** as the far-higher summit. No cap to raise - the new areas' wild levels are the ceiling. On the current HP curve (`((L + 20) / 21) ^ 3.5`, a Digimon's damage ~ level²), each doubling of level makes same-stage fights ~2.3-2.5x longer at an equal level (x1.5 level: ~1.6x; x3: ~4x), so stages, roster and partners still have to carry part of the climb - tune with the simulator once Act 8's levels exist. Whether "Limit Breaks" survive as a name (e.g. story beats that open each higher tier) is open.
 
 **Goal:** the post-game's progression. See STORY.md section 8.
 - `MAX_LEVEL` rises in steps (100 → 150) as Limit Breaks are earned from post-game bosses; the XP curves (feature: leveling curves) continue past Lv 100.

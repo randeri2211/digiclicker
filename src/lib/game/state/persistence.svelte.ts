@@ -21,6 +21,7 @@ import { pushToast } from './notifications.svelte';
 import type { AreaProgressState, InventoryState, RosterState } from '../types';
 import { AUTOSAVE_INTERVAL_MS } from '../constants';
 import { ITEM_CATALOG } from '../items/itemCatalog';
+import { getAbility, rollAbility } from '../abilities/abilityCatalog';
 import { initialAreaProgress, reapplyEarnedUnlocks } from '../areas/areaProgress';
 import { getPath } from '../areas/areaRegistry';
 
@@ -59,11 +60,28 @@ function normalizeAreaProgress(loaded: AreaProgressState): AreaProgressState {
 // v2 saves made before inheritedFromLevel existed lack it - 0 means "never
 // digivolved into", which is exactly right for them (any upgrade shows as
 // an improvement over "no level recorded").
+// Special abilities: an entry without a known one (saves from before
+// abilities were rolled for everyone, or the old stat-boost ids) rolls a
+// fresh one; a pending reroll offer with unknown ids is dropped.
 function normalizeRoster(loaded: RosterState): RosterState {
   return Object.fromEntries(
-    Object.entries(loaded).map(([id, entry]) => [id, { ...entry, xp: Number.isFinite(entry.xp) ? entry.xp : 0, inheritedFromLevel: entry.inheritedFromLevel ?? 0 }])
+    Object.entries(loaded).map(([id, entry]) => [
+      id,
+      {
+        ...entry,
+        xp: Number.isFinite(entry.xp) ? entry.xp : 0,
+        inheritedFromLevel: entry.inheritedFromLevel ?? 0,
+        abilityId: getAbility(entry.abilityId) ? entry.abilityId : rollAbility(),
+        abilityRerolls: entry.abilityRerolls ?? 0,
+        abilityOffer: entry.abilityOffer?.every((a) => getAbility(a)) ? entry.abilityOffer : null,
+      },
+    ])
   );
 }
+
+// The Ability Reroll Crystal was removed (rerolls are a village service
+// now) - any a save still holds are refunded at their old Shop price.
+const REMOVED_CRYSTAL_REFUND_BITS = 400;
 
 // Overwrites a keyed-record $state object in place (not merge) - its key
 // set is dynamic, so keys from whichever slot was previously live have to
@@ -103,6 +121,8 @@ function snapshotLiveState(): SaveSlotData {
 
 function applySlotToLiveState(data: SaveSlotData): void {
   Object.assign(currency, data.currency);
+  const crystals = (data.inventory as Record<string, number>)['ability-reroll-crystal'] ?? 0;
+  if (crystals > 0) currency.bits += crystals * REMOVED_CRYSTAL_REFUND_BITS;
   replaceRecord(roster, normalizeRoster(data.roster));
   Object.assign(hatchery, data.hatchery);
   // Normal wild fights are untimed - saves from when every fight had a

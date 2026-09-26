@@ -67,10 +67,11 @@ function makeWildSpawn(now: number, speciesId: string, level: number, hpMultipli
 }
 
 // A boss: the species' normal wild HP at the boss level times its
-// hpMultiplier, on a timer funded by the squad's HP.
-export function makeBossSpawn(now: number, boss: BossDefinition, squadHp: number): WildSpawnState {
+// hpMultiplier, on a timer funded by the squad's HP (x timerFactor - the
+// squad's Iron Will abilities).
+export function makeBossSpawn(now: number, boss: BossDefinition, squadHp: number, timerFactor = 1): WildSpawnState {
   const maxHp = Math.round(computeWildMaxHp(boss.speciesId, boss.level) * boss.hpMultiplier);
-  return makeSpawn(now, boss.speciesId, boss.level, maxHp, computeFightTimeLimitMs(squadHp));
+  return makeSpawn(now, boss.speciesId, boss.level, maxHp, computeFightTimeLimitMs(squadHp) * timerFactor);
 }
 
 // Weighted-random species pick within the active path's pool, then a

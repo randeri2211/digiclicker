@@ -1,4 +1,4 @@
-import type { Stage } from './types';
+import type { AbilityEffect, Stage } from './types';
 import balance from './balance.json';
 import type { FightTimerFormula } from './combat/fightTimer';
 import type { CurveFormula } from './combat/levelCurveFormulas';
@@ -221,10 +221,23 @@ export const MYSTERY_EGG_COST_BITS = balance.MYSTERY_EGG_COST_BITS;
  * a duplicate becomes a bonus instead of a second copy). */
 export const DUPLICATE_HATCH_XP = balance.DUPLICATE_HATCH_XP;
 
-// ---- Items -----------------------------------------------------------
-/** Bits price for one Ability Reroll Crystal in the Shop (see
- * items/itemCatalog.ts, abilities/abilities.ts's useAbilityReroll). */
-export const ABILITY_REROLL_COST_BITS = balance.ABILITY_REROLL_COST_BITS;
+// ---- Special abilities ---------------------------------------------
+/** Special abilities (abilities/abilityCatalog.ts): roll weight per tier
+ * I/II/III (common -> rare). */
+export const ABILITY_TIER_WEIGHTS = balance.ABILITY_TIER_WEIGHTS as [number, number, number];
+/** Duplicate roster auras stack with this falloff - strongest copy 100%,
+ * then x0.8, x0.64... so they add up to at most 1 / (1 - falloff) copies'
+ * worth (5 at 0.8), like the roster's own falloff. */
+export const ABILITY_AURA_FALLOFF = balance.ABILITY_AURA_FALLOFF;
+/** Each effect's size in percent for tiers I/II/III. */
+export const ABILITY_PERCENT = balance.ABILITY_PERCENT as Record<AbilityEffect, [number, number, number]>;
+/** A reroll's Bits cost: BASE x GROWTH ^ (rerolls already paid on that
+ * Digimon), capped by the current act's cap - later acts raise the cap,
+ * so rerolls slow down but never become impossible. Acts past the list
+ * use its last cap. */
+export const ABILITY_REROLL_BASE_COST = balance.ABILITY_REROLL_BASE_COST;
+export const ABILITY_REROLL_COST_GROWTH = balance.ABILITY_REROLL_COST_GROWTH;
+export const ABILITY_REROLL_COST_CAP_BY_ACT: number[] = balance.ABILITY_REROLL_COST_CAP_BY_ACT;
 
 // ---- Expeditions -------------------------------------------------------
 // A party of roster Digimon is sent to a destination (data/expeditions.json)

@@ -20,6 +20,7 @@
   import ExpeditionsScreen from './lib/components/ExpeditionsScreen.svelte';
   import QuestLogScreen from './lib/components/QuestLogScreen.svelte';
   import Toasts from './lib/components/shared/Toasts.svelte';
+  import AbilityRerollDialog from './lib/components/AbilityRerollDialog.svelte';
   import {
     startCombatTickLoop,
     actScreen,
@@ -45,7 +46,7 @@
     isOwned,
     automation,
     buyMysteryEgg,
-    useAbilityReroll,
+    startAbilityReroll,
     ABILITY_CATALOG,
     computeEntryStatValue,
   } from './lib/game/state/game.svelte';
@@ -128,7 +129,7 @@
       isOwned,
       automation,
       buyMysteryEgg,
-      useAbilityReroll,
+      startAbilityReroll,
       ABILITY_CATALOG,
       computeEntryStatValue,
     };
@@ -199,6 +200,7 @@
   {/if}
 
   {#if screen === 'game'}
+    <AbilityRerollDialog />
     <Toasts />
     <OfflineReportScreen />
     <BackupReminder />

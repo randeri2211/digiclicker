@@ -4,7 +4,7 @@
   import RosterStatsPanel from './RosterStatsPanel.svelte';
   import ContextMenu from '../shared/ContextMenu.svelte';
   import StatWindow from '../shared/StatWindow.svelte';
-  import { getRosterEntryMenuItems, useAbilityReroll, partners, partnerSlots, isPartner, setPartner } from '../../game/state/game.svelte';
+  import { getRosterEntryMenuItems, openAbilityReroll, partners, partnerSlots, isPartner, setPartner } from '../../game/state/game.svelte';
   import type { RosterEntry } from '../../game/types';
 
   interface Props {
@@ -36,7 +36,7 @@
     y={menuState.y}
     items={getRosterEntryMenuItems({
       onOpenStats: () => (statsFor = entry),
-      onUseAbilityReroll: () => useAbilityReroll(entry),
+      onRerollAbility: () => openAbilityReroll(entry.speciesId),
       onOpenDigivolve: () => onOpenEvolution(entry.speciesId),
       partner: {
         isPartner: isPartner(entry.speciesId),

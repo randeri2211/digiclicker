@@ -1,8 +1,9 @@
-import type { HatcheryState, RosterEntry, RosterState, StatBlock } from '../types';
+import type { AbilityId, HatcheryState, RosterEntry, RosterState, StatBlock } from '../types';
 import { getSpecies } from '../images';
 import { rollBaseStats, rollGrowthPerLevel, zeroStatBlock } from '../combat/stats';
 import { getAllAreaSpeciesIds } from '../areas/areaRegistry';
 import { HATCHERY_STARTING_CAPACITY, HATCHERY_MAX_CAPACITY } from '../constants';
+import { rollAbility } from '../abilities/abilityCatalog';
 
 // PLACEHOLDER: hardcoded starting roster.
 const STARTER_SPECIES = ['agumon', 'gomamon'];
@@ -14,11 +15,13 @@ export const PRELOAD_SPECIES_IDS = [...getAllAreaSpeciesIds(), ...STARTER_SPECIE
 
 // Shared entry-creation logic - used for starters, egg hatches (see
 // game/eggs/eggs.ts) and digivolves (see game/evolution/digivolve.ts,
-// the only caller that passes an inherited bonus and its source level).
+// the only caller that passes an inherited bonus, its source level and
+// the source's ability to inherit). Everyone else rolls a fresh ability.
 export function createRosterEntry(
   speciesId: string,
   inheritedBonus: StatBlock = zeroStatBlock(),
-  inheritedFromLevel = 0
+  inheritedFromLevel = 0,
+  abilityId: AbilityId = rollAbility()
 ): RosterEntry {
   const species = getSpecies(speciesId);
   const stage = species?.stage ?? 'Unknown';
@@ -30,7 +33,7 @@ export function createRosterEntry(
     growthPerLevel: rollGrowthPerLevel(stage, statAffinity),
     inheritedBonus,
     inheritedFromLevel,
-    abilityId: null,
+    abilityId,
   };
 }
 

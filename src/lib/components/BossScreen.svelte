@@ -23,6 +23,7 @@
   } from '../game/combat/damage';
   import { computeWildMaxHp, computeFightTimeLimitMs } from '../game/combat/spawn';
   import SpeciesTags from './shared/SpeciesTags.svelte';
+  import AbilityChip from './shared/AbilityChip.svelte';
   import { formatMultiplier, multiplierTone } from './shared/matchup';
 
   interface Props {
@@ -185,6 +186,7 @@
               <div class="c-info">
                 <span class="c-name">{getSpeciesName(c.entry.speciesId)} <span class="dim">Lv {levelForXp(c.entry.xp)}</span></span>
                 <SpeciesTags speciesId={c.entry.speciesId} />
+                <AbilityChip abilityId={c.entry.abilityId} relevantIn="boss" />
               </div>
               <span class="mult {multiplierTone(c.multiplier)}">{formatMultiplier(c.multiplier)}</span>
             </button>

@@ -138,7 +138,9 @@ export function digivolve(entry: RosterEntry, targetSpeciesId: string): boolean 
     ownedTarget.inheritedBonus = maxStatBlocks(ownedTarget.inheritedBonus, inheritedBonus);
     ownedTarget.inheritedFromLevel = Math.max(ownedTarget.inheritedFromLevel, sourceLevel);
   } else {
-    addToRoster(createRosterEntry(target.id, inheritedBonus, sourceLevel));
+    // The new form inherits the source's special ability (the source keeps
+    // it too); an already-owned target keeps its own.
+    addToRoster(createRosterEntry(target.id, inheritedBonus, sourceLevel, entry.abilityId ?? undefined));
   }
   entry.xp = 0;
   transferPartner(entry.speciesId, target.id);

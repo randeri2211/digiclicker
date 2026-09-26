@@ -46,7 +46,7 @@ export type EggType =
 
 /** A plain string union - adding a new item is a new member here plus a
  * matching ITEM_CATALOG entry (see src/lib/game/items/itemCatalog.ts). */
-export type ItemId = 'ability-reroll-crystal' | 'attack-chip' | 'speed-chip' | 'hp-disk';
+export type ItemId = 'attack-chip' | 'speed-chip' | 'hp-disk';
 
 export interface ItemDefinition {
   id: ItemId;
@@ -61,32 +61,47 @@ export interface ItemDefinition {
  * initialization) - lookups never need a `?? 0` fallback. */
 export type InventoryState = Record<ItemId, number>;
 
-/** 4 stats x 3 rarity tiers - a plain string union so adding a new
- * ability is a new member here plus a matching ABILITY_CATALOG entry
- * (see src/lib/game/abilities/abilityCatalog.ts). */
-export type AbilityId =
-  | 'attack-minor'
-  | 'attack-major'
-  | 'attack-superior'
-  | 'hp-minor'
-  | 'hp-major'
-  | 'hp-superior'
-  | 'speed-minor'
-  | 'speed-major'
-  | 'speed-superior'
-  | 'special-attack-minor'
-  | 'special-attack-major'
-  | 'special-attack-superior';
+/** An ABILITY_CATALOG key (src/lib/game/abilities/abilityCatalog.ts), e.g.
+ * "battle-cry-2" or "virus-buster-3" - generated from the effects x tiers,
+ * so a plain string; unknown ids (old saves) are rerolled on load. */
+export type AbilityId = string;
+
+/** What an ability does. Roster auras work while the Digimon is in the
+ * roster and not away; boss effects only in a boss squad; expedition
+ * effects only on an expedition party. */
+export type AbilityEffect =
+  | 'roster-attack'
+  | 'roster-speed'
+  | 'kill-xp'
+  | 'kill-bits'
+  | 'egg-xp'
+  | 'click-damage'
+  | 'vs-attribute'
+  | 'vs-element'
+  | 'squad-damage'
+  | 'boss-timer'
+  | 'expedition-speed'
+  | 'expedition-haul'
+  | 'expedition-eggs';
+
+export type AbilityContext = 'roster' | 'boss' | 'expedition';
 
 export interface AbilityDefinition {
   id: AbilityId;
+  /** e.g. "Battle Cry II" / "Fire Hunter III". */
   name: string;
+  /** The family name without the tier ("Battle Cry") - the roster filter. */
+  family: string;
   description: string;
-  statKey: keyof StatBlock;
-  /** e.g. 10 = +10% to statKey. */
+  effect: AbilityEffect;
+  context: AbilityContext;
+  /** vs-attribute / vs-element only: which attribute or element. */
+  target?: string;
+  /** 1 = I (common) .. 3 = III (rare). */
+  tier: 1 | 2 | 3;
+  /** The effect's size in percent (e.g. 8 = +8%). */
   percent: number;
-  /** Rarity weight for rerollAbility's weighted pick - higher rolls more
-   * often, same convention as AreaSpawnEntry/mystery-egg pool weights. */
+  /** Rarity weight for the weighted roll. */
   weight: number;
 }
 
@@ -176,10 +191,16 @@ export interface RosterEntry {
    * Evolution screen so the player knows what level beats the current
    * bonus. */
   inheritedFromLevel: number;
-  /** Null until an Ability Reroll Crystal is used on this entry (see
-   * abilities/abilities.ts's useAbilityReroll) - that item is the only
-   * source, nothing rolls one automatically. */
+  /** Rolled when the entry is created (hatch, starter) or inherited from
+   * the source when digivolved into; changed by rerolls (abilities.ts).
+   * Null only transiently - loading a save rolls one for any entry
+   * without a known ability. */
   abilityId: AbilityId | null;
+  /** Rerolls paid for on this entry - drives its next reroll's cost. */
+  abilityRerolls?: number;
+  /** A paid reroll's 3 choices, waiting for the pick (kept in the save so
+   * closing the dialog doesn't lose a paid reroll). */
+  abilityOffer?: AbilityId[] | null;
 }
 
 /** Keyed by speciesId - the key itself enforces "one per species". */
@@ -505,7 +526,7 @@ export interface QuestDefinition {
 
 /** A game system a village resident can unlock - see data/npcs.json. A
  * system no NPC provides is always open. */
-export type SystemId = 'expeditions' | 'hatchery-upgrades' | 'mystery-eggs' | 'shop' | 'continent-travel';
+export type SystemId = 'expeditions' | 'hatchery-upgrades' | 'mystery-eggs' | 'shop' | 'ability-rerolls' | 'continent-travel';
 
 /** A story character (src/lib/data/npcs.json) - quest giver and/or village
  * resident. A resident joins the village when the flag `resident:<id>` is

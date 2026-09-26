@@ -1,6 +1,7 @@
 import type { Element, RosterEntry, Stage } from '../types';
 import { getSpecies, getAttributeIconName } from '../images';
 import { IN_GAME_STAGES } from '../constants';
+import { ABILITY_FAMILIES, getAbility } from '../abilities/abilityCatalog';
 
 // One filter + sort model for every roster list (the Roster screen, the
 // sidebar's top contributors) - the UI is RosterFilterControls.svelte.
@@ -29,26 +30,29 @@ export interface RosterFilter {
   stage: Stage | 'Any';
   element: Element | 'Any';
   attribute: AttributeGroup | 'Any';
+  /** A special ability family ("Battle Cry", "Fire Hunter"...), any tier. */
+  ability: string;
   sort: RosterSortKey;
 }
 
-export const DEFAULT_ROSTER_FILTER: RosterFilter = { stage: 'Any', element: 'Any', attribute: 'Any', sort: 'dps' };
+export const DEFAULT_ROSTER_FILTER: RosterFilter = { stage: 'Any', element: 'Any', attribute: 'Any', ability: 'Any', sort: 'dps' };
 
 /** Any narrowing on (sort doesn't count - it hides nothing). */
 export function isFilterActive(filter: RosterFilter): boolean {
-  return filter.stage !== 'Any' || filter.element !== 'Any' || filter.attribute !== 'Any';
+  return filter.stage !== 'Any' || filter.element !== 'Any' || filter.attribute !== 'Any' || filter.ability !== 'Any';
 }
 
 /** "Rookie / Fire" - the active narrowing, for headers. */
 export function describeFilter(filter: RosterFilter): string {
-  return [filter.stage, filter.element, filter.attribute].filter((part) => part !== 'Any').join(' / ');
+  return [filter.stage, filter.element, filter.attribute, filter.ability].filter((part) => part !== 'Any').join(' / ');
 }
 
-export function matchesRosterFilter(speciesId: string, filter: RosterFilter): boolean {
-  const species = getSpecies(speciesId);
+export function matchesRosterFilter(entry: RosterEntry, filter: RosterFilter): boolean {
+  const species = getSpecies(entry.speciesId);
   if (filter.stage !== 'Any' && species?.stage !== filter.stage) return false;
   if (filter.element !== 'Any' && species?.element !== filter.element) return false;
   if (filter.attribute !== 'Any' && getAttributeIconName(species?.attribute ?? '') !== filter.attribute) return false;
+  if (filter.ability !== 'Any' && getAbility(entry.abilityId)?.family !== filter.ability) return false;
   return true;
 }
 
@@ -64,7 +68,7 @@ export function applyRosterFilter<Row extends { entry: RosterEntry; dps: number 
     stage: (a, b) => stageOrder(b) - stageOrder(a) || byDps(a, b),
     name: (a, b) => name(a).localeCompare(name(b)),
   };
-  return rows.filter((row) => matchesRosterFilter(row.entry.speciesId, filter)).sort(compare[filter.sort]);
+  return rows.filter((row) => matchesRosterFilter(row.entry, filter)).sort(compare[filter.sort]);
 }
 
 export function loadRosterFilter(key: string): RosterFilter {
@@ -74,6 +78,7 @@ export function loadRosterFilter(key: string): RosterFilter {
       stage: FILTER_STAGES.includes(saved.stage) ? saved.stage : 'Any',
       element: FILTER_ELEMENTS.includes(saved.element) ? saved.element : 'Any',
       attribute: (FILTER_ATTRIBUTES as readonly string[]).includes(saved.attribute) ? saved.attribute : 'Any',
+      ability: ABILITY_FAMILIES.includes(saved.ability) ? saved.ability : 'Any',
       sort: saved.sort in SORT_KEYS ? saved.sort : 'dps',
     };
   } catch {

@@ -56,6 +56,11 @@
       <div class="section-title">Items</div>
       {#if !isSystemUnlocked('shop')}
         <div class="locked-note">🔒 {lockedHint('shop')}</div>
+      {:else if itemEntries.length === 0}
+        <div class="locked-note">
+          Nothing on the shelves yet. Ability rerolls are a service now: open a Digimon's menu and pick
+          <b>Reroll ability…</b>
+        </div>
       {:else}
       <div class="grid">
         {#each itemEntries as item (item.id)}

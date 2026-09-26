@@ -11,6 +11,7 @@ import {
   expeditionDurationMs,
   expeditionHaulMultiplier,
   rollHaul,
+  expeditionEggFactor,
 } from '../expeditions/expeditions';
 import { EXPEDITION_MAX_CONCURRENT, EXPEDITION_MAX_PARTY } from '../constants';
 import { isSystemUnlocked } from '../village/village';
@@ -79,7 +80,8 @@ export function claimExpedition(id: string, now: number = Date.now()): Expeditio
   const destination = expedition ? getDestination(expedition.destinationId) : undefined;
   if (!expedition || !hasReturned(expedition, now) || !destination) return null;
 
-  const { haul, eggs } = rollHaul(destination, expeditionHaulMultiplier(destination, partyOf(expedition)));
+  const party = partyOf(expedition);
+  const { haul, eggs } = rollHaul(destination, expeditionHaulMultiplier(destination, party), expeditionEggFactor(party));
   payHaul(haul, eggs);
   expeditions.active.splice(index, 1);
   expeditions.lastHaul = haul;
