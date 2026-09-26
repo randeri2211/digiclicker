@@ -34,6 +34,31 @@ export function getEggSpriteUrl(eggType: EggType): string {
   return `${import.meta.env.BASE_URL}sprites/eggs/${eggType}.webp`;
 }
 
+// Element / attribute icons (import_type_icons.py builds public/sprites/icons/).
+// Neutral has no icon - callers fall back to its coloured dot.
+const ELEMENTS_WITH_ICONS = new Set(['Fire', 'Water', 'Plant', 'Electric', 'Earth', 'Wind', 'Metal', 'Light', 'Dark']);
+
+export function getElementIconUrl(element: string): string | null {
+  return ELEMENTS_WITH_ICONS.has(element) ? `${import.meta.env.BASE_URL}sprites/icons/elements/${element}.webp` : null;
+}
+
+// The data's attribute values -> the icon set's (Time Stranger) names.
+const ATTRIBUTE_ICON: Record<string, string> = {
+  Vaccine: 'Vaccine',
+  Data: 'Data',
+  Virus: 'Virus',
+  Free: 'Free',
+  Variable: 'Variable',
+  Unknown: 'Unknown',
+  Unidentified: 'Unknown',
+  None: 'NoData',
+  'NO DATA': 'NoData',
+};
+
+export function getAttributeIconUrl(attribute: string): string {
+  return `${import.meta.env.BASE_URL}sprites/icons/attributes/${ATTRIBUTE_ICON[attribute] ?? 'Unknown'}.webp`;
+}
+
 /** Kill-drop and Mystery eggs share the same per-type sprite - callers
  * pair this with getEggSpriteUrl, and add the "?" overlay when
  * egg.isMystery. */

@@ -23,7 +23,8 @@
   import { getSpecies, getSpriteUrl, getSpeciesName } from '../game/images';
   import { levelForXp } from '../game/combat/levelCurve';
   import { EXPEDITION_MAX_CONCURRENT, EXPEDITION_MAX_PARTY } from '../game/constants';
-  import SpeciesTags, { ELEMENT_COLOR } from './shared/SpeciesTags.svelte';
+  import ElementIcon from './shared/ElementIcon.svelte';
+  import SpeciesTags from './shared/SpeciesTags.svelte';
 
   interface Props {
     onClose: () => void;
@@ -175,7 +176,7 @@
             {#if unlocked}
               <span class="dest-desc">{d.description}</span>
               <span class="dest-meta">
-                {#each d.favoredElements as el (el)}<span class="el"><i class="dot" style="background:{ELEMENT_COLOR[el]}"></i>{el}</span>{/each}
+                {#each d.favoredElements as el (el)}<span class="el"><ElementIcon element={el} size={14} />{el}</span>{/each}
                 <span>· {d.durationMinutes} min</span>
               </span>
               <span class="dest-loot">{lootSummary(d)}</span>
@@ -418,11 +419,6 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-  }
-  .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
   }
   .dest-loot {
     font-size: 11px;

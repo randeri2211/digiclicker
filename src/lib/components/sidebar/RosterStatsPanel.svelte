@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { RosterEntry } from '../../game/types';
   import { getSpeciesName, getSpriteUrl, getSpecies } from '../../game/images';
-  import { ELEMENT_COLOR } from '../shared/SpeciesTags.svelte';
   import RosterFilterControls from '../shared/RosterFilterControls.svelte';
+  import ElementIcon from '../shared/ElementIcon.svelte';
   import { loadRosterFilter, saveRosterFilter, applyRosterFilter, isFilterActive, describeFilter, SORT_KEYS } from '../../game/roster/rosterFilter';
   import { levelForXp } from '../../game/combat/levelCurve';
   import {
@@ -184,7 +184,7 @@
           <span class="row-meta">
             Lv {levelForXp(row.entry.xp)}
             {#if species?.element}
-              · <span class="element-dot" style:background={ELEMENT_COLOR[species.element]}></span>{species.element}
+              · <ElementIcon element={species.element} size={14} />{species.element}
             {/if}
           </span>
         </span>
@@ -382,12 +382,6 @@
     gap: 4px;
     font-size: 11px;
     color: var(--text-dim);
-  }
-  .element-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    display: inline-block;
   }
   .collapse-toggle {
     appearance: none;
