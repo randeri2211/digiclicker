@@ -66,6 +66,10 @@ export const PARTNER_EXTRA_GRACE = balance.PARTNER_EXTRA_GRACE;
 /** Extra share of kill XP for a partner (0.25 = +25%). */
 export const PARTNER_XP_BONUS = balance.PARTNER_XP_BONUS;
 
+// ---- Saves -------------------------------------------------------------
+/** Hours between "export a backup?" popups (state/backupReminder.svelte.ts). */
+export const EXPORT_REMINDER_HOURS = balance.EXPORT_REMINDER_HOURS;
+
 // ---- Digivolution requirements & scope ----------------------------
 /** Level the source must reach before digivolving into a species at the
  * given target stage. A stage with no entry has no level requirement

@@ -11,8 +11,11 @@ import { resetQuestWatch } from '../quests/quests';
 import { resetResidentWatch } from '../village/village';
 import { catchUpSinceSave, dismissOfflineReport } from './offline.svelte';
 import { partners } from './partners.svelte';
+import { applyBackupReminder, snapshotBackupReminder, markExported } from './backupReminder.svelte';
 import { createSlot, updateSlot, getSlot, deleteSlot as deleteSlotFromStorage, listSlots } from './slots';
 import type { SaveSlot, SaveSlotData } from './saveData';
+import { SAVE_KEY, isValidSlotData, invalidateSaveFileCache } from './saveData';
+import { pushToast } from './notifications.svelte';
 import type { AreaProgressState, InventoryState, RosterState } from '../types';
 import { AUTOSAVE_INTERVAL_MS } from '../constants';
 import { ITEM_CATALOG } from '../items/itemCatalog';
@@ -20,6 +23,13 @@ import { initialAreaProgress, reapplyEarnedUnlocks } from '../areas/areaProgress
 import { getPath } from '../areas/areaRegistry';
 
 export const activeSlot: { id: string | null } = $state({ id: null });
+
+/** `takenOver`: another tab saved this same game, so this tab stopped
+ * saving (it would overwrite newer progress) - App shows a banner. */
+export const saveSession: { takenOver: boolean } = $state({ takenOver: false });
+// When this tab last saved the active slot, to tell our writes from others'.
+let lastOwnSaveAt = 0;
+let saveFailureShown = false;
 
 // Keeps only current ITEM_CATALOG keys, backfilling 0 for any added after
 // the save was made - lookups elsewhere assume InventoryState always has
@@ -81,6 +91,7 @@ function snapshotLiveState(): SaveSlotData {
       expeditions,
       progress,
       partners: partners.ids,
+      backupReminder: snapshotBackupReminder(),
     })
   );
 }
@@ -107,30 +118,68 @@ function applySlotToLiveState(data: SaveSlotData): void {
   progress.completedQuests = data.progress?.completedQuests ?? [];
   // Only Digimon still owned (and within today's slot count).
   partners.ids = (data.partners ?? []).filter((id) => roster[id]);
+  applyBackupReminder(data.backupReminder);
   // Quests already ready in this save shouldn't all announce themselves.
   resetQuestWatch();
   resetResidentWatch();
 }
 
-export function loadSlotIntoLiveState(slotId: string): void {
+/** All or nothing: if the slot's data can't be applied, the game goes back
+ * to what it had and nothing is saved over the slot. False on failure. */
+export function loadSlotIntoLiveState(slotId: string): boolean {
   const slot = getSlot(slotId);
-  if (!slot) return;
-  applySlotToLiveState(slot.data);
+  if (!slot || !isValidSlotData(slot.data)) return false;
+  const before = snapshotLiveState();
+  try {
+    applySlotToLiveState(slot.data);
+  } catch (error) {
+    console.error('Could not load save slot', slotId, error);
+    applySlotToLiveState(before);
+    return false;
+  }
   activeSlot.id = slotId;
+  saveSession.takenOver = false;
+  lastOwnSaveAt = slot.savedAt;
   // The game was closed since this save was written - fight that time now.
   catchUpSinceSave(slot.savedAt);
+  return true;
 }
 
 export function startNewGameInSlot(name?: string): void {
   const slot = createSlot(name);
   applySlotToLiveState(slot.data);
   activeSlot.id = slot.id;
+  saveSession.takenOver = false;
+  lastOwnSaveAt = slot.savedAt;
   dismissOfflineReport();
 }
 
 export function saveGame(): void {
-  if (!activeSlot.id) return;
-  updateSlot(activeSlot.id, snapshotLiveState());
+  if (!activeSlot.id || saveSession.takenOver) return;
+  const saved = updateSlot(activeSlot.id, snapshotLiveState());
+  if (saved) {
+    lastOwnSaveAt = Date.now();
+    saveFailureShown = false;
+  } else if (!saveFailureShown) {
+    // Once per failure streak, not every autosave.
+    saveFailureShown = true;
+    pushToast("Couldn't save", 'Browser storage is full or blocked - use Export on the main menu to keep a copy.');
+  }
+}
+
+// Another tab wrote the save file. If it saved the game this tab is
+// playing, this tab's progress is now older - stop saving here rather
+// than overwrite it. (The storage event only fires in OTHER tabs.)
+function onStorage(event: StorageEvent) {
+  if (event.key !== SAVE_KEY) return;
+  invalidateSaveFileCache();
+  if (!activeSlot.id || !event.newValue) return;
+  try {
+    const slot = JSON.parse(event.newValue).slots?.find((s: SaveSlot) => s.id === activeSlot.id);
+    if (slot && slot.savedAt > lastOwnSaveAt) saveSession.takenOver = true;
+  } catch {
+    // unreadable - leave it to the next load to deal with
+  }
 }
 
 export function deleteSlot(id: string): void {
@@ -141,6 +190,12 @@ export function deleteSlot(id: string): void {
 }
 
 export function exportSlotToFile(id: string): void {
+  // The game being played: record the export and save first, so the file
+  // is current (and the backup reminder resets).
+  if (id === activeSlot.id) {
+    markExported();
+    saveGame();
+  }
   const slot = getSlot(id);
   if (!slot) return;
 
@@ -160,18 +215,6 @@ function isObject(value: unknown): boolean {
 // Shape check only - an exported v1 save (active/training team, no
 // roster/hatchery) fails here and is rejected cleanly rather than
 // crashing the first time the roster is read.
-function isValidSlotData(value: unknown): value is SaveSlotData {
-  if (!isObject(value)) return false;
-  const data = value as Record<string, unknown>;
-  return (
-    isObject(data.currency) &&
-    isObject(data.roster) &&
-    isObject(data.hatchery) &&
-    isObject(data.inventory) &&
-    isObject(data.areaProgress) &&
-    isObject(data.automation)
-  );
-}
 
 export async function importSlotFromFile(file: File): Promise<SaveSlot | null> {
   try {
@@ -204,6 +247,7 @@ export function startAutosave(): void {
   autosaveIntervalId = setInterval(saveGame, AUTOSAVE_INTERVAL_MS);
   document.addEventListener('visibilitychange', onVisibilityChange);
   window.addEventListener('pagehide', onPageHide);
+  window.addEventListener('storage', onStorage);
 }
 
 export function stopAutosave(): void {
@@ -211,5 +255,6 @@ export function stopAutosave(): void {
   clearInterval(autosaveIntervalId);
   autosaveIntervalId = null;
   document.removeEventListener('visibilitychange', onVisibilityChange);
+  window.removeEventListener('storage', onStorage);
   window.removeEventListener('pagehide', onPageHide);
 }

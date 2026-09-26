@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { saveGame, exportSlotToFile, activeSlot, automation, setAutomationEnabled } from '../game/state/game.svelte';
+  import {
+    saveGame,
+    exportSlotToFile,
+    activeSlot,
+    automation,
+    setAutomationEnabled,
+    backupReminder,
+    setBackupReminderOff,
+  } from '../game/state/game.svelte';
+  import { EXPORT_REMINDER_HOURS } from '../game/constants';
 
   interface Props {
     onClose: () => void;
@@ -65,6 +74,15 @@
         onchange={(e) => setAutomationEnabled((e.target as HTMLInputElement).checked)}
       />
       Auto-Digivolve
+    </label>
+
+    <label class="toggle-row">
+      <input
+        type="checkbox"
+        checked={!backupReminder.off}
+        onchange={(e) => setBackupReminderOff(!(e.target as HTMLInputElement).checked)}
+      />
+      Remind me to export a backup (every {EXPORT_REMINDER_HOURS}h)
     </label>
 
     <button class="close-btn" onclick={onClose}>Close</button>

@@ -399,6 +399,28 @@ on total XP earned per kill.
   freely); `--no-partners` / `--hold-partners` compare strategies. At
   these values the effect is modest (+2-3 levels, some bosses faster).
 
+### Saves & safety (confirmed, built)
+- Autosave every `AUTOSAVE_INTERVAL_MS` (15s) and whenever the tab is
+  hidden or closed; saves live in this browser's localStorage.
+- **Nothing unreadable is ever deleted** (`state/saveData.ts`): a corrupted,
+  unknown or other-version save file is copied to
+  `digiclicker-saves-v2-unreadable-<time>` before anything is written, the
+  **rolling backup** (`...-backup`, the last good file, refreshed at most
+  every 10 min) is restored instead if it's readable, and the main menu
+  explains what happened with a download of the original. Bad slots are set
+  aside the same way while good ones still load. If the original can't even
+  be copied, saving pauses for the session.
+- Loading a slot is **all or nothing**: if its data can't be applied, the
+  game goes back to what it had and nothing is saved over the slot.
+- **One tab saves a game at a time:** if another tab saves the same slot,
+  this tab stops saving (banner: reload to play here) instead of
+  overwriting newer progress.
+- A failed save (storage full/blocked) shows one toast, not one per
+  autosave.
+- **Backup reminder:** every `EXPORT_REMINDER_HOURS` (6h) since the last
+  export, a small popup offers Export now / Later (1h) / Don't remind me
+  (Settings turns it back on). Exporting the game in play saves first.
+
 ### Offline progress (confirmed, built)
 - Time the game wasn't ticking is **fast-forwarded with the real combat
   rules**: `fastForwardWildCombat` in `state/combat.svelte.ts` jumps kill
