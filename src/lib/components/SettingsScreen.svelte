@@ -9,6 +9,10 @@
     setBackupReminderOff,
   } from '../game/state/game.svelte';
   import { EXPORT_REMINDER_HOURS } from '../game/constants';
+  import { openBugReport, BUILD_ID } from '../game/bugReport';
+  import { resetTips } from '../game/state/tips.svelte';
+
+  let tipsReset = $state(false);
 
   interface Props {
     onClose: () => void;
@@ -67,6 +71,13 @@
       <button class="panel-btn danger" onclick={onBackToMenu}>Load (Back to Menu)</button>
     </div>
 
+    <div class="panel-buttons">
+      <button class="panel-btn" onclick={openBugReport}>Report a bug</button>
+      <button class="panel-btn" onclick={() => ((tipsReset = true), resetTips())}>
+        {tipsReset ? 'Tips will show again' : 'Show tips again'}
+      </button>
+    </div>
+
     <label class="toggle-row">
       <input
         type="checkbox"
@@ -84,6 +95,8 @@
       />
       Remind me to export a backup (every {EXPORT_REMINDER_HOURS}h)
     </label>
+
+    <div class="build">Build {BUILD_ID}</div>
 
     <button class="close-btn" onclick={onClose}>Close</button>
   </div>
@@ -120,6 +133,10 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  .build {
+    font-size: 10px;
+    color: var(--text-dim);
   }
   .panel-btn {
     appearance: none;

@@ -32,6 +32,8 @@ jobs:
       - run: npx vite build
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
+          # Shown in bug reports (src/lib/game/bugReport.ts).
+          VITE_BUILD_ID: ${{ github.sha }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

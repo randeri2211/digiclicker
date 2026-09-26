@@ -29,7 +29,7 @@
     position: absolute;
     left: 24px;
     bottom: 24px;
-    z-index: 15;
+    z-index: 9; /* under the menu screens (10+) */
     width: 320px;
     display: flex;
     flex-direction: column;

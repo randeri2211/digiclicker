@@ -415,6 +415,18 @@ on total XP earned per kill.
 - Afterwards the game goes on; the quest log shows an **"Act N complete"
   badge** with Replay. Acts 2-4 only need an entry in acts.json.
 
+### Onboarding tips & bug reports (confirmed, built)
+- **Tips** (`state/tips.svelte.ts`): one small card at a time, each shown the
+  first time it applies - welcome, quests, a second path (map), a Digimon
+  ready to digivolve, the first egg, expeditions unlocked, 4+ Digimon
+  (partners), the first boss, and after 30 min of play a backup nudge.
+  Remembered per browser; "Skip all tips", and Settings -> "Show tips
+  again". Tips and the backup reminder never show at the same time.
+- **Report a bug** (top bar, Settings): a Google Form when configured
+  (`data/bugReport.json`, created by `tools/create-bug-report-form.gs`),
+  else a GitHub issue form - pre-filled with build (the Pages workflow's
+  commit), browser, location and progress.
+
 ### Saves & safety (confirmed, built)
 - Autosave every `AUTOSAVE_INTERVAL_MS` (15s) and whenever the tab is
   hidden or closed; saves live in this browser's localStorage.

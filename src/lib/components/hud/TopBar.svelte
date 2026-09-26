@@ -9,6 +9,7 @@
   import { currency, expeditions, QUESTS, questStatus, isSystemUnlocked, lockedHint } from '../../game/state/game.svelte';
   import { pushToast } from '../../game/state/notifications.svelte';
   import type { SystemId } from '../../game/types';
+  import { openBugReport } from '../../game/bugReport';
 
   interface Props {
     onOpenSettings: () => void;
@@ -98,6 +99,12 @@
     </svg>
   </HudButton>
   <CompendiumButton onClick={onOpenCompendium} />
+  <HudButton title="Report a bug" onClick={openBugReport}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <ellipse cx="12" cy="14" rx="5" ry="6" stroke="currentColor" stroke-width="1.6" />
+      <path d="M12 8v12M9 6l1.5 2M15 6l-1.5 2M7 12H4M20 12h-3M7 17l-2.5 1.5M17 17l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+  </HudButton>
   <SettingsButton onClick={onOpenSettings} />
 </div>
 
