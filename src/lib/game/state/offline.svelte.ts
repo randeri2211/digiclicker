@@ -1,3 +1,4 @@
+import { playStats } from './playStats.svelte';
 import { combat, fastForwardWildCombat } from './combat.svelte';
 import { currency } from './currency.svelte';
 import { roster } from './roster.svelte';
@@ -52,6 +53,7 @@ export function catchUp(awayMs: number, now: number = Date.now()): OfflineReport
   const pathsBefore = unlockedKeys();
 
   const kills = combat.boss ? 0 : fastForwardWildCombat(countedMs, now);
+  if (!combat.boss) playStats.offlineMs += countedMs;
 
   const levelUps: OfflineReport['levelUps'] = {};
   const newDigimon: string[] = [];

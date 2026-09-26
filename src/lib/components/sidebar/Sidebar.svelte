@@ -53,8 +53,10 @@
 {/if}
 
 <style>
+  /* Grows with the window so the roster panel's icons stay readable; the
+     combat column and map take what's left. */
   .sidebar {
-    width: 340px;
+    width: clamp(340px, 30vw, 520px);
     flex-shrink: 0;
     border-left: 1px solid var(--panel-border);
     background: rgba(13, 19, 25, 0.6);

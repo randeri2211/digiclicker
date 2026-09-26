@@ -1,3 +1,4 @@
+import { playStats } from './playStats.svelte';
 import type { CombatState, ItemId, Stage, SquadMember } from '../types';
 import { roster } from './roster.svelte';
 import { getFightingRoster, isAway } from './expeditions.svelte';
@@ -149,6 +150,7 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
     return;
   }
   combat.wild = null;
+  playStats.wildKills += 1;
 
   const xpValue = computeKillXp(wild.level);
   const bitsValue = computeKillBits(wild.level);

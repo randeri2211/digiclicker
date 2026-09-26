@@ -1,5 +1,16 @@
 <script lang="ts">
-  import { QUESTS, questStatus, requirementProgress, completeQuest, ITEM_CATALOG, getNpc, NPCS, residentFlag } from '../game/state/game.svelte';
+  import {
+    QUESTS,
+    questStatus,
+    requirementProgress,
+    completeQuest,
+    ITEM_CATALOG,
+    getNpc,
+    NPCS,
+    residentFlag,
+    completedActs,
+    openActScreen,
+  } from '../game/state/game.svelte';
   import type { QuestStatus } from '../game/state/game.svelte';
   import type { QuestDefinition } from '../game/types';
   import { getSpriteUrl } from '../game/images';
@@ -66,6 +77,13 @@
       <button class="close-btn" onclick={onClose}>Close</button>
     </div>
 
+    {#each completedActs() as act (act.id)}
+      <div class="act-badge">
+        <span>★ Act {act.number} complete · {act.title}</span>
+        <button class="replay" onclick={() => openActScreen(act.id)}>Replay</button>
+      </div>
+    {/each}
+
     <div class="list">
       {#each listed as { quest, status } (quest.id)}
         {@const giver = getNpc(quest.giver)}
@@ -108,6 +126,26 @@
 </div>
 
 <style>
+  .act-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--warn);
+    border: 1px solid var(--warn);
+    background: rgba(255, 176, 32, 0.06);
+  }
+  .replay {
+    appearance: none;
+    font: inherit;
+    font-size: 11px;
+    padding: 3px 10px;
+    background: var(--panel-2);
+    border: 1px solid var(--warn);
+    color: var(--text-h);
+    cursor: pointer;
+  }
   .backdrop {
     position: absolute;
     inset: 0;

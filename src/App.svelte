@@ -4,6 +4,7 @@
   import VillageScreen from './lib/components/VillageScreen.svelte';
   import OfflineReportScreen from './lib/components/OfflineReportScreen.svelte';
   import BackupReminder from './lib/components/BackupReminder.svelte';
+  import ActCompleteScreen from './lib/components/ActCompleteScreen.svelte';
   import { saveSession } from './lib/game/state/game.svelte';
   import Sidebar from './lib/components/sidebar/Sidebar.svelte';
   import LoadingScreen from './lib/components/LoadingScreen.svelte';
@@ -192,6 +193,7 @@
     <Toasts />
     <OfflineReportScreen />
     <BackupReminder />
+    <ActCompleteScreen />
     {#if saveSession.takenOver}
       <div class="taken-over" role="alert">
         This save was continued in another tab, so this tab has stopped saving (it would overwrite the newer progress).

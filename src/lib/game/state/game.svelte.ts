@@ -92,3 +92,6 @@ export { saveSession } from './persistence.svelte';
 export { getSaveFileProblem, dismissSaveFileProblem } from './saveData';
 export type { SaveFileProblem } from './saveData';
 export { backupReminder, snoozeBackupReminder, setBackupReminderOff } from './backupReminder.svelte';
+export { playStats } from './playStats.svelte';
+export { ACTS, actScreen, openActScreen, closeActScreen, completedActs } from './actScreen.svelte';
+export type { ActDefinition } from './actScreen.svelte';

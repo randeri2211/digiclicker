@@ -5,6 +5,8 @@ import { pushToast } from '../state/notifications.svelte';
 import { newlyJoinedResidents } from '../village/village';
 import { catchUpGap, flushPendingReport } from '../state/offline.svelte';
 import { checkBackupReminder } from '../state/backupReminder.svelte';
+import { playStats } from '../state/playStats.svelte';
+import { checkActCompletion } from '../state/actScreen.svelte';
 import { COMBAT_TICK_INTERVAL_MS } from '../constants';
 
 let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -21,10 +23,13 @@ export function startCombatTickLoop() {
   intervalId = setInterval(() => {
     const now = Date.now();
     if (lastLoopAt !== null && now - lastLoopAt > GAP_MS) catchUpGap(now - lastLoopAt - COMBAT_TICK_INTERVAL_MS, now);
+    // Time with the player here (gaps count as offline, in catchUp).
+    else if (lastLoopAt !== null) playStats.onlineMs += now - lastLoopAt;
     lastLoopAt = now;
     if (typeof document === 'undefined' || document.visibilityState !== 'hidden') flushPendingReport();
     updateExpeditions(now);
     checkBackupReminder(now);
+    checkActCompletion();
     tick(now);
     for (const quest of newlyReadyQuests()) pushToast('Quest ready', quest.title);
     for (const npc of newlyJoinedResidents()) pushToast(`${npc.name} joined the village`, npc.role);
