@@ -49,6 +49,9 @@ jobs:
       - name: Sprites
         if: always()
         run: python optimize_sprites.py --check
+      - name: Type icons
+        if: always()
+        run: python import_type_icons.py --check
 
   pacing:
     # Informational: how the current balance plays out (tools/simulate.mjs).

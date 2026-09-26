@@ -81,6 +81,13 @@ data or art from the wiki. Scraped **source art** lives in `art/`
    to date (`--force` rebuilds all). **Commit `public/sprites/`** - CI
    checks every in-game species has one (`--check`).
 
+6. **`import_type_icons.py`** - the element and attribute icons: downloads
+   them into `art/icons/` (Fandom's element icons with their dark tile
+   removed, the Frontier Spirit Marks for Light / Dark, Digimon Story:
+   Time Stranger's attribute icons from Wikimon) and ships 64px WebPs in
+   `public/sprites/icons/` (commit those; CI checks with `--check`).
+   Only needed if the icon set changes.
+
 Run steps 1-3 in order after wiki content changes or to pick up new
 species; run 4 + a second pass of 3 whenever sprite coverage needs
 topping up; always finish with step 5. Optional art clean-up before
