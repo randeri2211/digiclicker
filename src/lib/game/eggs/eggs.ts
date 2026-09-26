@@ -1,3 +1,4 @@
+import { playSound } from '../audio/sfx.svelte';
 import { playStats } from '../state/playStats.svelte';
 import type { DigimonSpecies, Egg, EggType } from '../types';
 import { getSpecies } from '../images';
@@ -93,6 +94,7 @@ export function hatchEgg(eggId: string): boolean {
   removeIncubatingEgg(egg.eggId);
   fillIncubatingSlots();
   playStats.eggsHatched += 1;
+  playSound('hatch');
   if (addToRoster(createRosterEntry(egg.speciesId))) return true;
 
   // Already owned - the roster holds one entry per species, so the egg

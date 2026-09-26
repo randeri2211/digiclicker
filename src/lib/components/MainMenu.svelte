@@ -57,8 +57,15 @@
     onEnterGame();
   }
 
+  // Deleting can't be undone: the first click arms it, the second deletes.
+  let confirmDeleteId: string | null = $state(null);
   function handleDelete(id: string, event: MouseEvent) {
     event.stopPropagation();
+    if (confirmDeleteId !== id) {
+      confirmDeleteId = id;
+      return;
+    }
+    confirmDeleteId = null;
     deleteSlot(id);
     refresh();
   }
@@ -123,7 +130,15 @@
         </div>
         <div class="slot-actions">
           <button class="slot-btn" onclick={(e) => handleExport(slot.id, e)}>Export</button>
-          <button class="slot-btn danger" onclick={(e) => handleDelete(slot.id, e)}>Delete</button>
+          <button
+            class="slot-btn danger"
+            class:armed={confirmDeleteId === slot.id}
+            title={confirmDeleteId === slot.id ? 'Click again to delete this save for good' : 'Delete this save'}
+            onclick={(e) => handleDelete(slot.id, e)}
+            onblur={() => confirmDeleteId === slot.id && (confirmDeleteId = null)}
+          >
+            {confirmDeleteId === slot.id ? 'Delete for good?' : 'Delete'}
+          </button>
         </div>
       </div>
     {/each}
@@ -267,6 +282,7 @@
     border-color: var(--accent);
     color: var(--accent);
   }
+  .slot-btn.danger.armed,
   .slot-btn.danger:hover {
     border-color: var(--danger);
     color: var(--danger);

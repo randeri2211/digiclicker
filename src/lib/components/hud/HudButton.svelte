@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { playSound } from '../../game/audio/sfx.svelte';
 
   // A top-bar icon button with an optional count badge - the shared shape
   // behind the newer HUD buttons (Expeditions, Quests).
@@ -18,7 +19,7 @@
   const { title, onClick, badge = 0, locked = false, tip, children }: Props = $props();
 </script>
 
-<button class="icon-btn" class:locked data-tip={tip} {title} aria-label={badge > 0 ? `${title} (${badge})` : title} onclick={onClick}>
+<button class="icon-btn" class:locked data-tip={tip} {title} aria-label={badge > 0 ? `${title} (${badge})` : title} onclick={() => (playSound('uiOpen'), onClick())}>
   {@render children()}
   {#if locked}
     <svg class="lock" width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">

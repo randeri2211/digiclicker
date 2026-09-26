@@ -1,3 +1,4 @@
+import { playSound } from '../audio/sfx.svelte';
 import { tick } from '../state/combat.svelte';
 import { updateExpeditions } from '../state/expeditions.svelte';
 import { newlyReadyQuests } from '../quests/quests';
@@ -34,8 +35,14 @@ export function startCombatTickLoop() {
     if (!tips.current) checkBackupReminder(now);
     checkActCompletion();
     tick(now);
-    for (const quest of newlyReadyQuests()) pushToast('Quest ready', quest.title);
-    for (const npc of newlyJoinedResidents()) pushToast(`${npc.name} joined the village`, npc.role);
+    for (const quest of newlyReadyQuests()) {
+      pushToast('Quest ready', quest.title);
+      playSound('questReady');
+    }
+    for (const npc of newlyJoinedResidents()) {
+      pushToast(`${npc.name} joined the village`, npc.role);
+      playSound('residentJoined');
+    }
   }, COMBAT_TICK_INTERVAL_MS);
 }
 

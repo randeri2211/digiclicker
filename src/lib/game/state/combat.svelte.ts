@@ -1,3 +1,4 @@
+import { playSound } from '../audio/sfx.svelte';
 import { playStats } from './playStats.svelte';
 import type { CombatState, ItemId, Stage, SquadMember } from '../types';
 import { roster } from './roster.svelte';
@@ -99,6 +100,7 @@ export function startBossFight(
 
   const squad = unique.map((speciesId) => ({ speciesId, multiplier: squadMultiplier(speciesId, boss.speciesId) }));
   combat.boss = { areaId, pathId, squad, statBonus };
+  playSound('bossStart');
   combat.wild = makeBossSpawn(now, boss, computeSquadStat(squadEntries(squad), 'hp', statBonus));
   combat.damagePopup = null;
   return true;
@@ -108,6 +110,7 @@ export function startBossFight(
 // the first. Loss/retreat: nothing. Either way normal spawns resume on the
 // next tick.
 function endBossFight(won: boolean): void {
+  if (combat.boss) playSound(won ? 'bossWin' : 'bossLose');
   const fight = combat.boss;
   const boss = fight ? getPath(fight.areaId, fight.pathId)?.boss : undefined;
   combat.boss = null;
@@ -151,6 +154,9 @@ function resolveKill(wild: NonNullable<CombatState['wild']>) {
   }
   combat.wild = null;
   playStats.wildKills += 1;
+  // Only while the player is clicking - idle kills (every fraction of a
+  // second later on) stay silent.
+  if (performance.now() - lastClickAt < ACTIVE_CLICK_MS) playSound('kill');
 
   const xpValue = computeKillXp(wild.level);
   const bitsValue = computeKillBits(wild.level);
@@ -213,7 +219,12 @@ export function fastForwardWildCombat(durationMs: number, now: number): number {
   return kills;
 }
 
+// When the player last clicked a wild - kill sounds only play while active.
+let lastClickAt = -Infinity;
+const ACTIVE_CLICK_MS = 1500;
+
 export function handleClick() {
+  lastClickAt = performance.now();
   const wild = combat.wild;
   if (!wild) return;
 
@@ -221,6 +232,7 @@ export function handleClick() {
     ? computeSquadClickDamage(squadEntries(combat.boss.squad), combat.boss.statBonus)
     : computeClickDamage(getFightingRoster());
   wild.currentHp = Math.max(0, wild.currentHp - damage);
+  playSound('hit');
   showDamagePopup(damage);
 
   if (wild.currentHp <= 0) {

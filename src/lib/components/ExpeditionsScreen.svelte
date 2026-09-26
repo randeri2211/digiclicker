@@ -9,6 +9,7 @@
     combat,
     startExpedition,
     claimExpedition,
+    recallExpedition,
     hasReturned,
     dismissHaul,
     ITEM_CATALOG,
@@ -85,6 +86,23 @@
       : null
   );
 
+  // Sending everyone still fighting leaves combat idle - easy to do with a
+  // two-Digimon roster, so say so (it's allowed: Recall brings them back).
+  const leavesNoFighters = $derived(
+    party.length > 0 && getRosterList().every((e) => party.includes(e.speciesId) || isAway(e.speciesId))
+  );
+
+  // Recall asks once: the first click arms it, the second recalls.
+  let confirmRecallId: string | null = $state(null);
+  function recall(id: string) {
+    if (confirmRecallId !== id) {
+      confirmRecallId = id;
+      return;
+    }
+    confirmRecallId = null;
+    recallExpedition(id);
+  }
+
   function start() {
     if (selected && startExpedition(selected.id, party)) party = [];
   }
@@ -156,9 +174,19 @@
               <div class="track"><div class="fill" style="width: {Math.round((1 - Math.max(0, left) / total) * 100)}%"></div></div>
               <span class="active-time">{back ? 'Back - the party is fighting again' : `${formatDuration(left)} left`}</span>
             </div>
-            <button class="claim" disabled={!back} onclick={() => claimExpedition(expedition.id)}>
-              {back ? 'Claim haul' : 'Exploring…'}
-            </button>
+            {#if back}
+              <button class="claim" onclick={() => claimExpedition(expedition.id)}>Claim haul</button>
+            {:else}
+              <button
+                class="recall"
+                class:armed={confirmRecallId === expedition.id}
+                title="Bring the party home now - they fight again right away, but the haul is lost"
+                onclick={() => recall(expedition.id)}
+                onblur={() => confirmRecallId === expedition.id && (confirmRecallId = null)}
+              >
+                {confirmRecallId === expedition.id ? 'Lose the haul?' : 'Recall'}
+              </button>
+            {/if}
           </div>
         {/each}
       </section>
@@ -217,6 +245,7 @@
           {:else}
             Pick at least one Digimon.
           {/if}
+          {#if leavesNoFighters}<span class="warn"> · nobody would be left to fight</span>{/if}
           {#if !slotFree}<span class="warn"> · an expedition is already out ({EXPEDITION_MAX_CONCURRENT} at a time)</span>{/if}
         </span>
         <button class="start" disabled={!preview || !slotFree} onclick={start}>Send party</button>
@@ -493,6 +522,26 @@
     color: var(--accent);
     cursor: pointer;
   }
+  .recall {
+    appearance: none;
+    font: inherit;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 9px 18px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .recall:hover {
+    border-color: var(--panel-border-strong);
+    color: var(--text-h);
+  }
+  .recall.armed {
+    border-color: var(--warn);
+    color: var(--warn);
+  }
   .start:disabled,
   .claim:disabled {
     opacity: 0.4;
@@ -501,7 +550,8 @@
   .dest:focus-visible,
   .candidate:focus-visible,
   .start:focus-visible,
-  .claim:focus-visible {
+  .claim:focus-visible,
+  .recall:focus-visible {
     outline: 1px solid var(--accent);
     outline-offset: 2px;
   }

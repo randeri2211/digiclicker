@@ -1,4 +1,4 @@
-import type { ActiveExpedition, ExpeditionHaul, ExpeditionState, RosterEntry } from '../types';
+import type { ActiveExpedition, Egg, ExpeditionHaul, ExpeditionState, RosterEntry } from '../types';
 import { roster, getRosterList } from './roster.svelte';
 import { currency } from './currency.svelte';
 import { addEgg } from './hatchery.svelte';
@@ -79,15 +79,34 @@ export function claimExpedition(id: string, now: number = Date.now()): Expeditio
   const destination = expedition ? getDestination(expedition.destinationId) : undefined;
   if (!expedition || !hasReturned(expedition, now) || !destination) return null;
 
-  const party = expedition.memberSpeciesIds.filter((sid) => roster[sid]).map((sid) => roster[sid]);
-  const { haul, eggs } = rollHaul(destination, expeditionHaulMultiplier(destination, party));
-  currency.data += haul.data;
-  for (const egg of eggs) addEgg(egg);
-  for (const item of haul.items) addItem(item.id, item.count);
-
+  const { haul, eggs } = rollHaul(destination, expeditionHaulMultiplier(destination, partyOf(expedition)));
+  payHaul(haul, eggs);
   expeditions.active.splice(index, 1);
   expeditions.lastHaul = haul;
   return haul;
+}
+
+/** Calls a party home before its time is up: the members fight again right
+ * away and the slot frees, but the trip is forfeit - no haul (so short
+ * recalled trips can't be farmed). A party that's already back is simply
+ * claimed. False if the expedition doesn't exist. */
+export function recallExpedition(id: string, now: number = Date.now()): boolean {
+  const index = expeditions.active.findIndex((e) => e.id === id);
+  const expedition = expeditions.active[index];
+  if (!expedition) return false;
+  if (hasReturned(expedition, now)) return claimExpedition(id, now) !== null;
+  expeditions.active.splice(index, 1);
+  return true;
+}
+
+function partyOf(expedition: ActiveExpedition): RosterEntry[] {
+  return expedition.memberSpeciesIds.filter((sid) => roster[sid]).map((sid) => roster[sid]);
+}
+
+function payHaul(haul: ExpeditionHaul, eggs: Egg[]): void {
+  currency.data += haul.data;
+  for (const egg of eggs) addEgg(egg);
+  for (const item of haul.items) addItem(item.id, item.count);
 }
 
 export function dismissHaul(): void {

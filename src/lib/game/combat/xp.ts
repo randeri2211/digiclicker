@@ -1,3 +1,4 @@
+import { playSound } from '../audio/sfx.svelte';
 import { isEggReady } from '../eggs/eggs';
 import { tryAutoDigivolve } from '../evolution/digivolve';
 import { levelForXp } from './levelCurve';
@@ -39,6 +40,7 @@ export function awardKillXp(xpValue: number, wildLevel?: number): void {
   // shouldn't also receive this same kill's XP.
   const fighters = getFightingRoster();
   const share = xpValue / Math.max(1, fighters.length) ** KILL_XP_SPLIT_EXPONENT;
+  let levelledUp = false;
   for (const entry of fighters) {
     // Already capped - skip rather than accumulate xp levelForXp would
     // just clamp away anyway.
@@ -47,9 +49,12 @@ export function awardKillXp(xpValue: number, wildLevel?: number): void {
     const partner = isPartner(entry.speciesId);
     const base = partner ? share * (1 + PARTNER_XP_BONUS) : share;
     const grace = partner ? PARTNER_EXTRA_GRACE : 0;
-    entry.xp += wildLevel === undefined ? base : base * overlevelXpFactor(levelForXp(entry.xp), wildLevel, grace);
+    const levelBefore = levelForXp(entry.xp);
+    entry.xp += wildLevel === undefined ? base : base * overlevelXpFactor(levelBefore, wildLevel, grace);
+    if (levelForXp(entry.xp) > levelBefore) levelledUp = true;
     tryAutoDigivolve(entry);
   }
+  if (levelledUp) playSound('levelUp');
 
   // Only incubating eggs progress - stored ones wait for a free slot, and
   // a ready egg stops at the hatch level until it's paid for (hatchEgg in

@@ -9,6 +9,7 @@ export {
   getFightingRoster,
   startExpedition,
   claimExpedition,
+  recallExpedition,
   hasReturned,
   dismissHaul,
 } from './expeditions.svelte';
