@@ -1,15 +1,14 @@
 <script lang="ts">
-  import type { RosterEntry, Stage } from '../game/types';
+  import type { RosterEntry } from '../game/types';
   import { getSpecies, getSpriteUrl, getSpeciesName } from '../game/images';
   import { levelForXp } from '../game/combat/levelCurve';
-  import { IN_GAME_STAGES } from '../game/constants';
   import {
     getRosterList,
     isAway,
     getRosterEntryMenuItems,
     useAbilityReroll,
     computeAttacksPerSecond,
-    computeEntryDps,
+    computeRosterDamageShares,
     partners,
     partnerSlots,
     isPartner,
@@ -19,6 +18,8 @@
   import StatWindow from './shared/StatWindow.svelte';
   import XpBar from './shared/XpBar.svelte';
   import SpeciesTags from './shared/SpeciesTags.svelte';
+  import RosterFilterControls from './shared/RosterFilterControls.svelte';
+  import { loadRosterFilter, saveRosterFilter, applyRosterFilter } from '../game/roster/rosterFilter';
 
   interface Props {
     /** speciesId preselects that entry on the Evolution screen. */
@@ -28,29 +29,21 @@
 
   const { onOpenEvolution, onClose }: Props = $props();
 
-  type SortKey = 'dps' | 'level' | 'stage';
-  const STAGES = [...IN_GAME_STAGES] as Stage[];
+  // Shared filter/sort model (roster/rosterFilter.ts), remembered per browser.
+  const FILTER_KEY = 'digiclicker-roster-filter';
+  let filter = $state(loadRosterFilter(FILTER_KEY));
+  $effect(() => saveRosterFilter(FILTER_KEY, $state.snapshot(filter)));
 
-  let stageFilter: Stage | 'all' = $state('all');
-  let sortKey: SortKey = $state('dps');
-
-  function stageOrderOf(entry: RosterEntry): number {
-    return getSpecies(entry.speciesId)?.stageOrder ?? 0;
-  }
-
+  // DPS = each one's share after the roster falloff - the same numbers as
+  // the sidebar's top contributors.
   const entries = $derived.by(() => {
     const all = getRosterList();
     const attacksPerSecond = computeAttacksPerSecond(all);
-    const filtered = stageFilter === 'all' ? all : all.filter((e) => getSpecies(e.speciesId)?.stage === stageFilter);
-    const rows = filtered.map((entry) => ({ entry, dps: computeEntryDps(entry, attacksPerSecond) }));
-    switch (sortKey) {
-      case 'dps':
-        return rows.sort((a, b) => b.dps - a.dps);
-      case 'level':
-        return rows.sort((a, b) => b.entry.xp - a.entry.xp);
-      case 'stage':
-        return rows.sort((a, b) => stageOrderOf(b.entry) - stageOrderOf(a.entry));
-    }
+    const shares = computeRosterDamageShares(all);
+    return applyRosterFilter(
+      all.map((entry, i) => ({ entry, dps: attacksPerSecond * shares[i] })),
+      filter,
+    );
   });
 
   let menuState: { entry: RosterEntry; x: number; y: number } | null = $state(null);
@@ -90,25 +83,7 @@
       <button class="close-btn" onclick={onClose}>Close</button>
     </div>
 
-    <div class="controls">
-      <label class="filter-toggle">
-        Stage
-        <select bind:value={stageFilter}>
-          <option value="all">All</option>
-          {#each STAGES as stage (stage)}
-            <option value={stage}>{stage}</option>
-          {/each}
-        </select>
-      </label>
-      <label class="filter-toggle">
-        Sort by
-        <select bind:value={sortKey}>
-          <option value="dps">DPS</option>
-          <option value="level">Level</option>
-          <option value="stage">Stage</option>
-        </select>
-      </label>
-    </div>
+    <RosterFilterControls bind:filter />
 
     <div class="grid">
       {#if entries.length === 0}
@@ -225,27 +200,6 @@
     border-color: var(--panel-border-strong);
     color: var(--text-h);
   }
-  .controls {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .filter-toggle select {
-    font: inherit;
-    font-family: var(--mono);
-    background: var(--panel-2);
-    border: 1px solid var(--panel-border);
-    color: var(--text-h);
-    padding: 2px 4px;
-  }
-  .filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-dim);
-    cursor: pointer;
-  }
   .grid {
     flex: 1;
     display: grid;
@@ -263,6 +217,8 @@
     appearance: none;
     font: inherit;
     font-family: var(--mono);
+    /* anchors the partner star */
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -1,3 +1,4 @@
+import type { PlayStats } from './playStats.svelte';
 import type {
   AreaProgressState,
   CurrencyState,
@@ -39,6 +40,8 @@ export interface SaveSlotData {
   partners?: string[];
   /** Optional: when this save was last exported (backup reminder). */
   backupReminder?: { lastExportAt: number; snoozedUntil: number; off: boolean };
+  /** Optional for saves made before play stats existed - counted from load. */
+  playStats?: PlayStats;
 }
 
 export interface SaveSlot {

@@ -399,6 +399,22 @@ on total XP earned per kill.
   freely); `--no-partners` / `--hold-partners` compare strategies. At
   these values the effect is modest (+2-3 levels, some bosses faster).
 
+### End of an act (confirmed, built)
+- When an act's finale flag is set (`data/acts.json`; Act 1:
+  `story:act-1-complete` from Devimon's quest), a four-panel screen plays
+  once (`ActCompleteScreen.svelte`, Back / Next / Skip, arrow keys):
+  1. the victory beat - a Black Gear shatters, the villain's last words;
+  2. **your journey** - time **played** vs. **fought while away**, wild
+     Digimon defeated, eggs hatched (`state/playStats.svelte.ts`, saved;
+     older saves count from their first load and say so), the act's
+     bosses, the collection by stage, partners, the village;
+  3. every area cleared, and the next act "coming soon" (Whamon, the next
+     region's areas as ???);
+  4. the act's reward (the Tags), the Crests still to find, Keep exploring
+     / Export your save.
+- Afterwards the game goes on; the quest log shows an **"Act N complete"
+  badge** with Replay. Acts 2-4 only need an entry in acts.json.
+
 ### Saves & safety (confirmed, built)
 - Autosave every `AUTOSAVE_INTERVAL_MS` (15s) and whenever the tab is
   hidden or closed; saves live in this browser's localStorage.

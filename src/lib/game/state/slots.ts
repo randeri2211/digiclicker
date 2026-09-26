@@ -16,6 +16,7 @@ function freshSlotData(): SaveSlotData {
     expeditions: { active: [], lastHaul: null },
     progress: { flags: {}, completedQuests: [] },
     partners: [],
+    playStats: { onlineMs: 0, offlineMs: 0, wildKills: 0, eggsHatched: 0, trackedSince: Date.now(), partial: false },
   };
 }
 

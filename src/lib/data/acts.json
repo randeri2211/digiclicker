@@ -1,0 +1,18 @@
+[
+  {
+    "id": "act-1",
+    "number": 1,
+    "title": "File Island",
+    "regionId": "file-island",
+    "finaleFlag": "story:act-1-complete",
+    "villain": "devimon",
+    "closingQuote": "\"You think... this is the end? My master waits across the sea... the network...\"",
+    "closingLine": "The last Black Gear cracks apart. For the first time since you arrived, nothing falls from the sky.",
+    "reward": { "name": "The Tags", "text": "Empty Crest holders from Jijimon - somewhere across the sea, the Crests are waiting to fill them." },
+    "next": {
+      "regionId": "server-continent",
+      "title": "The Server Continent",
+      "teaser": "Whamon waits at the shore. Across the sea, Etemon's network hums - and the Crests are hidden somewhere in it."
+    }
+  }
+]
