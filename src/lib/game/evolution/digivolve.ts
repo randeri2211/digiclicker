@@ -1,3 +1,4 @@
+import { playSound } from '../audio/sfx.svelte';
 import { transferPartner } from '../state/partners.svelte';
 import type { DigimonSpecies, RosterEntry, StatRangeBlock } from '../types';
 import { getSpecies } from '../images';
@@ -141,6 +142,7 @@ export function digivolve(entry: RosterEntry, targetSpeciesId: string): boolean 
   }
   entry.xp = 0;
   transferPartner(entry.speciesId, target.id);
+  playSound('digivolve');
 
   if (automation.preferences[entry.speciesId]?.targetSpeciesId !== target.id) {
     setPreference(entry.speciesId, target.id, option.requirement?.minLevel ?? 0);

@@ -11,6 +11,9 @@
   import { EXPORT_REMINDER_HOURS } from '../game/constants';
   import { openBugReport, BUILD_ID } from '../game/bugReport';
   import { resetTips } from '../game/state/tips.svelte';
+  import { soundSettings, setVolume, setMuted, playSound, SOUNDS } from '../game/audio/sfx.svelte';
+  import type { SoundName } from '../game/audio/sfx.svelte';
+  const soundNames = Object.keys(SOUNDS) as SoundName[];
 
   let tipsReset = $state(false);
 
@@ -96,6 +99,33 @@
       Remind me to export a backup (every {EXPORT_REMINDER_HOURS}h)
     </label>
 
+    <div class="sound">
+      <div class="sound-title">Sound</div>
+      <label class="toggle-row">
+        <input type="checkbox" checked={!soundSettings.muted} onchange={(e) => setMuted(!(e.target as HTMLInputElement).checked)} />
+        Sound effects
+      </label>
+      <label class="volume" class:dim={soundSettings.muted}>
+        Volume
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          value={soundSettings.volume}
+          disabled={soundSettings.muted}
+          oninput={(e) => setVolume(Number((e.target as HTMLInputElement).value))}
+          onchange={() => playSound('levelUp')}
+        />
+        <span>{Math.round(soundSettings.volume * 100)}%</span>
+      </label>
+      {#if import.meta.env.DEV}
+        <div class="sound-test">
+          {#each soundNames as name (name)}<button onclick={() => playSound(name)}>{name}</button>{/each}
+        </div>
+      {/if}
+    </div>
+
     <div class="build">Build {BUILD_ID}</div>
 
     <button class="close-btn" onclick={onClose}>Close</button>
@@ -133,6 +163,46 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  .sound {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sound-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .volume {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .volume input {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+  .volume.dim {
+    opacity: 0.5;
+  }
+  .sound-test {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .sound-test button {
+    appearance: none;
+    font: inherit;
+    font-size: 10px;
+    padding: 2px 6px;
+    background: var(--panel-2);
+    border: 1px dashed var(--danger);
+    color: var(--text);
+    cursor: pointer;
   }
   .build {
     font-size: 10px;

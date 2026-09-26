@@ -6,7 +6,17 @@
   import HudButton from './HudButton.svelte';
   import CompendiumButton from './CompendiumButton.svelte';
   import SettingsButton from './SettingsButton.svelte';
-  import { currency, expeditions, QUESTS, questStatus, isSystemUnlocked, lockedHint } from '../../game/state/game.svelte';
+  import {
+    currency,
+    expeditions,
+    QUESTS,
+    questStatus,
+    isSystemUnlocked,
+    lockedHint,
+    combat,
+    areaProgress,
+    getPath,
+  } from '../../game/state/game.svelte';
   import { pushToast } from '../../game/state/notifications.svelte';
   import type { SystemId } from '../../game/types';
   import { openBugReport } from '../../game/bugReport';
@@ -51,6 +61,23 @@
   const expeditionsReady = $derived(expeditions.active.filter((e) => e.returned).length);
   // Quests ready to turn in.
   const questsReady = $derived(QUESTS.filter((q) => questStatus(q) === 'ready').length);
+
+  // The tab title, for players idling in another tab: what's waiting for
+  // them first, else where they're fighting. Restored when leaving the game.
+  const tabTitle = $derived.by(() => {
+    const waiting = [
+      combat.boss && 'Boss fight!',
+      expeditionsReady && 'Expedition back',
+      questsReady && (questsReady > 1 ? `${questsReady} quests ready` : 'Quest ready'),
+    ].filter(Boolean);
+    if (waiting.length) return `(!) ${waiting.join(' · ')} | DigiClicker`;
+    const path = getPath(areaProgress.activeAreaId, areaProgress.activePathId);
+    return path ? `${path.name} | DigiClicker` : 'DigiClicker';
+  });
+  $effect(() => {
+    document.title = tabTitle;
+  });
+  $effect(() => () => (document.title = 'DigiClicker'));
 </script>
 
 <div class="topbar">

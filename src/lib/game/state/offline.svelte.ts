@@ -1,3 +1,4 @@
+import { withSoundSuppressed } from '../audio/sfx.svelte';
 import { playStats } from './playStats.svelte';
 import { combat, fastForwardWildCombat } from './combat.svelte';
 import { currency } from './currency.svelte';
@@ -52,7 +53,8 @@ export function catchUp(awayMs: number, now: number = Date.now()): OfflineReport
   const levelsBefore = Object.fromEntries(Object.values(roster).map((e) => [e.speciesId, levelForXp(e.xp)]));
   const pathsBefore = unlockedKeys();
 
-  const kills = combat.boss ? 0 : fastForwardWildCombat(countedMs, now);
+  // Silently - it replays hundreds of kills, level-ups, hatches at once.
+  const kills = combat.boss ? 0 : withSoundSuppressed(() => fastForwardWildCombat(countedMs, now));
   if (!combat.boss) playStats.offlineMs += countedMs;
 
   const levelUps: OfflineReport['levelUps'] = {};
