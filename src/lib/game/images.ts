@@ -1,3 +1,4 @@
+import typeIcons from '../data/typeIcons.json';
 import rawData from '../data/digimon-evolution.json';
 import type { DigimonSpecies, Egg, EggType, Stage } from './types';
 
@@ -34,29 +35,29 @@ export function getEggSpriteUrl(eggType: EggType): string {
   return `${import.meta.env.BASE_URL}sprites/eggs/${eggType}.webp`;
 }
 
-// Element / attribute icons (import_type_icons.py builds public/sprites/icons/).
-// Neutral has no icon - callers fall back to its coloured dot.
-const ELEMENTS_WITH_ICONS = new Set(['Fire', 'Water', 'Plant', 'Electric', 'Earth', 'Wind', 'Metal', 'Light', 'Dark']);
+// Element / attribute icons (import_type_icons.py builds public/sprites/icons/;
+// data/typeIcons.json says which data value uses which icon - the Python
+// check reads the same file). Neutral has no icon - callers fall back to
+// its coloured dot.
+const ELEMENTS_WITH_ICONS = new Set<string>(typeIcons.elements);
+const ATTRIBUTE_ICON: Record<string, string> = typeIcons.attributes;
 
 export function getElementIconUrl(element: string): string | null {
   return ELEMENTS_WITH_ICONS.has(element) ? `${import.meta.env.BASE_URL}sprites/icons/elements/${element}.webp` : null;
 }
 
-// The data's attribute values -> the icon set's (Time Stranger) names.
-const ATTRIBUTE_ICON: Record<string, string> = {
-  Vaccine: 'Vaccine',
-  Data: 'Data',
-  Virus: 'Virus',
-  Free: 'Free',
-  Variable: 'Variable',
-  Unknown: 'Unknown',
-  Unidentified: 'Unknown',
-  None: 'NoData',
-  'NO DATA': 'NoData',
-};
+const ATTRIBUTE_ICON_NAMES = new Set(Object.values(ATTRIBUTE_ICON));
 
-export function getAttributeIconUrl(attribute: string): string {
-  return `${import.meta.env.BASE_URL}sprites/icons/attributes/${ATTRIBUTE_ICON[attribute] ?? 'Unknown'}.webp`;
+/** The icon an attribute value shows (Unidentified -> Unknown, None ->
+ * NoData...), or null if it has none. An icon name itself (e.g. a filter
+ * option's "NoData") resolves to itself. */
+export function getAttributeIconName(attribute: string): string | null {
+  return ATTRIBUTE_ICON[attribute] ?? (ATTRIBUTE_ICON_NAMES.has(attribute) ? attribute : null);
+}
+
+export function getAttributeIconUrl(attribute: string): string | null {
+  const icon = getAttributeIconName(attribute);
+  return icon ? `${import.meta.env.BASE_URL}sprites/icons/attributes/${icon}.webp` : null;
 }
 
 /** Kill-drop and Mystery eggs share the same per-type sprite - callers
