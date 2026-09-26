@@ -416,7 +416,11 @@ on total XP earned per kill.
   badge** with Replay. Acts 2-4 only need an entry in acts.json.
 
 ### Onboarding tips & bug reports (confirmed, built)
-- **Tips** (`state/tips.svelte.ts`): one small card at a time, each shown the
+- **Tips** (`state/tips.svelte.ts`, `TipCard.svelte`) are coach marks: the
+  screen dims and blocks clicks, the element the tip is about (marked
+  `data-tip="..."`) stays lit, and the bubble sits beside it (below, above,
+  right or left - whichever fits; centred if the target isn't on screen).
+  They wait while any dialog or menu is open. One at a time, each shown the
   first time it applies - welcome, quests, a second path (map), a Digimon
   ready to digivolve, the first egg, expeditions unlocked, 4+ Digimon
   (partners), the first boss, and after 30 min of play a backup nudge.

@@ -65,6 +65,7 @@
     title={expeditionsLocked ? `Expeditions - ${lockedHint('expeditions')}` : 'Expeditions'}
     locked={expeditionsLocked}
     onClick={gated(['expeditions'], onOpenExpeditions)}
+    tip="expeditions"
     badge={expeditionsReady}
   >
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">

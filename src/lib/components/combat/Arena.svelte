@@ -23,7 +23,7 @@
   });
 </script>
 
-<div class="arena" class:boss={combat.boss}>
+<div class="arena" class:boss={combat.boss} data-tip="arena">
   {#if result}
     <div class="result" class:won={result.won} role="status">
       <span class="result-title">{result.won ? `${getSpeciesName(result.speciesId)} defeated!` : "Time's up"}</span>

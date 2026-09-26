@@ -7,6 +7,7 @@
 </script>
 
 <div
+  data-tip="settings"
   class="icon-btn"
   title="Settings"
   onclick={onClick}
