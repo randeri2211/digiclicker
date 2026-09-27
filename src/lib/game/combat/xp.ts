@@ -36,12 +36,13 @@ export function overlevelXpFactor(level: number, wildLevel: number, extraGrace =
  * nothing. With the wild's level, a Digimon well above it gets less
  * (overlevelXpFactor), so levels settle near the area being played.
  */
-export function awardKillXp(xpValue: number, wildLevel?: number): void {
+/** `eggMultiplier`: extra factor on the eggs' share (the Shop's egg boost). */
+export function awardKillXp(xpValue: number, wildLevel?: number, eggMultiplier = 1): void {
   // Snapshot first - an auto-digivolve adds a new entry mid-loop, which
   // shouldn't also receive this same kill's XP.
   const fighters = getFightingRoster();
   // Mentor auras boost the Digimon's XP, Warm Heart auras the eggs'.
-  const eggXp = xpValue * (1 + auraBonus(fighters, 'egg-xp'));
+  const eggXp = xpValue * (1 + auraBonus(fighters, 'egg-xp')) * eggMultiplier;
   xpValue *= 1 + auraBonus(fighters, 'kill-xp');
   const share = xpValue / Math.max(1, fighters.length) ** KILL_XP_SPLIT_EXPONENT;
   const partnerShare = xpValue / Math.max(1, fighters.length) ** PARTNER_KILL_XP_SPLIT_EXPONENT;

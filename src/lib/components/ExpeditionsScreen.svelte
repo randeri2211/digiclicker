@@ -23,7 +23,8 @@
   } from '../game/expeditions/expeditions';
   import { getSpecies, getSpriteUrl, getSpeciesName } from '../game/images';
   import { levelForXp } from '../game/combat/levelCurve';
-  import { EXPEDITION_MAX_CONCURRENT, EXPEDITION_MAX_PARTY } from '../game/constants';
+  import { EXPEDITION_MAX_PARTY } from '../game/constants';
+  import { expeditionSlots } from '../game/state/shop.svelte';
   import ElementIcon from './shared/ElementIcon.svelte';
   import SpeciesTags from './shared/SpeciesTags.svelte';
   import AbilityChip from './shared/AbilityChip.svelte';
@@ -47,7 +48,7 @@
     destinations.find((d) => isDestinationUnlocked(areaProgress, d))?.id ?? null
   );
   const selected = $derived(selectedId ? getDestination(selectedId) : undefined);
-  const slotFree = $derived(expeditions.active.length < EXPEDITION_MAX_CONCURRENT);
+  const slotFree = $derived(expeditions.active.length < expeditionSlots());
 
   let party: string[] = $state([]);
 
@@ -248,7 +249,7 @@
             Pick at least one Digimon.
           {/if}
           {#if leavesNoFighters}<span class="warn"> · nobody would be left to fight</span>{/if}
-          {#if !slotFree}<span class="warn"> · an expedition is already out ({EXPEDITION_MAX_CONCURRENT} at a time)</span>{/if}
+          {#if !slotFree}<span class="warn"> · an expedition is already out ({expeditionSlots()} at a time)</span>{/if}
         </span>
         <button class="start" disabled={!preview || !slotFree} onclick={start}>Send party</button>
       </div>

@@ -16,6 +16,8 @@
     combat,
     areaProgress,
     getPath,
+    BOOSTS,
+    boostRemainingMs,
   } from '../../game/state/game.svelte';
   import { pushToast } from '../../game/state/notifications.svelte';
   import type { SystemId } from '../../game/types';
@@ -62,6 +64,19 @@
   // Quests ready to turn in.
   const questsReady = $derived(QUESTS.filter((q) => questStatus(q) === 'ready').length);
 
+  // Shop boosts that are running, with minutes left (a coarse clock is enough).
+  let clock = $state(Date.now());
+  $effect(() => {
+    const id = setInterval(() => (clock = Date.now()), 5000);
+    return () => clearInterval(id);
+  });
+  const BOOST_SHORT = { xp: 'XP', bits: 'Bits', egg: 'Eggs' } as const;
+  const runningBoosts = $derived(
+    BOOSTS.map((b) => ({ ...b, short: BOOST_SHORT[b.id], minutes: Math.ceil(boostRemainingMs(b.id, clock) / 60_000) })).filter(
+      (b) => b.minutes > 0
+    )
+  );
+
   // The tab title, for players idling in another tab: what's waiting for
   // them first, else where they're fighting. Restored when leaving the game.
   const tabTitle = $derived.by(() => {
@@ -85,6 +100,9 @@
   <div class="currency-row">
     <CurrencyPill kind="bits" value={currency.bits} />
     <CurrencyPill kind="data" value={currency.data} />
+    {#each runningBoosts as boost (boost.id)}
+      <span class="boost" title="{boost.name}: {boost.description} - {boost.minutes} min left">⚡ {boost.short} {boost.minutes}m</span>
+    {/each}
   </div>
   <EvolutionBadgeButton onClick={onOpenEvolution} />
   <RosterButton onClick={onOpenRoster} />
@@ -167,5 +185,16 @@
     display: flex;
     gap: 12px;
     margin-left: auto;
+  }
+  .boost {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--pos);
+    border: 1px solid var(--pos);
+    background: var(--pos-soft);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
 </style>

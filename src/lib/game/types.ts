@@ -46,7 +46,28 @@ export type EggType =
 
 /** A plain string union - adding a new item is a new member here plus a
  * matching ITEM_CATALOG entry (see src/lib/game/items/itemCatalog.ts). */
-export type ItemId = 'attack-chip' | 'speed-chip' | 'hp-disk';
+export type ItemId = 'attack-chip' | 'speed-chip' | 'hp-disk' | DigiMeatId;
+
+/** Digi-Meat tiers - fed to one Digimon for flat XP (state/shop.svelte.ts). */
+export type DigiMeatId = 'meat-small' | 'meat' | 'meat-giant' | 'meat-prime';
+
+/** Timed Shop boosts: kill XP, kill Bits, egg incubation XP. */
+export type BoostId = 'xp' | 'bits' | 'egg';
+
+/** Permanent Shop upgrades (bought tiers). */
+export type ShopUpgradeId = 'expedition-slot' | 'click-power';
+
+export interface ShopState {
+  /** When each boost runs out (ms timestamp; 0 = never bought). */
+  boostEndsAt: Record<BoostId, number>;
+  /** Times each boost was bought at full price - drives its next price. */
+  boostPurchases: Record<BoostId, number>;
+  upgrades: Record<ShopUpgradeId, number>;
+  /** The deal window the `bought` list belongs to (floor(now / window)). */
+  dealWindow: number;
+  /** Indexes of this window's deals already bought. */
+  dealsBought: number[];
+}
 
 export interface ItemDefinition {
   id: ItemId;

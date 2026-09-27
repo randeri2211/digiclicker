@@ -1,9 +1,33 @@
 <script lang="ts">
-  import type { EggType, ItemId } from '../game/types';
-  import { currency, buyItem, canAffordItem, ITEM_CATALOG, buyMysteryEgg, isSystemUnlocked, lockedHint } from '../game/state/game.svelte';
+  import type { EggType } from '../game/types';
+  import {
+    currency,
+    inventory,
+    ITEM_CATALOG,
+    buyItem,
+    canAffordItem,
+    buyMysteryEgg,
+    isSystemUnlocked,
+    lockedHint,
+    MEAT_IDS,
+    BOOSTS,
+    boostRemainingMs,
+    boostCost,
+    canExtendBoost,
+    buyBoost,
+    UPGRADES,
+    upgradeCost,
+    buyUpgrade,
+    shop,
+    getDeals,
+    isDealBought,
+    buyDeal,
+    dealWindowEndsAt,
+  } from '../game/state/game.svelte';
+  import type { BoostId } from '../game/types';
   import { MYSTERY_EGG_WEIGHTS } from '../game/eggs/mysteryEggs';
   import { getEggSpriteUrl } from '../game/images';
-  import { MYSTERY_EGG_COST_BITS } from '../game/constants';
+  import { MYSTERY_EGG_COST_BITS, SHOP_BOOST_MINUTES, SHOP_BOOST_MAX_BANKED_MINUTES } from '../game/constants';
 
   interface Props {
     onClose: () => void;
@@ -11,17 +35,30 @@
 
   const { onClose }: Props = $props();
 
-  // Only items with a price - boss chips etc. are found, not sold.
-  const itemEntries = Object.values(ITEM_CATALOG).filter((item) => item.costBits !== null);
+  // A 1s clock for boost timers and the deal countdown (deals also roll
+  // over while the Shop is open).
+  let now = $state(Date.now());
+  $effect(() => {
+    const id = setInterval(() => (now = Date.now()), 1000);
+    return () => clearInterval(id);
+  });
+
+  const shopOpen = $derived(isSystemUnlocked('shop'));
+  // Boost deal prices follow the boost's own price, so re-read on purchases.
+  const deals = $derived.by(() => {
+    void [shop.boostPurchases.xp, shop.boostPurchases.bits, shop.boostPurchases.egg];
+    return getDeals(now);
+  });
   const eggTypes = Object.keys(MYSTERY_EGG_WEIGHTS) as EggType[];
 
-  function handleBuyItem(id: ItemId) {
-    buyItem(id);
+  function formatMs(ms: number): string {
+    const total = Math.max(0, Math.ceil(ms / 1000));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const sec = total % 60;
+    return h > 0 ? `${h}h ${m}m` : `${m}m ${sec.toString().padStart(2, '0')}s`;
   }
-
-  function handleBuyEgg(eggType: EggType) {
-    buyMysteryEgg(eggType);
-  }
+  const bits = (n: number) => `${n.toLocaleString()} bits`;
 
   $effect(() => {
     function handleKeydown(e: KeyboardEvent) {
@@ -39,77 +76,123 @@
   role="button"
   tabindex="0"
 >
-  <div
-    class="panel"
-    onclick={(e) => e.stopPropagation()}
-    onkeydown={(e) => e.stopPropagation()}
-    role="dialog"
-    tabindex="-1"
-  >
+  <div class="panel" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()} role="dialog" tabindex="-1">
     <div class="panel-header">
       <div class="panel-title">Shop</div>
-      <div class="bits-note">You have {currency.bits} bits.</div>
+      <div class="bits-note">You have {bits(Math.floor(currency.bits))}.</div>
       <button class="close-btn" onclick={onClose}>Close</button>
     </div>
 
-    <div class="section">
-      <div class="section-title">Items</div>
-      {#if !isSystemUnlocked('shop')}
-        <div class="locked-note">🔒 {lockedHint('shop')}</div>
-      {:else if itemEntries.length === 0}
-        <div class="locked-note">
-          Nothing on the shelves yet. Ability rerolls are a service now: open a Digimon's menu and pick
-          <b>Reroll ability…</b>
+    {#if !shopOpen}
+      <div class="locked-note">🔒 {lockedHint('shop')}</div>
+    {:else}
+      <div class="section">
+        <div class="section-title">Deals <span class="dim">- new ones in {formatMs(dealWindowEndsAt(now) - now)}; each can be bought once</span></div>
+        <div class="grid">
+          {#each deals as deal, i (i)}
+            {@const bought = isDealBought(i, now)}
+            {@const blocked = bought || currency.bits < deal.price || (deal.kind === 'boost' && !canExtendBoost(deal.id as BoostId, now))}
+            <div class="card deal" class:bought class:chip={deal.kind === 'chip'}>
+              <div class="card-name">{deal.name}</div>
+              <div class="card-desc">{deal.description}</div>
+              <div class="card-cost">{bits(deal.price)}</div>
+              <button class="buy-btn" class:blocked disabled={blocked} onclick={() => buyDeal(i, now)}>
+                {bought ? 'Bought' : 'Buy'}
+              </button>
+            </div>
+          {/each}
         </div>
-      {:else}
-      <div class="grid">
-        {#each itemEntries as item (item.id)}
-          {@const affordable = canAffordItem(item.id)}
-          <div class="card">
-            <div class="card-name">{item.name}</div>
-            <div class="card-desc">{item.description}</div>
-            <div class="card-cost">{item.costBits} bits</div>
-            <button
-              class="buy-btn"
-              class:blocked={!affordable}
-              disabled={!affordable}
-              onclick={() => handleBuyItem(item.id)}
-            >
-              Buy
-            </button>
-          </div>
-        {/each}
       </div>
-      {/if}
-    </div>
+
+      <div class="section">
+        <div class="section-title">Digi-Meat <span class="dim">- feed it from a Digimon's menu</span></div>
+        <div class="grid">
+          {#each MEAT_IDS as id (id)}
+            {@const item = ITEM_CATALOG[id]}
+            {@const affordable = canAffordItem(id)}
+            <div class="card">
+              <div class="card-name">{item.name} <span class="owned">×{inventory[id]}</span></div>
+              <div class="card-desc">{item.description}</div>
+              <div class="card-cost">{bits(item.costBits ?? 0)}</div>
+              <button class="buy-btn" class:blocked={!affordable} disabled={!affordable} onclick={() => buyItem(id)}>Buy</button>
+            </div>
+          {/each}
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          Boosts <span class="dim">- +{SHOP_BOOST_MINUTES} min each, up to {SHOP_BOOST_MAX_BANKED_MINUTES / 60}h banked; they keep running while you're away</span>
+        </div>
+        <div class="grid">
+          {#each BOOSTS as boost (boost.id)}
+            {@const left = boostRemainingMs(boost.id, now)}
+            {@const cost = boostCost(boost.id)}
+            {@const full = !canExtendBoost(boost.id, now)}
+            <div class="card" class:running={left > 0}>
+              <div class="card-name">{boost.name}</div>
+              <div class="card-desc">{boost.description} for {SHOP_BOOST_MINUTES} min.</div>
+              <div class="timer">{left > 0 ? `Running · ${formatMs(left)} left` : 'Not running'}</div>
+              <div class="card-cost">{bits(cost)}</div>
+              <button
+                class="buy-btn"
+                class:blocked={full || currency.bits < cost}
+                disabled={full || currency.bits < cost}
+                onclick={() => buyBoost(boost.id, now)}
+              >
+                {full ? 'Fully banked' : left > 0 ? 'Extend' : 'Buy'}
+              </button>
+            </div>
+          {/each}
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Upgrades <span class="dim">- permanent</span></div>
+        <div class="grid">
+          {#each UPGRADES as upgrade (upgrade.id)}
+            {@const cost = upgradeCost(upgrade.id)}
+            {@const tier = shop.upgrades[upgrade.id]}
+            <div class="card">
+              <div class="card-name">
+                {upgrade.name}{#if upgrade.maxTier > 1}&nbsp;<span class="owned">{tier}/{upgrade.maxTier}</span>{/if}
+              </div>
+              <div class="card-desc">{upgrade.description}</div>
+              <div class="card-cost">{cost === null ? 'Owned' : bits(cost)}</div>
+              <button
+                class="buy-btn"
+                class:blocked={cost === null || currency.bits < cost}
+                disabled={cost === null || currency.bits < cost}
+                onclick={() => buyUpgrade(upgrade.id)}
+              >
+                {cost === null ? 'Maxed' : 'Buy'}
+              </button>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
 
     <div class="section">
       <div class="section-title">Digi-Eggs</div>
       {#if !isSystemUnlocked('mystery-eggs')}
         <div class="locked-note">🔒 {lockedHint('mystery-eggs')}</div>
       {:else}
-      <div class="grid">
-        {#each eggTypes as eggType (eggType)}
-          {@const affordable = currency.bits >= MYSTERY_EGG_COST_BITS}
-          <div class="card">
-            <div class="card-sprite">
-              <img src={getEggSpriteUrl(eggType)} alt="" />
-              <span class="mystery-badge">?</span>
+        <div class="grid">
+          {#each eggTypes as eggType (eggType)}
+            {@const affordable = currency.bits >= MYSTERY_EGG_COST_BITS}
+            <div class="card">
+              <div class="card-sprite">
+                <img src={getEggSpriteUrl(eggType)} alt="" />
+                <span class="mystery-badge">?</span>
+              </div>
+              <div class="card-name">Mystery {eggType} Digi-Egg</div>
+              <div class="card-desc">Hatches into a random {eggType}-flavored Fresh Digimon.</div>
+              <div class="card-cost">{bits(MYSTERY_EGG_COST_BITS)}</div>
+              <button class="buy-btn" class:blocked={!affordable} disabled={!affordable} onclick={() => buyMysteryEgg(eggType)}>Buy</button>
             </div>
-            <div class="card-name">Mystery {eggType} Digi-Egg</div>
-            <div class="card-desc">Hatches into a random {eggType}-flavored Fresh Digimon.</div>
-            <div class="card-cost">{MYSTERY_EGG_COST_BITS} bits</div>
-            <button
-              class="buy-btn"
-              class:blocked={!affordable}
-              disabled={!affordable}
-              onclick={() => handleBuyEgg(eggType)}
-            >
-              Buy
-            </button>
-          </div>
-        {/each}
-      </div>
+          {/each}
+        </div>
       {/if}
     </div>
   </div>
@@ -263,5 +346,35 @@
   .buy-btn.blocked {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  .dim {
+    color: var(--text-dim);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .owned {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+  }
+  .timer {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .card.running {
+    border-color: var(--pos);
+  }
+  .card.running .timer {
+    color: var(--pos);
+  }
+  .card.deal {
+    border-color: var(--accent);
+  }
+  .card.deal.chip {
+    border-color: var(--warn);
+  }
+  .card.deal.bought {
+    opacity: 0.55;
   }
 </style>

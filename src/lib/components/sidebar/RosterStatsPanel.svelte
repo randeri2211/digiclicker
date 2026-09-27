@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { RosterEntry } from '../../game/types';
+  import { clickPowerFactor } from '../../game/state/shop.svelte';
   import { getSpeciesName, getSpriteUrl, getSpecies } from '../../game/images';
   import RosterFilterControls from '../shared/RosterFilterControls.svelte';
   import ElementIcon from '../shared/ElementIcon.svelte';
@@ -34,7 +35,7 @@
   const totalDps = $derived(computeRosterDps(entries));
   const attacksPerSecond = $derived(computeAttacksPerSecond(entries));
   const damagePerHit = $derived(computeRosterDamagePerHit(entries));
-  const clickDamage = $derived(computeClickDamage(entries));
+  const clickDamage = $derived(computeClickDamage(entries) * clickPowerFactor());
 
   const totals = $derived({
     attack: computeRosterStatTotal(entries, 'attack'),
